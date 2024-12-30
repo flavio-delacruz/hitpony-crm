@@ -1,5 +1,4 @@
-import { Grid, Card, Typography } from "@mui/material";
-import { styled } from "@mui/system";
+import { Grid } from "@mui/material";
 import UserTable from "../../components/userTable/userTable";
 import OrdersList from "../../components/ordersList/ordersList";
 import Layout from "../../components/layout/layout";

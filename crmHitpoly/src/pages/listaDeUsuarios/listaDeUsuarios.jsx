@@ -18,24 +18,26 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import Layout from "../../components/layout/layout";
 import TablaUsuarios from "../../components/tablaUsuarios/tablaUsuarios";
 import NavBar from "../../components/navBar/NavBar";
-import HeaderUsuarios from "../../components/headerUsuarios/headerUsuarios";
+import UserListHeader from "../../components/headers/userListHeader/userListHeader";
 
 const ListaDeUsuarios = () => {
-  const [search, setSearch] = useState("");
+  const handleAddNew = () => {
+    console.log("Agregar Nuevo clickeado");
+  };
 
-  const handleSearch = (event) => {
-    setSearch(event.target.value);
+  const handleShareForm = () => {
+    console.log("Compartir Formulario clickeado");
   };
 
   return (
     <Layout>
       <Box sx={{}}>
-        {/* Toolbar */}
-        <HeaderUsuarios
-          pageTitle="Lista de Usuarios"
-          userCount={5}
+        <UserListHeader
+          pageName="Lista de Usuarios"
+          userCount={25}
+          onAddNew={handleAddNew}
+          onShareForm={handleShareForm}
         />
-
         {/* Campo de búsqueda y filtro */}
 
         {/* Tabla */}
