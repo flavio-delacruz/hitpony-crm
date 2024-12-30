@@ -21,8 +21,8 @@ const buttons = [
   { text: "Dashboard", icon: DashboardIcon, path: "/dashboard" },
   { text: "Lista de Usuarios", icon: PeopleIcon, path: "/usuarios" },
   { text: "Contacto", icon: ContactPageIcon, path: "/contact" },
-  { text: "Afiliado", icon: AccountCircleIcon, path: "/affiliate" },
-  { text: "Metricas", icon: BackupTableIcon, path: "/metrics" },
+  { text: "Perfil", icon: AccountCircleIcon, path: "/perfil" },
+  { text: "Metricas", icon: BackupTableIcon, path: "/metricas" },
 ];
 
 const SideBar = () => {

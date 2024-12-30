@@ -4,7 +4,9 @@ import Dashboard from "./pages/dashboardPage/dashboardPage";
 import InfoContacto from "./components/infoContacto/infoContacto";
 import InfoAfiliados from "./components/infoDelAfiliado/infoAfiliado";
 import ListaDeUsuarios from "./pages/listaDeUsuarios/listaDeUsuarios";
+import AffiliateProfilePage from "./pages/affiliateProfilePage/affiliateProfilePage";
 import PaginaCrm from "./components/paginaCrm/paginaCrm";
+import MetricasPage from "./pages/metricasPage/metricasPage";
 
 function App() {
   return (
@@ -23,12 +25,12 @@ function App() {
           element={<ListaDeUsuarios />}
         />
         <Route
-          path="/afiliados"
-          element={<InfoAfiliados />}
+          path="/perfil"
+          element={<AffiliateProfilePage />}
         />
         <Route
           path="/metricas"
-          element={<ListaDeUsuarios />}
+          element={<MetricasPage />}
         />
         <Route
           path="/pagina"
