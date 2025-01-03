@@ -29,7 +29,12 @@ const SideBar = () => {
   return (
     <Sidebar sx={{ margin: "20px" }}>
       <Typography
-        sx={{ fontWeight: "bold", color: "#FFF" }}
+        sx={{
+          fontWeight: "bold",
+          color: "#FFF",
+          padding: "30px",
+          textAlign: "center",
+        }}
         variant="h5"
         gutterBottom
       >

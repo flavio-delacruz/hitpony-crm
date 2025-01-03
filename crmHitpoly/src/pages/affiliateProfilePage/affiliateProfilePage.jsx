@@ -14,138 +14,154 @@ const AffiliateProfilePage = () => {
     <Layout>
       <Box
         sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          border: "1px solid #ccc",
-          borderRadius: 2,
-          padding: 2,
-          maxWidth: "100%",
-          height: "80vh",
+          with: "100%",
+          height: "auto",
+          backgroundColor: "#FFF",
           margin: "auto",
-          backgroundColor: "#fff",
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          padding: "20px",
+          borderRadius: "15px",
         }}
       >
-        {/* Left Side */}
-        <Box
-          sx={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            marginRight: { md: 2 },
-          }}
+        <Grid
+          container
+          spacing={2}
         >
-          <Avatar
-            sx={{
-              width: 100,
-              height: 100,
-              marginBottom: 2,
-            }}
-          />
-          <Typography
-            variant="h6"
-            gutterBottom
-          >
-            Afiliado Profile
-          </Typography>
-          <Typography variant="body1">Elmer Coro Huaman</Typography>
-          <Typography variant="body2">corohuamanelmer@gmail.com</Typography>
-          <Typography variant="body2">976 367 567</Typography>
-        </Box>
-
-        <Divider
-          orientation="vertical"
-          flexItem
-          sx={{ display: { xs: "none", md: "block" } }}
-        />
-
-        {/* Right Side */}
-        <Box
-          sx={{
-            flex: 2,
-            display: "flex",
-            flexDirection: "column",
-            marginTop: { xs: 2, md: 0 },
-          }}
-        >
-          <Typography
-            variant="h6"
-            gutterBottom
-          >
-            Edition Information
-          </Typography>
-
+          {/* Imagen y nombre */}
           <Grid
-            container
-            spacing={2}
+            item
+            xs={3}
           >
-            <Grid
-              item
-              xs={12}
-              md={6}
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                backgroundColor: "#f0f0f0",
+                borderRadius: "50%",
+                margin: "auto",
+              }}
+            />
+            <Typography
+              variant="h6"
+              align="center"
+              mt={2}
             >
-              <TextField
-                fullWidth
-                label="Nombre"
-                variant="outlined"
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              md={6}
-            >
-              <TextField
-                fullWidth
-                label="Correo"
-                variant="outlined"
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              md={6}
-            >
-              <TextField
-                fullWidth
-                label="Telefono"
-                variant="outlined"
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              md={6}
-            >
-              <TextField
-                fullWidth
-                label="Ciudad"
-                variant="outlined"
-              />
-            </Grid>
+              Elmer Coro Huaman
+            </Typography>
           </Grid>
 
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: 3,
-            }}
+          {/* Biografía */}
+          <Grid
+            item
+            xs={9}
           >
-            <Button
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+            >
+              Biografía
+            </Typography>
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
               variant="outlined"
-              color="secondary"
+              placeholder="Breve biografía de la persona..."
+            />
+          </Grid>
+
+          {/* Frase */}
+          <Grid
+            item
+            xs={12}
+          >
+            <Typography
+              variant="subtitle1"
+              gutterBottom
             >
-              Restablecer
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
+              Frase
+            </Typography>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Frase que describe a la persona"
+            />
+          </Grid>
+
+          {/* Datos personales */}
+          <Grid
+            item
+            xs={6}
+          >
+            <Typography
+              variant="subtitle1"
+              gutterBottom
             >
-              Guardar
-            </Button>
-          </Box>
-        </Box>
+              Datos Personales
+            </Typography>
+            <ul>
+              <li>Edad: __ años</li>
+              <li>Profesión: __</li>
+              <li>Estado civil: __</li>
+              <li>Ciudad: __</li>
+              <li>Arquetipo: __</li>
+            </ul>
+          </Grid>
+
+          {/* Personalidad */}
+          <Grid
+            item
+            xs={6}
+          >
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+            >
+              Personalidad
+            </Typography>
+            <ul>
+              <li>Característica 1</li>
+              <li>Característica 2</li>
+              <li>Característica 3</li>
+            </ul>
+          </Grid>
+
+          {/* Objetivos */}
+          <Grid
+            item
+            xs={6}
+          >
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+            >
+              Objetivos
+            </Typography>
+            <ul>
+              <li>Objetivo 1</li>
+              <li>Objetivo 2</li>
+              <li>Objetivo 3</li>
+            </ul>
+          </Grid>
+
+          {/* Frustraciones */}
+          <Grid
+            item
+            xs={6}
+          >
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+            >
+              Frustraciones
+            </Typography>
+            <ul>
+              <li>Frustración 1</li>
+              <li>Frustración 2</li>
+              <li>Frustración 3</li>
+            </ul>
+          </Grid>
+        </Grid>
       </Box>
     </Layout>
   );

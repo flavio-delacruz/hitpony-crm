@@ -31,7 +31,7 @@ const UserListPage = () => {
 
   return (
     <Layout>
-      <Box sx={{}}>
+      <Box sx={{ padding: "0" }}>
         <UserListHeader
           pageName="Lista de Usuarios"
           userCount={25}
