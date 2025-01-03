@@ -16,25 +16,25 @@ const DashboardPage = () => {
         mb={4}
       >
         <InfoCard
-          title="Today's Money"
+          title="Dinero del dia"
           amount="$53k"
-          percentage="+55% than last week"
+          percentage="+55% respecto a la semana pasada"
           percentageColor="textSecondary"
         />
         <InfoCard
-          title="Today's Users"
+          title="Usuarios del Día"
           amount="2,300"
-          percentage="+3% than last month"
+          percentage="+3% respecto al mes pasado"
         />
         <InfoCard
-          title="New Clients"
+          title="Nuevos Clientes"
           amount="3,462"
-          percentage="-2% than yesterday"
+          percentage="-2% respecto a ayer"
         />
         <InfoCard
-          title="Sales"
+          title="Ventas"
           amount="$103,430"
-          percentage="+5% than yesterday"
+          percentage="+5% respecto a ayer"
         />
       </Grid>
       {/* Cards Row 2 */}
@@ -51,8 +51,9 @@ const DashboardPage = () => {
             { data: [60, 50, 15, 25] },
           ]}
           xAxis={[{ data: ["Q1", "Q2", "Q3", "Q4"], scaleType: "band" }]}
-          title="Website Views"
-          subtitle="Last Campaign Performance"
+          titleChart="Reporte de Usuarios"
+          title="Número total de usuarios registrados"
+          subtitle="Resumen de los usuarios activos/inactivos más recientes"
         />
         <ChartCard
           series={[
@@ -62,8 +63,9 @@ const DashboardPage = () => {
             { data: [60, 50, 15, 25] },
           ]}
           xAxis={[{ data: ["Q1", "Q2", "Q3", "Q4"], scaleType: "band" }]}
-          title="Daily Sales"
-          subtitle=" (+15%) increase in today sales."
+          titleChart="Estado de Leads"
+          title="Cantidad de leads distribuidos..."
+          subtitle=" +15% leads gestionados hoy"
         />
         <ChartCard
           series={[
@@ -73,8 +75,9 @@ const DashboardPage = () => {
             { data: [60, 50, 15, 25] },
           ]}
           xAxis={[{ data: ["Q1", "Q2", "Q3", "Q4"], scaleType: "band" }]}
-          title="Completed Tasks"
-          subtitle="Last Campaign Performance"
+          titleChart="Métricas de Ventas"
+          title="Incremento porcentual en ventas"
+          subtitle="Progreso respecto al objetivo mensual"
         />
       </Grid>
 
@@ -84,15 +87,15 @@ const DashboardPage = () => {
         spacing={2}
       >
         <ContentCard
-          title="Projects"
-          subtitle="30 done this month"
+          title="Lista de Usuarios"
+          subtitle="30 usuarios que han interactuado recientemente"
           gridSize={8}
         >
           <UserTable />
         </ContentCard>
         <ContentCard
-          title="Orders Overview"
-          subtitle="24 new orders"
+          title="Resumen de Leads"
+          subtitle="Cantidad de leads capturados hoy"
           gridSize={4}
         >
           <OrdersList />

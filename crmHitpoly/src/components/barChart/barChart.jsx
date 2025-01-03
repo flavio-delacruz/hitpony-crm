@@ -19,7 +19,7 @@ ChartJS.register(
   Legend
 );
 
-const BarChart = () => {
+const BarChart = ({ titleChart }) => {
   const data = {
     labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo"],
     datasets: [
@@ -55,7 +55,7 @@ const BarChart = () => {
           component="div"
           gutterBottom
         >
-          Reporte de Ventas
+          {titleChart}
         </Typography>
         <Bar
           data={data}

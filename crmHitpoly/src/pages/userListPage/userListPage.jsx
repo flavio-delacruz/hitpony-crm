@@ -20,7 +20,7 @@ import TablaUsuarios from "../../components/tablaUsuarios/tablaUsuarios";
 import NavBar from "../../components/navBar/NavBar";
 import UserListHeader from "../../components/headers/userListHeader/userListHeader";
 
-const ListaDeUsuarios = () => {
+const UserListPage = () => {
   const handleAddNew = () => {
     console.log("Agregar Nuevo clickeado");
   };
@@ -73,4 +73,4 @@ const ListaDeUsuarios = () => {
   );
 };
 
-export default ListaDeUsuarios;
+export default UserListPage;

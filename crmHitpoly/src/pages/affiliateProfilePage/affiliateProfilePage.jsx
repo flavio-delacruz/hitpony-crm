@@ -19,7 +19,8 @@ const AffiliateProfilePage = () => {
           border: "1px solid #ccc",
           borderRadius: 2,
           padding: 2,
-          maxWidth: 800,
+          maxWidth: "100%",
+          height: "80vh",
           margin: "auto",
           backgroundColor: "#fff",
         }}

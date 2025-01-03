@@ -16,13 +16,30 @@ const UserTable = () => {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const users = [
-    { id: 1, name: "Juan Pérez", email: "juan.perez@example.com", age: 25 },
-    { id: 2, name: "Ana López", email: "ana.lopez@example.com", age: 30 },
-    { id: 3, name: "Carlos Ruiz", email: "carlos.ruiz@example.com", age: 35 },
-    { id: 4, name: "María Gómez", email: "maria.gomez@example.com", age: 28 },
-    { id: 5, name: "Luis Torres", email: "luis.torres@example.com", age: 22 },
-    { id: 6, name: "Sofía García", email: "sofia.garcia@example.com", age: 27 },
-    { id: 7, name: "Pedro Díaz", email: "pedro.diaz@example.com", age: 32 },
+    {
+      id: 1,
+      name: "Juan Pérez",
+      email: "juan.perez@example.com",
+      ultima_actividad: "Hace 2 días",
+    },
+    {
+      id: 1,
+      name: "Juan Pérez",
+      email: "juan.perez@example.com",
+      ultima_actividad: "Hace 5 horas",
+    },
+    {
+      id: 1,
+      name: "Juan Pérez",
+      email: "juan.perez@example.com",
+      ultima_actividad: "Hace 1 semana",
+    },
+    {
+      id: 1,
+      name: "Juan Pérez",
+      email: "juan.perez@example.com",
+      ultima_actividad: "Hace 4 dias",
+    },
   ];
 
   const handleChangePage = (event, newPage) => {
@@ -35,10 +52,11 @@ const UserTable = () => {
   };
 
   return (
-    <Paper sx={{ width: "100%", margin: "20px auto", padding: "20px" }}>
+    <Paper sx={{ width: "auto", margin: "20px auto", padding: "20px" }}>
       <Typography
         variant="h5"
         component="div"
+        sx={{ fontWeight: "bold" }}
         gutterBottom
       >
         Lista de Usuarios
@@ -50,7 +68,7 @@ const UserTable = () => {
               <TableCell>ID</TableCell>
               <TableCell>Nombre</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell>Edad</TableCell>
+              <TableCell>Ultima Actividad</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -61,7 +79,7 @@ const UserTable = () => {
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.age}</TableCell>
+                  <TableCell>{user.ultima_actividad}</TableCell>
                 </TableRow>
               ))}
           </TableBody>
