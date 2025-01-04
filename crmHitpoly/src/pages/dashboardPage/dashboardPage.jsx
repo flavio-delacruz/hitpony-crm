@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material";
-import UserTable from "../../components/userTable/userTable";
-import OrdersList from "../../components/ordersList/ordersList";
+import UserTable from "../../components/tables/userTable/userTable";
+import OrdersList from "../../components/cards/ordersList/ordersList";
 import Layout from "../../components/layout/layout";
 import InfoCard from "../../components/cards/infoCard/infoCard";
 import ChartCard from "../../components/cards/chartCard/chartCard";

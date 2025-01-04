@@ -1,24 +1,7 @@
-import { useState } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-  Toolbar,
-  Typography,
-} from "@mui/material";
-import FilterListIcon from "@mui/icons-material/FilterList";
+import { Box } from "@mui/material";
 import Layout from "../../components/layout/layout";
-import TablaUsuarios from "../../components/tablaUsuarios/tablaUsuarios";
-import NavBar from "../../components/navBar/NavBar";
 import UserListHeader from "../../components/headers/userListHeader/userListHeader";
+import DataTable from "../../components/tables/userDataTable/userDataTable";
 
 const UserListPage = () => {
   const handleAddNew = () => {
@@ -38,36 +21,9 @@ const UserListPage = () => {
           onAddNew={handleAddNew}
           onShareForm={handleShareForm}
         />
-        {/* Campo de búsqueda y filtro */}
 
         {/* Tabla */}
-        <TablaUsuarios />
-        {/*
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Apellidos</TableCell>
-                <TableCell>Teléfono</TableCell>
-                <TableCell>Correo electrónico</TableCell>
-                <TableCell>Propietario del contacto</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredUsers.map((user, index) => (
-                <TableRow key={index}>
-                  <TableCell>{user.nombre}</TableCell>
-                  <TableCell>{user.apellidos}</TableCell>
-                  <TableCell>{user.telefono}</TableCell>
-                  <TableCell>{user.correo}</TableCell>
-                  <TableCell>{user.propietario}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        */}
+        <DataTable />
       </Box>
     </Layout>
   );

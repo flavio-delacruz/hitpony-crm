@@ -13,7 +13,7 @@ const modalStyle = {
   borderRadius: "10px",
 };
 
-const EditModal = () => {
+const AddModal = () => {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     nombre: "",
@@ -32,7 +32,14 @@ const EditModal = () => {
   const handleClose = () => setOpen(false);
 
   const handleSubmit = () => {
-    console.log("Información actualizada:", formData);
+    console.log("Nueva información agregada:", formData);
+    setFormData({
+      nombre: "",
+      apellidos: "",
+      correo: "",
+      telefono: "",
+      direccion: "",
+    });
     handleClose();
   };
 
@@ -40,10 +47,10 @@ const EditModal = () => {
     <div>
       <Button
         variant="contained"
-        color="primary"
+        color="success"
         onClick={handleOpen}
       >
-        Editar Información
+        Añadir Nuevo
       </Button>
       <Modal
         open={open}
@@ -55,7 +62,7 @@ const EditModal = () => {
             component="h2"
             sx={{ mb: 2, textAlign: "center" }}
           >
-            Editar Información Personal
+            Añadir Información Personal
           </Typography>
           <Grid
             container
@@ -135,7 +142,7 @@ const EditModal = () => {
             </Button>
             <Button
               variant="contained"
-              color="primary"
+              color="success"
               onClick={handleSubmit}
             >
               Guardar
@@ -147,4 +154,4 @@ const EditModal = () => {
   );
 };
 
-export default EditModal;
+export default AddModal;

@@ -8,7 +8,6 @@ import {
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import CodeIcon from "@mui/icons-material/Code";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
 
 const OrdersList = () => {
   const orders = [

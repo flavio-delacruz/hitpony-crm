@@ -1,167 +1,196 @@
+import { useState } from "react";
 import {
   Box,
-  TextField,
   Typography,
   Button,
-  Avatar,
+  TextField,
+  Modal,
   Grid,
-  Divider,
+  Avatar,
+  Card,
+  CardContent,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import Layout from "../../components/layout/layout";
 
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: "10px",
+};
+
 const AffiliateProfilePage = () => {
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    nombre: "Karol Juárez",
+    apellidos: "Castro",
+    correo: "karol.juarez@example.com",
+    telefono: "987654321",
+    direccion: "Av. Siempre Viva 123",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const handleSubmit = () => {
+    console.log("Información actualizada:", formData);
+    handleClose();
+  };
+
   return (
     <Layout>
-      <Box
-        sx={{
-          with: "100%",
-          height: "auto",
-          backgroundColor: "#FFF",
-          margin: "auto",
-          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-          padding: "20px",
-          borderRadius: "15px",
-        }}
-      >
-        <Grid
-          container
-          spacing={2}
-        >
-          {/* Imagen y nombre */}
-          <Grid
-            item
-            xs={3}
-          >
-            <Box
-              sx={{
-                width: 80,
-                height: 80,
-                backgroundColor: "#f0f0f0",
-                borderRadius: "50%",
-                margin: "auto",
-              }}
-            />
+      <Box sx={{ p: 4 }}>
+        <Card sx={{ maxWidth: 400, mx: "auto", boxShadow: 3 }}>
+          <CardContent>
+            <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+              <Avatar sx={{ width: 100, height: 100 }}>KJ</Avatar>
+            </Box>
             <Typography
               variant="h6"
               align="center"
-              mt={2}
-            >
-              Elmer Coro Huaman
-            </Typography>
-          </Grid>
-
-          {/* Biografía */}
-          <Grid
-            item
-            xs={9}
-          >
+            >{`${formData.nombre} ${formData.apellidos}`}</Typography>
             <Typography
-              variant="subtitle1"
-              gutterBottom
+              variant="body2"
+              align="center"
+              color="text.secondary"
             >
-              Biografía
+              {formData.correo}
             </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              variant="outlined"
-              placeholder="Breve biografía de la persona..."
-            />
-          </Grid>
-
-          {/* Frase */}
-          <Grid
-            item
-            xs={12}
-          >
             <Typography
-              variant="subtitle1"
-              gutterBottom
-            >
-              Frase
-            </Typography>
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Frase que describe a la persona"
-            />
-          </Grid>
-
-          {/* Datos personales */}
-          <Grid
-            item
-            xs={6}
-          >
+              variant="body2"
+              align="center"
+              color="text.secondary"
+            >{`Teléfono: ${formData.telefono}`}</Typography>
             <Typography
-              variant="subtitle1"
-              gutterBottom
+              variant="body2"
+              align="center"
+              color="text.secondary"
+            >{`Dirección: ${formData.direccion}`}</Typography>
+            <Box
+              mt={3}
+              sx={{ display: "flex", justifyContent: "center" }}
             >
-              Datos Personales
-            </Typography>
-            <ul>
-              <li>Edad: __ años</li>
-              <li>Profesión: __</li>
-              <li>Estado civil: __</li>
-              <li>Ciudad: __</li>
-              <li>Arquetipo: __</li>
-            </ul>
-          </Grid>
+              <Button
+                variant="contained"
+                startIcon={<EditIcon />}
+                onClick={handleOpen}
+              >
+                Editar Perfil
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
 
-          {/* Personalidad */}
-          <Grid
-            item
-            xs={6}
-          >
+        {/* Modal para editar información */}
+        <Modal
+          open={open}
+          onClose={handleClose}
+        >
+          <Box sx={modalStyle}>
             <Typography
-              variant="subtitle1"
-              gutterBottom
+              variant="h6"
+              component="h2"
+              sx={{ mb: 2, textAlign: "center" }}
             >
-              Personalidad
+              Editar Información Personal
             </Typography>
-            <ul>
-              <li>Característica 1</li>
-              <li>Característica 2</li>
-              <li>Característica 3</li>
-            </ul>
-          </Grid>
-
-          {/* Objetivos */}
-          <Grid
-            item
-            xs={6}
-          >
-            <Typography
-              variant="subtitle1"
-              gutterBottom
+            <Grid
+              container
+              spacing={2}
             >
-              Objetivos
-            </Typography>
-            <ul>
-              <li>Objetivo 1</li>
-              <li>Objetivo 2</li>
-              <li>Objetivo 3</li>
-            </ul>
-          </Grid>
-
-          {/* Frustraciones */}
-          <Grid
-            item
-            xs={6}
-          >
-            <Typography
-              variant="subtitle1"
-              gutterBottom
+              <Grid
+                item
+                xs={12}
+              >
+                <TextField
+                  fullWidth
+                  label="Nombre"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <TextField
+                  fullWidth
+                  label="Apellidos"
+                  name="apellidos"
+                  value={formData.apellidos}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <TextField
+                  fullWidth
+                  label="Correo"
+                  name="correo"
+                  value={formData.correo}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <TextField
+                  fullWidth
+                  label="Teléfono"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <TextField
+                  fullWidth
+                  label="Dirección"
+                  name="direccion"
+                  value={formData.direccion}
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Grid>
+            <Box
+              mt={3}
+              sx={{ display: "flex", justifyContent: "space-between" }}
             >
-              Frustraciones
-            </Typography>
-            <ul>
-              <li>Frustración 1</li>
-              <li>Frustración 2</li>
-              <li>Frustración 3</li>
-            </ul>
-          </Grid>
-        </Grid>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleClose}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+              >
+                Guardar
+              </Button>
+            </Box>
+          </Box>
+        </Modal>
       </Box>
     </Layout>
   );

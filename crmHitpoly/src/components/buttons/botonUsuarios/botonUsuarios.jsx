@@ -1,4 +1,3 @@
-// Importa las dependencias necesarias
 import Button from "@mui/material/Button";
 
 const BotonUsuarios = ({ text, icon: Icon, backgroundColor }) => {

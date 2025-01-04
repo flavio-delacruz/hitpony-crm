@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { styled } from "@mui/system";
 import SideBar from "../sideBar/sideBar";
-import HeaderComponent from "../headers/headerComponent";
+import HeaderComponent from "../headers/headerComponet/headerComponent";
 
 const MainContent = styled(Box)({
   flex: 1,
