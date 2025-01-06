@@ -1,12 +1,14 @@
+import { useState } from "react";
 import { Box, Typography, Divider } from "@mui/material";
 import { styled } from "@mui/system";
-import DashboardIcon from "@mui/icons-material/Dashboard";
+import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
-
 import BotonSideBar from "../buttons/botonSideBar/botonSideBar";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import BackupTableIcon from "@mui/icons-material/BackupTable";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import LogoutModal from "../modals/logoutModal/logoutModal";
 
 const Sidebar = styled(Box)({
   height: "auto",
@@ -18,14 +20,18 @@ const Sidebar = styled(Box)({
 });
 
 const buttons = [
-  { text: "Dashboard", icon: DashboardIcon, path: "/dashboard" },
-  { text: "Lista de Usuarios", icon: PeopleIcon, path: "/usuarios" },
+  { text: "Inicio", icon: HomeIcon, path: "/dashboard" },
+  { text: "Usuarios", icon: PeopleIcon, path: "/usuarios" },
   { text: "Crm", icon: ContactPageIcon, path: "/crm" },
+  { text: "Metricas", icon: AssessmentIcon, path: "/metricas" },
   { text: "Perfil", icon: AccountCircleIcon, path: "/perfil" },
-  { text: "Metricas", icon: BackupTableIcon, path: "/metricas" },
 ];
 
 const SideBar = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
   return (
     <Sidebar sx={{ margin: "20px" }}>
       <Typography
@@ -40,10 +46,16 @@ const SideBar = () => {
       >
         Hitpoly Dashboard
       </Typography>
-      <Divider sx={{ backgroundColor: "#FFF" }} />
+      <Divider
+        sx={{
+          backgroundColor: "#FFF",
+          marginBottom: "20px",
+          marginTop: "20px",
+        }}
+      />
       <Box
         sx={{
-          height: "auto",
+          height: "87%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -63,10 +75,15 @@ const SideBar = () => {
         <Box>
           <BotonSideBar
             text="Cerrar sesion"
-            Icon={BackupTableIcon}
+            Icon={ExitToAppIcon}
+            onClick={handleOpenModal}
           />
         </Box>
       </Box>
+      <LogoutModal
+        open={isModalOpen}
+        handleClose={handleCloseModal}
+      />
     </Sidebar>
   );
 };

@@ -1,30 +1,56 @@
+import { useState } from "react";
 import { Box } from "@mui/material";
 import Layout from "../../components/layout/layout";
 import UserListHeader from "../../components/headers/userListHeader/userListHeader";
 import DataTable from "../../components/tables/userDataTable/userDataTable";
+import AddModal from "../../components/modals/addModal/addModal";
 
 const UserListPage = () => {
+  const [users, setUsers] = useState([
+    // Datos iniciales de ejemplo
+    {
+      nombre: "Juan",
+      apellidos: "Pérez",
+      correo: "juan.perez@example.com",
+      telefono: "123456789",
+      direccion: "Calle 1",
+    },
+    {
+      nombre: "María",
+      apellidos: "López",
+      correo: "maria.lopez@example.com",
+      telefono: "987654321",
+      direccion: "Avenida 2",
+    },
+  ]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleAddNew = () => {
-    console.log("Agregar Nuevo clickeado");
+    setIsModalOpen(true);
   };
 
-  const handleShareForm = () => {
-    console.log("Compartir Formulario clickeado");
+  const handleSaveUser = (newUser) => {
+    setUsers([...users, newUser]);
+    setIsModalOpen(false);
   };
 
   return (
-    <Layout>
+    <Layout title={"Usuarios"}>
       <Box sx={{ padding: "0" }}>
         <UserListHeader
-          pageName="Lista de Usuarios"
-          userCount={25}
           onAddNew={handleAddNew}
-          onShareForm={handleShareForm}
+          onShareForm={() => console.log("Compartir Formulario clickeado")}
         />
 
         {/* Tabla */}
         <DataTable />
       </Box>
+      <AddModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveUser}
+      />
     </Layout>
   );
 };

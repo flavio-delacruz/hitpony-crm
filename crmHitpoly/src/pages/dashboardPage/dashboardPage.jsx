@@ -8,7 +8,7 @@ import ContentCard from "../../components/cards/contentCard/contentCard";
 
 const DashboardPage = () => {
   return (
-    <Layout>
+    <Layout title="Inicio">
       {/* Cards Row 1 */}
       <Grid
         container

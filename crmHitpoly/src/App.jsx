@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./components/login/login";
 import Dashboard from "./pages/dashboardPage/dashboardPage";
-import InfoContacto from "./components/infoContacto/infoContacto";
-import InfoAfiliados from "./components/infoDelAfiliado/infoAfiliado";
+//import InfoContacto from "./components/infoContacto/infoContacto";
+//import InfoAfiliados from "./components/infoDelAfiliado/infoAfiliado";
 import UserListPage from "./pages/userListPage/userListPage";
 import AffiliateProfilePage from "./pages/affiliateProfilePage/affiliateProfilePage";
-import PaginaCrm from "./components/paginaCrm/paginaCrm";
+//import PaginaCrm from "./components/paginaCrm/paginaCrm";
 import MetricasPage from "./pages/metricasPage/metricasPage";
 import CrmPage from "./pages/crmPage/crmPage";
 

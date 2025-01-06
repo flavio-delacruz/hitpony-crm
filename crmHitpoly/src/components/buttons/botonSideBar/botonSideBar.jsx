@@ -1,19 +1,21 @@
 import { Box, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 
-const BotonSideBar = ({ text, Icon, to, isSelected }) => {
+const BotonSideBar = ({ text, Icon, to, isSelected, onClick }) => {
   return (
     <Link
       to={to}
       style={{ textDecoration: "none" }}
     >
       <Box
-        mt={4}
+        onClick={onClick}
+        mt={2}
         sx={{
           display: "flex",
+          gap: "10px",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "10px",
+          padding: "15px",
           borderRadius: "4px",
           cursor: "pointer",
           backgroundColor: isSelected ? "hsl(348, 85%, 62%)" : "transparent",

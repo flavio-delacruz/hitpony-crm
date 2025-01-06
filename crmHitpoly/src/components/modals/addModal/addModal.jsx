@@ -13,8 +13,7 @@ const modalStyle = {
   borderRadius: "10px",
 };
 
-const AddModal = () => {
-  const [open, setOpen] = useState(false);
+const AddModal = ({ open, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     nombre: "",
     apellidos: "",
@@ -28,11 +27,8 @@ const AddModal = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
   const handleSubmit = () => {
-    console.log("Nueva información agregada:", formData);
+    onSave(formData);
     setFormData({
       nombre: "",
       apellidos: "",
@@ -40,117 +36,108 @@ const AddModal = () => {
       telefono: "",
       direccion: "",
     });
-    handleClose();
+    onClose();
   };
 
   return (
-    <div>
-      <Button
-        variant="contained"
-        color="success"
-        onClick={handleOpen}
-      >
-        Añadir Nuevo
-      </Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-      >
-        <Box sx={modalStyle}>
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{ mb: 2, textAlign: "center" }}
-          >
-            Añadir Información Personal
-          </Typography>
+    <Modal
+      open={open}
+      onClose={onClose}
+    >
+      <Box sx={modalStyle}>
+        <Typography
+          variant="h6"
+          component="h2"
+          sx={{ mb: 2, textAlign: "center" }}
+        >
+          Añadir Información Personal
+        </Typography>
+        <Grid
+          container
+          spacing={2}
+        >
           <Grid
-            container
-            spacing={2}
+            item
+            xs={12}
           >
-            <Grid
-              item
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="Nombre"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="Apellidos"
-                name="apellidos"
-                value={formData.apellidos}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="Correo"
-                name="correo"
-                value={formData.correo}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="Teléfono"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="Dirección"
-                name="direccion"
-                value={formData.direccion}
-                onChange={handleChange}
-              />
-            </Grid>
+            <TextField
+              fullWidth
+              label="Nombre"
+              name="nombre"
+              value={formData.nombre}
+              onChange={handleChange}
+            />
           </Grid>
-          <Box
-            mt={3}
-            sx={{ display: "flex", justifyContent: "space-between" }}
+          <Grid
+            item
+            xs={12}
           >
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={handleClose}
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleSubmit}
-            >
-              Guardar
-            </Button>
-          </Box>
+            <TextField
+              fullWidth
+              label="Apellidos"
+              name="apellidos"
+              value={formData.apellidos}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+          >
+            <TextField
+              fullWidth
+              label="Correo"
+              name="correo"
+              value={formData.correo}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+          >
+            <TextField
+              fullWidth
+              label="Teléfono"
+              name="telefono"
+              value={formData.telefono}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+          >
+            <TextField
+              fullWidth
+              label="Dirección"
+              name="direccion"
+              value={formData.direccion}
+              onChange={handleChange}
+            />
+          </Grid>
+        </Grid>
+        <Box
+          mt={3}
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={onClose}
+          >
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={handleSubmit}
+          >
+            Guardar
+          </Button>
         </Box>
-      </Modal>
-    </div>
+      </Box>
+    </Modal>
   );
 };
 

@@ -66,7 +66,7 @@ const CrmPage = () => {
   };
 
   return (
-    <Layout>
+    <Layout title={"Crm"}>
       <DragDropContext onDragEnd={onDragEnd}>
         <Box
           display="flex"

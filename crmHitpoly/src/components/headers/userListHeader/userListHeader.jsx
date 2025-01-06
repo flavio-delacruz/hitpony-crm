@@ -2,7 +2,7 @@ import { AppBar, Toolbar, Button, Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ShareIcon from "@mui/icons-material/Share";
 
-const UserListHeader = ({ pageName, userCount, onAddNew, onShareForm }) => {
+const UserListHeader = ({ onAddNew, onShareForm }) => {
   return (
     <AppBar
       position="static"

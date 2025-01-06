@@ -25,7 +25,7 @@ const MetricasPage = () => {
   ];
 
   return (
-    <Layout>
+    <Layout title={"Metricas"}>
       <ChartCard
         series={[
           { data: [35, 44, 24, 34] },

@@ -8,7 +8,7 @@ const MainContent = styled(Box)({
   padding: "20px",
 });
 
-const Layout = ({ children }) => {
+const Layout = ({ children, title }) => {
   return (
     <Box
       sx={{
@@ -19,7 +19,7 @@ const Layout = ({ children }) => {
     >
       <SideBar />
       <MainContent>
-        <HeaderComponent />
+        <HeaderComponent title={title} />
         {/* contenido de la pagina */}
         {children}
       </MainContent>

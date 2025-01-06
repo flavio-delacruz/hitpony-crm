@@ -49,7 +49,7 @@ const AffiliateProfilePage = () => {
   };
 
   return (
-    <Layout>
+    <Layout title={"Perfil"}>
       <Box sx={{ p: 4 }}>
         <Card sx={{ maxWidth: 400, mx: "auto", boxShadow: 3 }}>
           <CardContent>

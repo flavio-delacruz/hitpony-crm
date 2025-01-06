@@ -12,14 +12,14 @@ const Header = styled(Box)({
   marginBottom: "20px",
 });
 
-const HeaderComponent = () => {
+const HeaderComponent = ({ title }) => {
   return (
     <Header>
       <Typography
         sx={{ fontWeight: "bold", color: "#000" }}
         variant="h6"
       >
-        Pages / Dashboard
+        Pagina / {title}
       </Typography>
       <Box
         display="flex"
