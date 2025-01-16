@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import UserTable from "../../components/tables/userTable/userTable";
 import OrdersList from "../../components/cards/ordersList/ordersList";
 import Layout from "../../components/layout/layout";
@@ -10,10 +10,17 @@ const DashboardPage = () => {
   return (
     <Layout title="Inicio">
       {/* Cards Row 1 */}
-      <Grid
-        container
-        spacing={2}
-        mb={4}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "repeat(2, 1fr)",
+            sm: "repeat(4, 1fr)",
+          },
+          gap: "20px",
+          flexWrap: "wrap",
+          marginBottom: "20px",
+        }}
       >
         <InfoCard
           title="Dinero del dia"
@@ -36,12 +43,19 @@ const DashboardPage = () => {
           amount="$103,430"
           percentage="+5% respecto a ayer"
         />
-      </Grid>
+      </Box>
       {/* Cards Row 2 */}
-      <Grid
-        container
-        spacing={2}
-        mb={4}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "repeat(1, 1fr)",
+            sm: "repeat(3, 1fr)",
+          },
+          gap: "20px",
+          flexWrap: "wrap",
+          marginBottom: "20px",
+        }}
       >
         <ChartCard
           series={[
@@ -79,12 +93,20 @@ const DashboardPage = () => {
           title="Incremento porcentual en ventas"
           subtitle="Progreso respecto al objetivo mensual"
         />
-      </Grid>
+      </Box>
 
       {/* Cards Row 3 */}
-      <Grid
-        container
-        spacing={2}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "repeat(1, 1fr)",
+            sm: "2fr 1fr",
+          },
+          gap: "20px",
+          flexWrap: "wrap",
+          marginBottom: "20px",
+        }}
       >
         <ContentCard
           title="Lista de Usuarios"
@@ -100,7 +122,7 @@ const DashboardPage = () => {
         >
           <OrdersList />
         </ContentCard>
-      </Grid>
+      </Box>
     </Layout>
   );
 };

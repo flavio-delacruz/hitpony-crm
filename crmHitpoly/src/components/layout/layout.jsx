@@ -20,7 +20,6 @@ const Layout = ({ children, title }) => {
       <SideBar />
       <MainContent>
         <HeaderComponent title={title} />
-        {/* contenido de la pagina */}
         {children}
       </MainContent>
     </Box>

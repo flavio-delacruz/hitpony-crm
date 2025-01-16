@@ -1,90 +1,40 @@
 import { useState } from "react";
-import { Box, Typography, Divider } from "@mui/material";
-import { styled } from "@mui/system";
-import HomeIcon from "@mui/icons-material/Home";
-import PeopleIcon from "@mui/icons-material/People";
-import BotonSideBar from "../buttons/botonSideBar/botonSideBar";
-import ContactPageIcon from "@mui/icons-material/ContactPage";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import AssessmentIcon from "@mui/icons-material/Assessment";
-import LogoutModal from "../modals/logoutModal/logoutModal";
-
-const Sidebar = styled(Box)({
-  height: "auto",
-  width: "280px",
-  backgroundColor: "hsl(270, 7%, 17%)",
-  borderRadius: "20px",
-  padding: "20px",
-  color: "#fff",
-});
-
-const buttons = [
-  { text: "Inicio", icon: HomeIcon, path: "/dashboard" },
-  { text: "Usuarios", icon: PeopleIcon, path: "/usuarios" },
-  { text: "Crm", icon: ContactPageIcon, path: "/crm" },
-  { text: "Metricas", icon: AssessmentIcon, path: "/metricas" },
-  { text: "Perfil", icon: AccountCircleIcon, path: "/perfil" },
-];
+import { Box, Drawer, useMediaQuery } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
+import SideBarContent from "./sideBarContent";
 
 const SideBar = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const isMobile = useMediaQuery("(max-width:600px)");
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const toggleDrawer = () => setDrawerOpen(!drawerOpen);
+
   return (
-    <Sidebar sx={{ margin: "20px" }}>
-      <Typography
-        sx={{
-          fontWeight: "bold",
-          color: "#FFF",
-          padding: "30px",
-          textAlign: "center",
-        }}
-        variant="h5"
-        gutterBottom
-      >
-        Hitpoly Dashboard
-      </Typography>
-      <Divider
-        sx={{
-          backgroundColor: "#FFF",
-          marginBottom: "20px",
-          marginTop: "20px",
-        }}
-      />
-      <Box
-        sx={{
-          height: "87%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
-      >
-        <Box>
-          {buttons.map((button) => (
-            <BotonSideBar
-              key={button.path}
-              text={button.text}
-              Icon={button.icon}
-              to={button.path}
-              isSelected={location.pathname === button.path}
-            />
-          ))}
+    <>
+      {isMobile ? (
+        <>
+          <IconButton
+            onClick={toggleDrawer}
+            sx={{ position: "fixed", top: 10, left: 10, zIndex: 1200 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Drawer
+            anchor="left"
+            open={drawerOpen}
+            onClose={toggleDrawer}
+            ModalProps={{ keepMounted: true }} // Mejora el rendimiento en móviles
+          >
+            <SideBarContent />
+          </Drawer>
+        </>
+      ) : (
+        <Box sx={{ margin: "20px" }}>
+          <SideBarContent />
         </Box>
-        <Box>
-          <BotonSideBar
-            text="Cerrar sesion"
-            Icon={ExitToAppIcon}
-            onClick={handleOpenModal}
-          />
-        </Box>
-      </Box>
-      <LogoutModal
-        open={isModalOpen}
-        handleClose={handleCloseModal}
-      />
-    </Sidebar>
+      )}
+    </>
   );
 };
 
