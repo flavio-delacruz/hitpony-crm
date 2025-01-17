@@ -1,12 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./components/login/login";
 import Dashboard from "./pages/dashboardPage/dashboardPage";
-import InfoContacto from "./components/infoContacto/infoContacto";
-import InfoAfiliados from "./components/infoDelAfiliado/infoAfiliado";
-import ListaDeUsuarios from "./pages/listaDeUsuarios/listaDeUsuarios";
+//import InfoContacto from "./components/infoContacto/infoContacto";
+//import InfoAfiliados from "./components/infoDelAfiliado/infoAfiliado";
+import UserListPage from "./pages/userListPage/userListPage";
 import AffiliateProfilePage from "./pages/affiliateProfilePage/affiliateProfilePage";
-import PaginaCrm from "./components/paginaCrm/paginaCrm";
+//import PaginaCrm from "./components/paginaCrm/paginaCrm";
 import MetricasPage from "./pages/metricasPage/metricasPage";
+import CrmPage from "./pages/crmPage/crmPage";
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
         />
         <Route
           path="/usuarios"
-          element={<ListaDeUsuarios />}
+          element={<UserListPage />}
         />
         <Route
           path="/perfil"
@@ -33,8 +34,8 @@ function App() {
           element={<MetricasPage />}
         />
         <Route
-          path="/pagina"
-          element={<PaginaCrm />}
+          path="/crm"
+          element={<CrmPage />}
         />
       </Routes>
     </Router>

@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import Layout from "../../components/layout/layout";
+import ChartCard from "../../components/cards/chartCard/chartCard";
 
 const MetricasPage = () => {
   // Datos de ejemplo para el crecimiento del usuario
@@ -24,41 +25,19 @@ const MetricasPage = () => {
   ];
 
   return (
-    <Layout>
-      <Card
-        sx={{
-          maxWidth: "100%",
-          margin: "auto",
-          boxShadow: 3,
-        }}
-      >
-        <CardContent>
-          <Typography
-            variant="h6"
-            gutterBottom
-          >
-            Crecimiento de Usuarios
-          </Typography>
-          <ResponsiveContainer
-            width="100%"
-            height={300}
-          >
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="users"
-                stroke="#8884d8"
-                activeDot={{ r: 8 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+    <Layout title={"Metricas"}>
+      <ChartCard
+        series={[
+          { data: [35, 44, 24, 34] },
+          { data: [51, 6, 49, 30] },
+          { data: [15, 25, 30, 50] },
+          { data: [60, 50, 15, 25] },
+        ]}
+        xAxis={[{ data: ["Q1", "Q2", "Q3", "Q4"], scaleType: "band" }]}
+        titleChart="Métricas de Ventas"
+        title="Incremento porcentual en ventas"
+        subtitle="Progreso respecto al objetivo mensual"
+      />
     </Layout>
   );
 };

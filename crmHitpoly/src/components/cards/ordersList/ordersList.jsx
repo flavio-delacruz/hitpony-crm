@@ -8,44 +8,45 @@ import {
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import CodeIcon from "@mui/icons-material/Code";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
 
 const OrdersList = () => {
   const orders = [
     {
       id: 1,
       icon: <NotificationsIcon color="success" />,
-      name: "$2400, Design changes",
-      date: "22 DEC 7:20 PM",
+      name: "Lead #234 actualizado a 'Cerrado'",
+      date: "(02 Ene, 10:30 AM)",
     },
     {
       id: 2,
       icon: <CodeIcon color="error" />,
-      name: "New order #1832412",
-      date: "21 DEC 11 PM",
+      name: " Lead #567 movido a 'En Proceso'",
+      date: "(02 Ene, 8:15 AM).",
     },
     {
       id: 3,
       icon: <ShoppingCartIcon color="primary" />,
-      name: "Server payments for April",
-      date: "21 DEC 9:34 PM",
-    },
-    {
-      id: 4,
-      icon: <CreditCardIcon color="warning" />,
-      name: "New card added for order #4395133",
-      date: "20 DEC 2:20 AM",
+      name: "Nuevo lead captado desde formulario #0034",
+      date: "(01 Ene, 9:00 PM).",
     },
   ];
 
   return (
-    <div style={{ width: "100%", maxWidth: 360, margin: "20px auto" }}>
+    <div
+      style={{
+        width: "100%",
+        maxWidth: 360,
+        margin: "20px auto",
+        height: "100%",
+      }}
+    >
       <Typography
         variant="h6"
         component="div"
+        sx={{ fontWeight: "bold" }}
         gutterBottom
       >
-        Orders Overview
+        Leads que cambiaron de estado en las últimas 24 horas
       </Typography>
       <List>
         {orders.map((order) => (

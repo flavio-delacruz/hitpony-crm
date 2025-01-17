@@ -13,6 +13,7 @@ const ChartCard = ({
   xAxis,
   height = 290,
   title,
+  titleChart,
   subtitle,
   margin = { top: 10, bottom: 30, left: 40, right: 10 },
 }) => {
@@ -23,6 +24,7 @@ const ChartCard = ({
     >
       <CardStyled>
         <BarChart
+          titleChart={titleChart}
           series={series}
           height={height}
           xAxis={xAxis}

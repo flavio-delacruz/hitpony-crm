@@ -1,150 +1,196 @@
+import { useState } from "react";
 import {
   Box,
-  TextField,
   Typography,
   Button,
-  Avatar,
+  TextField,
+  Modal,
   Grid,
-  Divider,
+  Avatar,
+  Card,
+  CardContent,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import Layout from "../../components/layout/layout";
 
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: "10px",
+};
+
 const AffiliateProfilePage = () => {
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    nombre: "Karol Juárez",
+    apellidos: "Castro",
+    correo: "karol.juarez@example.com",
+    telefono: "987654321",
+    direccion: "Av. Siempre Viva 123",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const handleSubmit = () => {
+    console.log("Información actualizada:", formData);
+    handleClose();
+  };
+
   return (
-    <Layout>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          border: "1px solid #ccc",
-          borderRadius: 2,
-          padding: 2,
-          maxWidth: 800,
-          margin: "auto",
-          backgroundColor: "#fff",
-        }}
-      >
-        {/* Left Side */}
-        <Box
-          sx={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            marginRight: { md: 2 },
-          }}
+    <Layout title={"Perfil"}>
+      <Box sx={{ p: 4 }}>
+        <Card sx={{ maxWidth: 400, mx: "auto", boxShadow: 3 }}>
+          <CardContent>
+            <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+              <Avatar sx={{ width: 100, height: 100 }}>KJ</Avatar>
+            </Box>
+            <Typography
+              variant="h6"
+              align="center"
+            >{`${formData.nombre} ${formData.apellidos}`}</Typography>
+            <Typography
+              variant="body2"
+              align="center"
+              color="text.secondary"
+            >
+              {formData.correo}
+            </Typography>
+            <Typography
+              variant="body2"
+              align="center"
+              color="text.secondary"
+            >{`Teléfono: ${formData.telefono}`}</Typography>
+            <Typography
+              variant="body2"
+              align="center"
+              color="text.secondary"
+            >{`Dirección: ${formData.direccion}`}</Typography>
+            <Box
+              mt={3}
+              sx={{ display: "flex", justifyContent: "center" }}
+            >
+              <Button
+                variant="contained"
+                startIcon={<EditIcon />}
+                onClick={handleOpen}
+              >
+                Editar Perfil
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* Modal para editar información */}
+        <Modal
+          open={open}
+          onClose={handleClose}
         >
-          <Avatar
-            sx={{
-              width: 100,
-              height: 100,
-              marginBottom: 2,
-            }}
-          />
-          <Typography
-            variant="h6"
-            gutterBottom
-          >
-            Afiliado Profile
-          </Typography>
-          <Typography variant="body1">Elmer Coro Huaman</Typography>
-          <Typography variant="body2">corohuamanelmer@gmail.com</Typography>
-          <Typography variant="body2">976 367 567</Typography>
-        </Box>
-
-        <Divider
-          orientation="vertical"
-          flexItem
-          sx={{ display: { xs: "none", md: "block" } }}
-        />
-
-        {/* Right Side */}
-        <Box
-          sx={{
-            flex: 2,
-            display: "flex",
-            flexDirection: "column",
-            marginTop: { xs: 2, md: 0 },
-          }}
-        >
-          <Typography
-            variant="h6"
-            gutterBottom
-          >
-            Edition Information
-          </Typography>
-
-          <Grid
-            container
-            spacing={2}
-          >
+          <Box sx={modalStyle}>
+            <Typography
+              variant="h6"
+              component="h2"
+              sx={{ mb: 2, textAlign: "center" }}
+            >
+              Editar Información Personal
+            </Typography>
             <Grid
-              item
-              xs={12}
-              md={6}
+              container
+              spacing={2}
             >
-              <TextField
-                fullWidth
-                label="Nombre"
-                variant="outlined"
-              />
+              <Grid
+                item
+                xs={12}
+              >
+                <TextField
+                  fullWidth
+                  label="Nombre"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <TextField
+                  fullWidth
+                  label="Apellidos"
+                  name="apellidos"
+                  value={formData.apellidos}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <TextField
+                  fullWidth
+                  label="Correo"
+                  name="correo"
+                  value={formData.correo}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <TextField
+                  fullWidth
+                  label="Teléfono"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <TextField
+                  fullWidth
+                  label="Dirección"
+                  name="direccion"
+                  value={formData.direccion}
+                  onChange={handleChange}
+                />
+              </Grid>
             </Grid>
-            <Grid
-              item
-              xs={12}
-              md={6}
+            <Box
+              mt={3}
+              sx={{ display: "flex", justifyContent: "space-between" }}
             >
-              <TextField
-                fullWidth
-                label="Correo"
+              <Button
                 variant="outlined"
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              md={6}
-            >
-              <TextField
-                fullWidth
-                label="Telefono"
-                variant="outlined"
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              md={6}
-            >
-              <TextField
-                fullWidth
-                label="Ciudad"
-                variant="outlined"
-              />
-            </Grid>
-          </Grid>
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: 3,
-            }}
-          >
-            <Button
-              variant="outlined"
-              color="secondary"
-            >
-              Restablecer
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-            >
-              Guardar
-            </Button>
+                color="secondary"
+                onClick={handleClose}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+              >
+                Guardar
+              </Button>
+            </Box>
           </Box>
-        </Box>
+        </Modal>
       </Box>
     </Layout>
   );

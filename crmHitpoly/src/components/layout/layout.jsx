@@ -1,14 +1,14 @@
 import { Box } from "@mui/material";
 import { styled } from "@mui/system";
 import SideBar from "../sideBar/sideBar";
-import HeaderComponent from "../headers/headerComponent";
+import HeaderComponent from "../headers/headerComponet/headerComponent";
 
 const MainContent = styled(Box)({
   flex: 1,
   padding: "20px",
 });
 
-const Layout = ({ children }) => {
+const Layout = ({ children, title }) => {
   return (
     <Box
       sx={{
@@ -19,8 +19,7 @@ const Layout = ({ children }) => {
     >
       <SideBar />
       <MainContent>
-        <HeaderComponent />
-        {/* contenido de la pagina */}
+        <HeaderComponent title={title} />
         {children}
       </MainContent>
     </Box>
