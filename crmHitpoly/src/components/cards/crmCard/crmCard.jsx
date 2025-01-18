@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
-import { FixedSizeList as List } from "react-window";
 
-const getItems = (count) =>
-  Array.from({ length: count }, (v, k) => k).map((k) => ({
-    id: `item-${k}`,
-    content: `item ${k}`,
+const getItems = (count, prefix) =>
+  Array.from({ length: count }, (_, k) => ({
+    id: `${prefix}-${k}`,
+    content: `Item ${k}`,
   }));
 
 const reorder = (list, startIndex, endIndex) => {
@@ -15,99 +14,109 @@ const reorder = (list, startIndex, endIndex) => {
   return result;
 };
 
-const grid = 8;
+const move = (source, destination, droppableSource, droppableDestination) => {
+  const sourceClone = Array.from(source);
+  const destClone = Array.from(destination);
+  const [removed] = sourceClone.splice(droppableSource.index, 1);
 
-const getItemStyle = (draggableStyle, isDragging) => ({
+  destClone.splice(droppableDestination.index, 0, removed);
+
+  const result = {};
+  result[droppableSource.droppableId] = sourceClone;
+  result[droppableDestination.droppableId] = destClone;
+
+  return result;
+};
+
+const getColumnStyle = (isDraggingOver) => ({
+  background: isDraggingOver ? "lightblue" : "lightgrey",
+  padding: 8,
+  width: 250,
+  minHeight: 500,
+});
+
+const getItemStyle = (isDragging, draggableStyle) => ({
   userSelect: "none",
-  padding: grid * 2,
-  margin: `0 0 ${grid}px 0`,
-  background: isDragging ? "lightgreen" : "grey",
+  padding: 16,
+  margin: "0 0 8px 0",
+  background: isDragging ? "lightgreen" : "white",
+  border: "1px solid grey",
   ...draggableStyle,
 });
 
-const Row = ({ data, index, style }) => {
-  const item = data[index];
-
-  if (!item) {
-    return null;
-  }
-
-  return (
-    <Draggable
-      draggableId={item.id}
-      index={index}
-      key={item.id}
-    >
-      {(provided, snapshot) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          style={{
-            ...getItemStyle(provided.draggableProps.style, snapshot.isDragging),
-            ...style,
-          }}
-        >
-          {item.content}
-        </div>
-      )}
-    </Draggable>
-  );
-};
-
 const CrmCard = () => {
-  const [items, setItems] = useState(getItems(10));
+  const [columns, setColumns] = useState({
+    column1: getItems(5, "col1"),
+    column2: getItems(5, "col2"),
+    column3: getItems(5, "col3"),
+  });
 
   const onDragEnd = (result) => {
-    if (!result.destination) {
-      return;
+    const { source, destination } = result;
+
+
+    if (!destination) return;
+
+
+    if (source.droppableId === destination.droppableId) {
+      const items = reorder(
+        columns[source.droppableId],
+        source.index,
+        destination.index
+      );
+      setColumns((prev) => ({
+        ...prev,
+        [source.droppableId]: items,
+      }));
+    } else {
+     
+      const result = move(
+        columns[source.droppableId],
+        columns[destination.droppableId],
+        source,
+        destination
+      );
+      setColumns((prev) => ({
+        ...prev,
+        ...result,
+      }));
     }
-    const reorderedItems = reorder(
-      items,
-      result.source.index,
-      result.destination.index
-    );
-    setItems(reorderedItems);
   };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable
-        droppableId="droppable"
-        mode="virtual"
-        renderClone={(provided, snapshot, rubric) => (
-          <div
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            ref={provided.innerRef}
-            style={getItemStyle(
-              provided.draggableProps.style,
-              snapshot.isDragging
+      <div style={{ display: "flex", gap: "16px" }}>
+        {Object.keys(columns).map((columnId) => (
+          <Droppable key={columnId} droppableId={columnId}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={getColumnStyle(snapshot.isDraggingOver)}
+              >
+                {columns[columnId].map((item, index) => (
+                  <Draggable key={item.id} draggableId={item.id} index={index}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        style={getItemStyle(
+                          snapshot.isDragging,
+                          provided.draggableProps.style
+                        )}
+                      >
+                        {item.content}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
             )}
-          >
-            {items[rubric.source.index].content}
-          </div>
-        )}
-      >
-        {(provided, snapshot) => {
-          const itemCount = snapshot.isUsingPlaceholder
-            ? items.length + 1
-            : items.length;
-
-          return (
-            <List
-              height={500}
-              itemCount={itemCount}
-              itemSize={50}
-              width="100%"
-              outerRef={provided.innerRef}
-              itemData={items}
-            >
-              {Row}
-            </List>
-          );
-        }}
-      </Droppable>
+          </Droppable>
+        ))}
+      </div>
     </DragDropContext>
   );
 };
