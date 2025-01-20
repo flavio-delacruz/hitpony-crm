@@ -12,10 +12,9 @@ import BotonSideBar from "../buttons/botonSideBar/botonSideBar";
 import LogoutModal from "../modals/logoutModal/logoutModal";
 
 const SidebarContainer = styled(Box)({
-  height: "100%",
+  height: "100vh",
   width: "280px",
   backgroundColor: "hsl(270, 7%, 17%)",
-  borderRadius: "20px",
   padding: "20px",
   color: "#fff",
 });
@@ -37,15 +36,17 @@ const SideBarContent = () => {
     <SidebarContainer>
       <Typography
         sx={{
-          fontWeight: "bold",
+          fontWeight: "900",
           color: "#FFF",
           padding: "30px",
           textAlign: "center",
+          fontSize: "30px",
+          letterSpacing: "0.5rem",
         }}
         variant="h5"
         gutterBottom
       >
-        Hitpoly Dashboard
+        HITPOLY
       </Typography>
       <Divider
         sx={{
@@ -56,7 +57,6 @@ const SideBarContent = () => {
       />
       <Box
         sx={{
-          height: "87%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",

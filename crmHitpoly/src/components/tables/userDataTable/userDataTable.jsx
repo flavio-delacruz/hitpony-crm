@@ -28,48 +28,48 @@ const columns = [
 const rows = [
   {
     id: 1,
-    nombres: "Snow",
-    apellidos: "Jon",
+    nombres: "Elmer",
+    apellidos: "Coro Huaman",
     telefono: 354789456,
     correo: "corohuamanelmer@gmail.com",
-    propietario: "Elmer Coro",
+    propietario: "Daniel Cruz",
     estado: "Activo",
     creacion: "2023-05-05",
     ciudad: "Lima",
     actividad: "Compra",
   },
   {
-    id: 1,
-    nombres: "Snow",
-    apellidos: "Jon",
+    id: 2,
+    nombres: "Javier",
+    apellidos: "Vilchez Nuñez",
     telefono: 354789456,
     correo: "corohuamanelmer@gmail.com",
-    propietario: "Elmer Coro",
+    propietario: "Karla Suarez",
+    estado: "Cesado",
+    creacion: "2023-05-05",
+    ciudad: "Lima",
+    actividad: "Compra",
+  },
+  {
+    id: 3,
+    nombres: "Claudia",
+    apellidos: "Corona Hernandez",
+    telefono: 354789456,
+    correo: "corohuamanelmer@gmail.com",
+    propietario: "Pedro Perez",
     estado: "Activo",
     creacion: "2023-05-05",
     ciudad: "Lima",
     actividad: "Compra",
   },
   {
-    id: 1,
-    nombres: "Snow",
-    apellidos: "Jon",
+    id: 4,
+    nombres: "Luis",
+    apellidos: "Maza Cordova",
     telefono: 354789456,
     correo: "corohuamanelmer@gmail.com",
-    propietario: "Elmer Coro",
-    estado: "Activo",
-    creacion: "2023-05-05",
-    ciudad: "Lima",
-    actividad: "Compra",
-  },
-  {
-    id: 1,
-    nombres: "Snow",
-    apellidos: "Jon",
-    telefono: 354789456,
-    correo: "corohuamanelmer@gmail.com",
-    propietario: "Elmer Coro",
-    estado: "Activo",
+    propietario: "Daniel Cruz",
+    estado: "Cesado",
     creacion: "2023-05-05",
     ciudad: "Lima",
     actividad: "Compra",
@@ -84,7 +84,6 @@ export default function DataTable() {
       sx={{
         height: "90vh",
         width: "auto",
-        borderRadius: "15px",
         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
       }}
     >
@@ -94,7 +93,7 @@ export default function DataTable() {
         initialState={{ pagination: { paginationModel } }}
         pageSizeOptions={[5, 10]}
         checkboxSelection
-        sx={{ border: 0, borderRadius: "15px" }}
+        sx={{ fontWeight: "bold" }}
       />
     </Paper>
   );

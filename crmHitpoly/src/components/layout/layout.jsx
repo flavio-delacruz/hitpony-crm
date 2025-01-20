@@ -6,6 +6,8 @@ import HeaderComponent from "../headers/headerComponet/headerComponent";
 const MainContent = styled(Box)({
   flex: 1,
   padding: "20px",
+  height: "100vh",
+  overflow: "auto",
 });
 
 const Layout = ({ children, title }) => {

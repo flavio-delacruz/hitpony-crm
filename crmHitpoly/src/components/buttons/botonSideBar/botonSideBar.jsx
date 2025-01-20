@@ -25,13 +25,18 @@ const BotonSideBar = ({ text, Icon, to, isSelected, onClick }) => {
         }}
       >
         <Typography
-          sx={{ fontWeight: "bold", color: "#FFF" }}
+          sx={{
+            fontWeight: "bold",
+            color: "#FFF",
+            padding: "0px",
+            margin: "0px",
+          }}
           variant="body1"
           gutterBottom
         >
           {text}
         </Typography>
-        {Icon && <Icon />}
+        {Icon && <Icon sx={{ color: "#FFF" }} />}
       </Box>
     </Link>
   );
