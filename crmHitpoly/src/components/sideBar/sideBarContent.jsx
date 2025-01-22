@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Typography, Divider } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 import { styled } from "@mui/system";
 
 import HomeIcon from "@mui/icons-material/Home";
@@ -10,6 +10,7 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import BotonSideBar from "../buttons/botonSideBar/botonSideBar";
 import LogoutModal from "../modals/logoutModal/logoutModal";
+import LogoHitpoly from "../../../public/LogoHitpoly";
 
 const SidebarContainer = styled(Box)({
   height: "100vh",
@@ -17,6 +18,8 @@ const SidebarContainer = styled(Box)({
   backgroundColor: "hsl(270, 7%, 17%)",
   padding: "20px",
   color: "#fff",
+  display: "flex",
+  flexDirection: "column",
 });
 
 const buttons = [
@@ -34,53 +37,35 @@ const SideBarContent = () => {
 
   return (
     <SidebarContainer>
-      <Typography
-        sx={{
-          fontWeight: "900",
-          color: "#FFF",
-          padding: "30px",
-          textAlign: "center",
-          fontSize: "30px",
-          letterSpacing: "0.5rem",
-        }}
-        variant="h5"
-        gutterBottom
-      >
-        HITPOLY
-      </Typography>
-      <Divider
-        sx={{
-          backgroundColor: "#FFF",
-          marginBottom: "20px",
-          marginTop: "20px",
-        }}
-      />
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
-      >
-        <Box>
-          {buttons.map((button) => (
-            <BotonSideBar
-              key={button.path}
-              text={button.text}
-              Icon={button.icon}
-              to={button.path}
-              isSelected={location.pathname === button.path}
-            />
-          ))}
-        </Box>
-        <Box>
+      <div>
+        <LogoHitpoly />
+        <Divider
+          sx={{
+            backgroundColor: "#FFF",
+            marginBottom: "20px",
+          }}
+        />
+      </div>
+
+      <Box sx={{ flexGrow: 1 }}>
+        {buttons.map((button) => (
           <BotonSideBar
-            text="Cerrar sesión"
-            Icon={ExitToAppIcon}
-            onClick={handleOpenModal}
+            key={button.path}
+            text={button.text}
+            Icon={button.icon}
+            to={button.path}
+            isSelected={location.pathname === button.path}
           />
-        </Box>
+        ))}
       </Box>
+      <Box>
+        <BotonSideBar
+          text="Cerrar sesión"
+          Icon={ExitToAppIcon}
+          onClick={handleOpenModal}
+        />
+      </Box>
+
       <LogoutModal
         open={isModalOpen}
         handleClose={handleCloseModal}

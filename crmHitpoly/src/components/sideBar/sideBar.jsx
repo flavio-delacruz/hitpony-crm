@@ -14,12 +14,6 @@ const SideBar = () => {
     <>
       {isMobile ? (
         <>
-          <IconButton
-            onClick={toggleDrawer}
-            sx={{ position: "fixed", top: 10, left: 10, zIndex: 1200 }}
-          >
-            <MenuIcon />
-          </IconButton>
           <Drawer
             anchor="left"
             open={drawerOpen}

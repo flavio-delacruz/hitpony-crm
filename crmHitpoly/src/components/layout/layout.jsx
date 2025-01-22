@@ -2,6 +2,8 @@ import { Box } from "@mui/material";
 import { styled } from "@mui/system";
 import SideBar from "../sideBar/sideBar";
 import HeaderComponent from "../headers/headerComponet/headerComponent";
+import { useMediaQuery } from "@mui/material";
+import HeaderComponentMovile from "../headers/headerComponet/headerComponentMovile";
 
 const MainContent = styled(Box)({
   flex: 1,
@@ -11,6 +13,7 @@ const MainContent = styled(Box)({
 });
 
 const Layout = ({ children, title }) => {
+  const isMobile = useMediaQuery("(max-width:600px)");
   return (
     <Box
       sx={{
@@ -21,7 +24,12 @@ const Layout = ({ children, title }) => {
     >
       <SideBar />
       <MainContent>
-        <HeaderComponent title={title} />
+        {isMobile ? (
+          <HeaderComponentMovile title={title} />
+        ) : (
+          <HeaderComponent title={title} />
+        )}
+
         {children}
       </MainContent>
     </Box>
