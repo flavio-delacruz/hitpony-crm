@@ -52,15 +52,13 @@ const UserTable = () => {
   };
 
   return (
-    <Paper sx={{ width: "auto", margin: "20px auto", padding: "20px" }}>
-      <Typography
-        variant="h5"
-        component="div"
-        sx={{ fontWeight: "bold" }}
-        gutterBottom
-      >
-        Lista de Usuarios
-      </Typography>
+    <Paper
+      sx={{
+        margin: { xs: "10px auto", sm: "20px auto" },
+        padding: { xs: "none", sm: "20px" },
+        boxShadow: "none",
+      }}
+    >
       <TableContainer>
         <Table>
           <TableHead>

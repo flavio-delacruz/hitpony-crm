@@ -16,17 +16,30 @@ const UserListHeader = ({ onAddNew, onShareForm }) => {
       }}
     >
       <Toolbar
-        sx={{ display: "flex", justifyContent: "space-between", padding: "0" }}
+        sx={{
+          display: "flex",
+          justifyContent: { xs: "center", md: "space-between" },
+          flexDirection: { sx: "column", md: "row" },
+          width: "100%",
+          padding: "0",
+        }}
       >
         <div></div>
         {/* Botones */}
-        <Box>
+        <Box
+          sx={{
+            display: { xs: "grid", md: "flex" },
+            gap: { xs: "0.5rem", md: "none" },
+            width: { xs: "100%", md: "auto" },
+          }}
+        >
           <Button
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
             onClick={onAddNew}
-            sx={{ mr: 2, fontWeight: "bold" }}
+            width={{ xs: "100%", sm: "auto" }}
+            sx={{ fontWeight: "bold" }}
           >
             Agregar Nuevo
           </Button>

@@ -36,18 +36,10 @@ const OrdersList = () => {
       style={{
         width: "100%",
         maxWidth: 360,
-        margin: "20px auto",
+        margin: { xs: "10px 0", sm: "20px auto" },
         height: "100%",
       }}
     >
-      <Typography
-        variant="h6"
-        component="div"
-        sx={{ fontWeight: "bold" }}
-        gutterBottom
-      >
-        Leads que cambiaron de estado en las últimas 24 horas
-      </Typography>
       <List>
         {orders.map((order) => (
           <ListItem

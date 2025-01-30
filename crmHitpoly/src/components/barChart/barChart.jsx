@@ -47,10 +47,10 @@ const BarChart = ({ titleChart }) => {
   };
 
   return (
-    <Card>
+    <Card sx={{ boxShadow: "none" }}>
       <CardContent>
         <Typography
-          sx={{ fontWeight: "bold" }}
+          sx={{ fontWeight: "bold", fontSize: { xs: "1.3rem" } }}
           variant="h5"
           component="div"
           gutterBottom

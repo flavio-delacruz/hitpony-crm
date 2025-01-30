@@ -2,7 +2,6 @@ import { Grid, Typography, Card } from "@mui/material";
 import { styled } from "@mui/system";
 
 const CardStyled = styled(Card)({
-  padding: "20px",
   borderRadius: "15px",
   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
 });
@@ -13,7 +12,13 @@ const ContentCard = ({ title, subtitle, children, gridSize = 8 }) => {
       item
       xs={gridSize}
     >
-      <CardStyled>
+      <CardStyled
+        sx={{
+          padding: { xs: "10px", sm: "20px" },
+          width: { xs: "90vw", sm: "100%" },
+          height: "100%",
+        }}
+      >
         <Typography
           sx={{ fontWeight: "bold" }}
           variant="h6"

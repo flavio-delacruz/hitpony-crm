@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Modal, Box, Typography, TextField, Button, Grid } from "@mui/material";
+import { Margin } from "@mui/icons-material";
 
 const modalStyle = {
   position: "absolute",
@@ -9,8 +10,9 @@ const modalStyle = {
   width: 400,
   bgcolor: "background.paper",
   boxShadow: 24,
-  p: 4,
+  padding: 4,
   borderRadius: "10px",
+  maring: "1rem 0",
 };
 
 const AddModal = ({ open, onClose, onSave }) => {

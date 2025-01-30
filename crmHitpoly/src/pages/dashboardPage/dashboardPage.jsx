@@ -17,7 +17,7 @@ const DashboardPage = () => {
             xs: "repeat(2, 1fr)",
             sm: "repeat(4, 1fr)",
           },
-          gap: "20px",
+          gap: { xs: "10px", sm: "20px" },
           flexWrap: "wrap",
           marginBottom: "20px",
         }}
@@ -98,6 +98,7 @@ const DashboardPage = () => {
       {/* Cards Row 3 */}
       <Box
         sx={{
+          width: { xs: "90vw", sm: "100%" },
           display: "grid",
           gridTemplateColumns: {
             xs: "repeat(1, 1fr)",

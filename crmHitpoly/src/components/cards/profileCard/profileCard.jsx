@@ -4,7 +4,6 @@ import {
   CardHeader,
   Divider,
   TextField,
-  Button,
   Typography,
   Grid,
 } from "@mui/material";
@@ -15,24 +14,12 @@ const ProfileCard = () => {
       sx={{
         padding: "20px",
         borderRadius: "15px",
-        height: "100%",
+        height: { sx: "auto", md: "100%" },
         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
       }}
     >
       <CardHeader
-        title="Edit Profile"
-        action={
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{
-              textTransform: "none",
-              fontWeight: "bold",
-            }}
-          >
-            Settings
-          </Button>
-        }
+        title="Editar perfil"
         sx={{ borderBottom: 1, borderColor: "divider", pb: 0 }}
       />
       <CardContent>
@@ -40,7 +27,7 @@ const ProfileCard = () => {
           variant="subtitle2"
           sx={{ textTransform: "uppercase", opacity: 0.7, mb: 2 }}
         >
-          User Information
+          Informacion del usuario
         </Typography>
         <Grid
           container
@@ -53,7 +40,7 @@ const ProfileCard = () => {
           >
             <TextField
               fullWidth
-              label="Username"
+              label="Nombre"
               defaultValue="lucky.jesse"
               variant="outlined"
             />
@@ -65,7 +52,7 @@ const ProfileCard = () => {
           >
             <TextField
               fullWidth
-              label="Email address"
+              label="Correo electronico"
               defaultValue="jesse@example.com"
               type="email"
               variant="outlined"
@@ -78,7 +65,7 @@ const ProfileCard = () => {
           >
             <TextField
               fullWidth
-              label="First name"
+              label="Primer apellido"
               defaultValue="Jesse"
               variant="outlined"
             />
@@ -90,7 +77,7 @@ const ProfileCard = () => {
           >
             <TextField
               fullWidth
-              label="Last name"
+              label="Segundo apellido"
               defaultValue="Lucky"
               variant="outlined"
             />
@@ -101,7 +88,7 @@ const ProfileCard = () => {
           variant="subtitle2"
           sx={{ textTransform: "uppercase", opacity: 0.7, mb: 2 }}
         >
-          Contact Information
+          Informacion de contacto
         </Typography>
         <Grid
           container
@@ -113,7 +100,7 @@ const ProfileCard = () => {
           >
             <TextField
               fullWidth
-              label="Address"
+              label="Direccion"
               defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
               variant="outlined"
             />
@@ -125,7 +112,7 @@ const ProfileCard = () => {
           >
             <TextField
               fullWidth
-              label="City"
+              label="Ciudad"
               defaultValue="New York"
               variant="outlined"
             />
@@ -137,7 +124,7 @@ const ProfileCard = () => {
           >
             <TextField
               fullWidth
-              label="Country"
+              label="Pais"
               defaultValue="United States"
               variant="outlined"
             />
@@ -149,7 +136,7 @@ const ProfileCard = () => {
           >
             <TextField
               fullWidth
-              label="Postal code"
+              label="Codigo postal"
               defaultValue="437300"
               variant="outlined"
             />
@@ -160,11 +147,11 @@ const ProfileCard = () => {
           variant="subtitle2"
           sx={{ textTransform: "uppercase", opacity: 0.7, mb: 2 }}
         >
-          About me
+          Sobre mi
         </Typography>
         <TextField
           fullWidth
-          label="About me"
+          label="Sobre mi"
           defaultValue="A beautiful Dashboard for Bootstrap 5. It is Free and Open Source."
           variant="outlined"
           multiline
