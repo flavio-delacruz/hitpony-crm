@@ -2,7 +2,6 @@ import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 
 const columns = [
-  { field: "id", headerName: "ID", width: 70 },
   { field: "nombres", headerName: "Nombres", width: 130 },
   {
     field: "apellidos",
@@ -22,7 +21,6 @@ const columns = [
   { field: "creacion", headerName: "Fecha de Creacion", width: 130 },
   { field: "ciudad", headerName: "Ciudad", width: 130 },
   { field: "actividad", headerName: "Ultima Actividad", width: 130 },
-  { field: "acciones", headerName: "Acciones", width: 130 },
 ];
 
 const rows = [

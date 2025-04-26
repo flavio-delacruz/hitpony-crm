@@ -8,6 +8,7 @@ import AffiliateProfilePage from "./pages/affiliateProfilePage/affiliateProfileP
 //import PaginaCrm from "./components/paginaCrm/paginaCrm";
 import MetricasPage from "./pages/metricasPage/metricasPage";
 import CrmPage from "./pages/crmPage/crmPage";
+import ContactPage from "./pages/contactPage/ContactPage";
 
 function App() {
   return (
@@ -36,6 +37,10 @@ function App() {
         <Route
           path="/crm"
           element={<CrmPage />}
+        />
+        <Route
+          path="/pagina-de-contacto"
+          element={<ContactPage />}
         />
       </Routes>
     </Router>
