@@ -23,22 +23,22 @@ const UserTable = () => {
       ultima_actividad: "Hace 2 días",
     },
     {
-      id: 1,
-      name: "Juan Pérez",
-      email: "juan.perez@example.com",
+      id: 2,
+      name: "Ana Gómez",
+      email: "ana.gomez@example.com",
       ultima_actividad: "Hace 5 horas",
     },
     {
-      id: 1,
-      name: "Juan Pérez",
-      email: "juan.perez@example.com",
+      id: 3,
+      name: "Carlos Díaz",
+      email: "carlos.diaz@example.com",
       ultima_actividad: "Hace 1 semana",
     },
     {
-      id: 1,
-      name: "Juan Pérez",
-      email: "juan.perez@example.com",
-      ultima_actividad: "Hace 4 dias",
+      id: 4,
+      name: "Lucía Sánchez",
+      email: "lucia.sanchez@example.com",
+      ultima_actividad: "Hace 4 días",
     },
   ];
 

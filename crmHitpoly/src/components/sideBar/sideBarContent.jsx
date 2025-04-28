@@ -11,6 +11,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import BotonSideBar from "../buttons/botonSideBar/botonSideBar";
 import LogoutModal from "../modals/logoutModal/logoutModal";
 import LogoHitpoly from "../../../public/LogoHitpoly";
+import {useAuth }from "../../context/AuthContext"
 
 const SidebarContainer = styled(Box)({
   height: "100vh",
@@ -31,9 +32,13 @@ const buttons = [
 ];
 const SideBarContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const {  user } = useAuth();
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+
+
+  console.log("USUARIO ID:", user);
+  
 
   return (
     <SidebarContainer>

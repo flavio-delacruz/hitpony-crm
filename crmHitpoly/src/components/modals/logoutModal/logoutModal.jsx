@@ -1,6 +1,14 @@
 import { Button, Modal, Box, Typography } from "@mui/material";
+import { useAuth } from "../../../context/AuthContext";
 
-const LogoutModal = ({ open, handleClose, handleLogout }) => {
+const LogoutModal = ({ open, handleClose }) => {
+  const { logout } = useAuth();
+
+  const handleConfirmLogout = () => {
+    logout();       
+    handleClose();  
+  };
+
   return (
     <Modal
       open={open}
@@ -33,6 +41,7 @@ const LogoutModal = ({ open, handleClose, handleLogout }) => {
         <Box
           display="flex"
           justifyContent="space-between"
+          mt={3}
         >
           <Button
             variant="outlined"
@@ -44,7 +53,7 @@ const LogoutModal = ({ open, handleClose, handleLogout }) => {
           <Button
             variant="contained"
             color="error"
-            onClick={handleLogout}
+            onClick={handleConfirmLogout}
           >
             Salir
           </Button>

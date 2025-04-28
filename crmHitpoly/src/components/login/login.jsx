@@ -2,12 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Grid } from "@mui/material";
 import Swal from "sweetalert2";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     try {
@@ -17,30 +19,28 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          funcion: 'login', 
+          funcion: 'login',
           email: email,
           password: password,
         }),
       });
 
       const data = await response.json();
-      console.log("DATA:", data);
+    
 
       if (data.status === "success") {
         const userData = data.user;
-        console.log("USER", userData);
-        
-        // Aquí puedes hacer algo con el usuario, como guardarlo en un contexto o estado global
-        // Ejemplo: login(userData);
+  
+
+        login(userData);
 
         Swal.fire({
           icon: 'success',
-          title: '¡Bienvenido al master de hitpoly!',
+          title: '¡Bienvenido al crm del masterfull!',
           text: 'Has iniciado sesión correctamente',
         });
 
-        // Redirige al dashboard
-        navigate('/master-full');
+        navigate('/dashboard');
       } else {
         Swal.fire({
           icon: 'error',
@@ -55,6 +55,12 @@ const Login = () => {
         title: 'Error del servidor',
         text: 'Hubo un problema al conectar con el servidor.',
       });
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleLogin();
     }
   };
 
@@ -93,6 +99,7 @@ const Login = () => {
             placeholder="Correo Electrónico"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
             style={{
               width: "100%",
               padding: "10px",
@@ -101,13 +108,14 @@ const Login = () => {
               border: "1px solid #ccc",
             }}
           />
-          
+
           <Box
             component="input"
             type="password"
             placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
             style={{
               width: "100%",
               padding: "10px",
@@ -116,7 +124,7 @@ const Login = () => {
               border: "1px solid #ccc",
             }}
           />
-          
+
           <Box
             component="button"
             onClick={handleLogin}
