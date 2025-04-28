@@ -1,17 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Link,
-  Divider,
-  Grid,
-  Card,
-} from "@mui/material";
-import loginImage from "../../assets/login.png";
 import { useNavigate } from "react-router-dom";
+import { Box, Grid } from "@mui/material";
+import Swal from "sweetalert2";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -21,172 +11,136 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(
-        "https://apisistemamembresia.hitpoly.com/ajax/usuarioController.php",
-        {
-          funcion: "login",
-          user: email,
-          pass: password,
+      const response = await fetch('https://apiweb.hitpoly.com/ajax/usuarioMasterController.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+        body: JSON.stringify({
+          funcion: 'login', 
+          email: email,
+          password: password,
+        }),
+      });
 
-      console.log("respuesta de inicio de sesion", response.data.status);
+      const data = await response.json();
+      console.log("DATA:", data);
 
-      if (
-        response.data.status === "success" &&
-        response.data.message === "logueado"
-      ) {
-        navigate("/dashboard");
+      if (data.status === "success") {
+        const userData = data.user;
+        console.log("USER", userData);
+        
+        // Aquí puedes hacer algo con el usuario, como guardarlo en un contexto o estado global
+        // Ejemplo: login(userData);
+
+        Swal.fire({
+          icon: 'success',
+          title: '¡Bienvenido al master de hitpoly!',
+          text: 'Has iniciado sesión correctamente',
+        });
+
+        // Redirige al dashboard
+        navigate('/master-full');
       } else {
-        setError(response.data.message);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Correo o contraseña incorrectos',
+        });
       }
     } catch (error) {
-      console.error("Error de inicio de sesión:", error);
-      setError("Error en la solicitud");
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleLogin();
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error del servidor',
+        text: 'Hubo un problema al conectar con el servidor.',
+      });
     }
   };
 
   return (
-    <div>
-      <Grid
-        container
-        justifyContent="center"
-        alignItems="center"
-        style={{ height: "100vh", backgroundColor: "#F2F2F2" }}
-      >
-        <Grid
-          container
-          justifyContent="center"
-          spacing={2}
-          alignItems="center"
+    <Grid
+      container
+      justifyContent="center"
+      alignItems="center"
+      style={{ height: "100vh", backgroundColor: "#F2F2F2" }}
+    >
+      <Grid item>
+        <Box
+          sx={{
+            padding: "30px",
+            maxWidth: "400px",
+            borderRadius: "10px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+            backgroundColor: "#fff",
+          }}
         >
-          <Grid item>
-            <Card
-              sx={{
-                padding: "30px",
-                maxWidth: "400px",
-                borderRadius: "10px",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-                backgroundColor: "#fff",
-              }}
-            >
-              <Typography
-                variant="h4"
-                component="h1"
-                gutterBottom
-              >
-                Crm Hitpoly
-              </Typography>
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                gutterBottom
-              >
-                La tecnología conectada con la ciencia!
-              </Typography>
+          <Box
+            component="h1"
+            sx={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              marginBottom: "10px",
+              textAlign: "center",
+            }}
+          >
+            Iniciar Sesión
+          </Box>
 
-              <TextField
-                fullWidth
-                label="Correo Electronico"
-                type="email"
-                margin="normal"
-                variant="outlined"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                onKeyDown={handleKeyDown}
-              />
-              <TextField
-                fullWidth
-                label="Contraseña"
-                type="password"
-                margin="normal"
-                variant="outlined"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                onKeyDown={handleKeyDown}
-              />
+          <Box
+            component="input"
+            type="email"
+            placeholder="Correo Electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "10px",
+              marginBottom: "15px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+            }}
+          />
+          
+          <Box
+            component="input"
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "10px",
+              marginBottom: "15px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+            }}
+          />
+          
+          <Box
+            component="button"
+            onClick={handleLogin}
+            style={{
+              width: "100%",
+              padding: "10px",
+              backgroundColor: "#1BAFBF",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Ingresar
+          </Box>
 
-              <Button
-                fullWidth
-                variant="contained"
-                onClick={handleLogin}
-                sx={{
-                  marginTop: "20px",
-                  background:
-                    "linear-gradient(45deg, #91A0F2, #1BAFBF, #7732D9)",
-                  color: "#fff",
-                  "&:hover": {
-                    background:
-                      "linear-gradient(45deg, #7732D9, #1BAFBF, #91A0F2)",
-                  },
-                }}
-              >
-                Ingresar
-              </Button>
-
-              {error && (
-                <Typography
-                  variant="body2"
-                  color="error"
-                  sx={{ marginTop: "10px" }}
-                >
-                  {error}
-                </Typography>
-              )}
-
-              {/* <Typography variant="body2" sx={{ marginTop: '20px' }}>
-                ¿No tienes cuenta? <Link href="/register">Crear cuenta</Link>
-              </Typography> */}
-
-              <Divider sx={{ marginY: "20px" }}>O</Divider>
-
-              <Box
-                sx={{ display: "flex", gap: "10px", marginBottom: "10px" }}
-              ></Box>
-
-              <Typography
-                variant="body2"
-                color="textSecondary"
-              >
-                info@hitpoly.com
-              </Typography>
-            </Card>
-          </Grid>
-
-          <Grid item>
-            <Box
-              sx={{
-                width: "450px",
-                height: "450px",
-                backgroundImage: `url(${loginImage})`,
-                backgroundSize: "contain",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
-                marginLeft: "40px",
-              }}
-            />
-          </Grid>
-        </Grid>
+          {error && (
+            <Box sx={{ marginTop: "10px", color: "red", textAlign: "center" }}>
+              {error}
+            </Box>
+          )}
+        </Box>
       </Grid>
-    </div>
+    </Grid>
   );
 };
 
