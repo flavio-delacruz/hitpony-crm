@@ -36,7 +36,7 @@ const Login = () => {
 
         Swal.fire({
           icon: 'success',
-          title: '¡Bienvenido al crm del masterfull!',
+          title: '¡Bienvenido al CRM de Hitpoly!',
           text: 'Has iniciado sesión correctamente',
         });
 

@@ -52,9 +52,8 @@ const ProfileCard = () => {
           >
             <TextField
               fullWidth
-              label="Correo electronico"
-              defaultValue="jesse@example.com"
-              type="email"
+              label="apellido"
+              defaultValue="Jesse"
               variant="outlined"
             />
           </Grid>
@@ -65,8 +64,9 @@ const ProfileCard = () => {
           >
             <TextField
               fullWidth
-              label="Primer apellido"
-              defaultValue="Jesse"
+              label="Correo"
+              defaultValue="jesse@example.com"
+              type="email"
               variant="outlined"
             />
           </Grid>
