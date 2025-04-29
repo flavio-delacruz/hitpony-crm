@@ -2,163 +2,160 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Divider,
   TextField,
   Typography,
   Grid,
+  Button,
+  Box,
+  IconButton,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../../../context/AuthContext";
+import ProfileImageCard from "./ProfileImageCard";
 
 const ProfileCard = () => {
+  const { user, login } = useAuth();
+  const [formData, setFormData] = useState(user);
+  const [editableFields, setEditableFields] = useState({});
+  const [localChanges, setLocalChanges] = useState(null);
+  const prevUserRef = useRef(user);
+
+  useEffect(() => {
+    const prevUser = prevUserRef.current;
+    if (JSON.stringify(prevUser) !== JSON.stringify(user)) {
+      setFormData(user);
+      setLocalChanges(null);
+      setEditableFields({});
+      prevUserRef.current = user;
+    }
+  }, [user]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const updated = { ...formData, [name]: value };
+    setFormData(updated);
+    setLocalChanges(updated);
+  };
+
+  const handleUpdate = async () => {
+    if (!formData.id) {
+      alert("El ID del usuario no está disponible.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "https://apiweb.hitpoly.com/ajax/updateSetterController.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            funcion: "update",
+            ...formData,
+            id: formData.id,
+          }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Error actualizando los datos");
+
+      const updatedUser = await response.json();
+      const updatedUserWithId = {
+        ...formData,
+        ...updatedUser,
+        id: formData.id,
+      };
+
+      setFormData(updatedUserWithId);
+      login(updatedUserWithId);
+      setEditableFields({});
+      alert("Datos actualizados correctamente");
+    } catch (error) {
+      console.error(error);
+      alert("Hubo un error actualizando los datos");
+    }
+  };
+
+  const toggleFieldEdit = (name) => {
+    setEditableFields((prev) => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  if (!user) return null;
+
+  const fields = [
+    { label: "Nombre", name: "nombre" },
+    { label: "Apellido", name: "apellido" },
+    { label: "Correo", name: "correo", type: "email" },
+    { label: "Teléfono", name: "telefono" },
+    { label: "Dirección", name: "direccion" },
+    { label: "Ciudad", name: "ciudad" },
+    { label: "País", name: "pais" },
+    { label: "Código Postal", name: "codigo_postal" },
+    { label: "Sobre mí", name: "sobre_mi", multiline: true, rows: 3 },
+  ];
+
   return (
-    <Card
-      sx={{
-        padding: "20px",
-        borderRadius: "15px",
-        height: { sx: "auto", md: "100%" },
-        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-      }}
-    >
-      <CardHeader
-        title="Editar perfil"
-        sx={{ borderBottom: 1, borderColor: "divider", pb: 0 }}
-      />
-      <CardContent>
-        <Typography
-          variant="subtitle2"
-          sx={{ textTransform: "uppercase", opacity: 0.7, mb: 2 }}
-        >
-          Informacion del usuario
-        </Typography>
-        <Grid
-          container
-          spacing={2}
-        >
-          <Grid
-            item
-            xs={12}
-            md={6}
-          >
-            <TextField
-              fullWidth
-              label="Nombre"
-              defaultValue="lucky.jesse"
-              variant="outlined"
-            />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={6}
-          >
-            <TextField
-              fullWidth
-              label="apellido"
-              defaultValue="Jesse"
-              variant="outlined"
-            />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={6}
-          >
-            <TextField
-              fullWidth
-              label="Correo"
-              defaultValue="jesse@example.com"
-              type="email"
-              variant="outlined"
-            />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={6}
-          >
-            <TextField
-              fullWidth
-              label="Segundo apellido"
-              defaultValue="Lucky"
-              variant="outlined"
-            />
-          </Grid>
-        </Grid>
-        <Divider sx={{ my: 3 }} />
-        <Typography
-          variant="subtitle2"
-          sx={{ textTransform: "uppercase", opacity: 0.7, mb: 2 }}
-        >
-          Informacion de contacto
-        </Typography>
-        <Grid
-          container
-          spacing={2}
-        >
-          <Grid
-            item
-            xs={12}
-          >
-            <TextField
-              fullWidth
-              label="Direccion"
-              defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-              variant="outlined"
-            />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={4}
-          >
-            <TextField
-              fullWidth
-              label="Ciudad"
-              defaultValue="New York"
-              variant="outlined"
-            />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={4}
-          >
-            <TextField
-              fullWidth
-              label="Pais"
-              defaultValue="United States"
-              variant="outlined"
-            />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={4}
-          >
-            <TextField
-              fullWidth
-              label="Codigo postal"
-              defaultValue="437300"
-              variant="outlined"
-            />
-          </Grid>
-        </Grid>
-        <Divider sx={{ my: 3 }} />
-        <Typography
-          variant="subtitle2"
-          sx={{ textTransform: "uppercase", opacity: 0.7, mb: 2 }}
-        >
-          Sobre mi
-        </Typography>
-        <TextField
-          fullWidth
-          label="Sobre mi"
-          defaultValue="A beautiful Dashboard for Bootstrap 5. It is Free and Open Source."
-          variant="outlined"
-          multiline
-          rows={3}
+    <Box>
+      <ProfileImageCard />
+      <Card
+        sx={{ padding: 3, borderRadius: 3, boxShadow: 3, marginTop: "20px" }}
+      >
+        <CardHeader
+          title="Editar perfil"
+          action={
+            localChanges &&
+            JSON.stringify(localChanges) !== JSON.stringify(user) ? (
+              <Button variant="contained" onClick={handleUpdate}>
+                Actualizar
+              </Button>
+            ) : null
+          }
+          sx={{ borderBottom: 1, borderColor: "divider", pb: 0 }}
         />
-      </CardContent>
-    </Card>
+
+        <CardContent>
+          <Typography
+            variant="subtitle2"
+            sx={{ textTransform: "uppercase", opacity: 0.7, mb: 2 }}
+          >
+            Información del usuario
+          </Typography>
+          <Grid container spacing={2}>
+            {fields.map((field) => (
+              <Grid
+                item
+                xs={12}
+                md={field.name === "sobre_mi" ? 12 : 6}
+                key={field.name}
+              >
+                <Box sx={{ position: "relative" }}>
+                  <TextField
+                    fullWidth
+                    label={field.label}
+                    name={field.name}
+                    value={formData[field.name] || ""}
+                    onChange={handleChange}
+                    type={field.type || "text"}
+                    variant="outlined"
+                    multiline={field.multiline || false}
+                    rows={field.rows || 1}
+                    disabled={!editableFields[field.name]}
+                  />
+                  <IconButton
+                    onClick={() => toggleFieldEdit(field.name)}
+                    size="small"
+                    sx={{ position: "absolute", top: 8, right: 8 }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 
