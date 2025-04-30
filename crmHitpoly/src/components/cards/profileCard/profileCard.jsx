@@ -13,6 +13,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import ProfileImageCard from "./ProfileImageCard";
+import Swal from "sweetalert2";
 
 const ProfileCard = () => {
   const { user, login } = useAuth();
@@ -70,10 +71,21 @@ const ProfileCard = () => {
       setFormData(updatedUserWithId);
       login(updatedUserWithId);
       setEditableFields({});
-      alert("Datos actualizados correctamente");
+       Swal.fire({
+                icon: 'success',
+                title: '¡Datos actualizados correctamente!',
+                text: 'Has editado los datos correctamente',
+              });
+      
     } catch (error) {
       console.error(error);
-      alert("Hubo un error actualizando los datos");
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Hubo un error actualizando los datos!",
+        footer: '<a href="#">Por que tengo este problema?</a>'
+      });
+    
     }
   };
 
