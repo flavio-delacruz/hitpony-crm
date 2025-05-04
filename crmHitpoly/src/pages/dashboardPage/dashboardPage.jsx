@@ -1,101 +1,88 @@
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import UserTable from "../../components/tables/userTable/userTable";
 import OrdersList from "../../components/cards/ordersList/ordersList";
 import Layout from "../../components/layout/layout";
-import InfoCard from "../../components/cards/infoCard/infoCard";
-import ChartCard from "../../components/cards/chartCard/chartCard";
 import ContentCard from "../../components/cards/contentCard/contentCard";
+import { useAuth } from "../../context/AuthContext";
+import { useEffect, useState } from "react";
+import SummaryCardsRow from "./componentes/SummaryCardsRow";
+import DashboardCharts from "./componentes/Charts";
 
 const DashboardPage = () => {
+  const { user } = useAuth();
+  const [totalProspectos, setTotalProspectos] = useState(null);
+  const [totalGanados, setTotalGanados] = useState(null);
+  const [prospectosData, setProspectosData] = useState([]);
+  const [totalInteresados, setTotalInteresados] = useState(null);
+  const [totalAgendados, setTotalAgendados] = useState(null);
+
+  useEffect(() => {
+    const fetchProspectos = async () => {
+      if (!user?.id) return;
+
+      try {
+        const response = await fetch(
+          "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              funcion: "getProspectos",
+              id: user.id,
+            }),
+          }
+        );
+
+        const data = await response.json();
+        console.log("Respuesta de API:", data);
+
+        if (Array.isArray(data.resultado)) {
+          setProspectosData(data.resultado);
+          setTotalProspectos(data.resultado.length);
+
+          const agendados = data.resultado.filter(
+            (p) => p.estado_contacto?.toLowerCase().trim() === "agendado"
+          ).length;
+          setTotalAgendados(agendados);
+
+          const interesados = data.resultado.filter(
+            (p) => p.estado_contacto?.toLowerCase().trim() === "interesado"
+          ).length;
+          setTotalInteresados(interesados);
+
+          const ganados = data.resultado.filter(
+            (p) => p.estado_contacto?.toLowerCase().trim() === "ganado"
+          ).length;
+          setTotalGanados(ganados);
+        } else {
+          setTotalProspectos(0);
+          setTotalGanados(0);
+          setProspectosData([]);
+        }
+      } catch (error) {
+        console.error("Error al obtener prospectos:", error);
+        setTotalProspectos(0);
+        setTotalGanados(0);
+        setProspectosData([]);
+      }
+    };
+
+    fetchProspectos();
+  }, [user]);
+
   return (
     <Layout title="Inicio">
-      {/* Cards Row 1 */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "repeat(2, 1fr)",
-            sm: "repeat(4, 1fr)",
-          },
-          gap: { xs: "10px", sm: "20px" },
-          flexWrap: "wrap",
-          marginBottom: "20px",
-        }}
-      >
-        <InfoCard
-          title="Dinero del dia"
-          amount="$53k"
-          percentage="+55% respecto a la semana pasada"
-          percentageColor="textSecondary"
-        />
-        <InfoCard
-          title="Usuarios del Día"
-          amount="2,300"
-          percentage="+3% respecto al mes pasado"
-        />
-        <InfoCard
-          title="Nuevos Clientes"
-          amount="3,462"
-          percentage="-2% respecto a ayer"
-        />
-        <InfoCard
-          title="Ventas"
-          amount="$103,430"
-          percentage="+5% respecto a ayer"
-        />
-      </Box>
-      {/* Cards Row 2 */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "repeat(1, 1fr)",
-            sm: "repeat(3, 1fr)",
-          },
-          gap: "20px",
-          flexWrap: "wrap",
-          marginBottom: "20px",
-        }}
-      >
-        <ChartCard
-          series={[
-            { data: [35, 44, 24, 34] },
-            { data: [51, 6, 49, 30] },
-            { data: [15, 25, 30, 50] },
-            { data: [60, 50, 15, 25] },
-          ]}
-          xAxis={[{ data: ["Q1", "Q2", "Q3", "Q4"], scaleType: "band" }]}
-          titleChart="Reporte de Usuarios"
-          title="Número total de usuarios registrados"
-          subtitle="Resumen de los usuarios activos/inactivos más recientes"
-        />
-        <ChartCard
-          series={[
-            { data: [35, 44, 24, 34] },
-            { data: [51, 6, 49, 30] },
-            { data: [15, 25, 30, 50] },
-            { data: [60, 50, 15, 25] },
-          ]}
-          xAxis={[{ data: ["Q1", "Q2", "Q3", "Q4"], scaleType: "band" }]}
-          titleChart="Estado de Leads"
-          title="Cantidad de leads distribuidos..."
-          subtitle=" +15% leads gestionados hoy"
-        />
-        <ChartCard
-          series={[
-            { data: [35, 44, 24, 34] },
-            { data: [51, 6, 49, 30] },
-            { data: [15, 25, 30, 50] },
-            { data: [60, 50, 15, 25] },
-          ]}
-          xAxis={[{ data: ["Q1", "Q2", "Q3", "Q4"], scaleType: "band" }]}
-          titleChart="Métricas de Ventas"
-          title="Incremento porcentual en ventas"
-          subtitle="Progreso respecto al objetivo mensual"
-        />
-      </Box>
+      <SummaryCardsRow
+        totalProspectos={totalProspectos}
+        totalInteresados={totalInteresados}
+        totalAgendados={totalAgendados}
+        totalGanados={totalGanados}
+      />
 
-      {/* Cards Row 3 */}
+      <DashboardCharts />
+
       <Box
         sx={{
           width: { xs: "90vw", sm: "100%" },
@@ -114,7 +101,7 @@ const DashboardPage = () => {
           subtitle="30 usuarios que han interactuado recientemente"
           gridSize={8}
         >
-          <UserTable />
+          <UserTable users={prospectosData} />
         </ContentCard>
         <ContentCard
           title="Resumen de Leads"

@@ -3,7 +3,6 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  InputBase,
   IconButton,
   Checkbox,
   FormControlLabel,
@@ -11,7 +10,6 @@ import {
   MenuItem,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import FilterUsuarios from "../filter/filterUsuarios/filterUsuarios";
 
 const NavBar = () => {
@@ -94,18 +92,6 @@ const NavBar = () => {
           Mi Aplicación
         </Typography>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <InputBase
-            placeholder="Buscar…"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            style={{
-              color: "white",
-              backgroundColor: "rgba(31, 29, 29, 0.69)",
-              borderRadius: "4px",
-              padding: "4px 8px",
-              marginRight: "8px",
-            }}
-          />
           <IconButton
             type="submit"
             aria-label="search"

@@ -12,6 +12,8 @@ import MetricasPage from "./pages/metricasPage/metricasPage";
 import CrmPage from "./pages/crmPage/crmPage";
 import ContactPage from "./pages/contactPage/ContactPage";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import RegistroClienteForm from "./components/forms/clientesPotenciales/layoutFormPublic";
+import ProspectosTracker from "./pages/tracker/ProspectosTracker";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -31,55 +33,65 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
-          
+
           {/* Rutas protegidas */}
-          <Route 
-            path="/dashboard" 
+          <Route
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/usuarios" 
+          <Route
+            path="/usuarios"
             element={
               <ProtectedRoute>
                 <UserListPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/perfil" 
+          <Route
+            path="/perfil"
             element={
               <ProtectedRoute>
                 <AffiliateProfilePage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/metricas" 
+          <Route
+            path="/metricas"
             element={
               <ProtectedRoute>
                 <MetricasPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/crm" 
+          <Route
+            path="/crm"
             element={
               <ProtectedRoute>
                 <CrmPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/pagina-de-contacto" 
+          <Route path="/tracker" element={<ProspectosTracker />} />
+          <Route
+            path="/pagina-de-contacto/:prospectId"
             element={
               <ProtectedRoute>
                 <ContactPage />
               </ProtectedRoute>
-            } 
+            }
+          />
+
+          <Route
+            path="formulario-de-contacto-cliente"
+            element={<RegistroClienteForm />}
+          />
+          <Route
+            path="/registros/:formName"
+            element={<RegistroClienteForm />}
           />
         </Routes>
       </Router>

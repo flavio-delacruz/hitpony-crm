@@ -7,40 +7,12 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Typography,
   TablePagination,
 } from "@mui/material";
 
-const UserTable = () => {
+const UserTable = ({ users = [] }) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  const users = [
-    {
-      id: 1,
-      name: "Juan Pérez",
-      email: "juan.perez@example.com",
-      ultima_actividad: "Hace 2 días",
-    },
-    {
-      id: 2,
-      name: "Ana Gómez",
-      email: "ana.gomez@example.com",
-      ultima_actividad: "Hace 5 horas",
-    },
-    {
-      id: 3,
-      name: "Carlos Díaz",
-      email: "carlos.diaz@example.com",
-      ultima_actividad: "Hace 1 semana",
-    },
-    {
-      id: 4,
-      name: "Lucía Sánchez",
-      email: "lucia.sanchez@example.com",
-      ultima_actividad: "Hace 4 días",
-    },
-  ];
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -50,6 +22,11 @@ const UserTable = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  // Filtramos solo los usuarios con estado_contacto "interesado"
+  const interesados = users.filter(
+    (user) => user.estado_contacto?.toLowerCase() === "interesado"
+  );
 
   return (
     <Paper
@@ -63,21 +40,21 @@ const UserTable = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
               <TableCell>Nombre</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell>Ultima Actividad</TableCell>
+              <TableCell>Celular</TableCell>
+              <TableCell>Estado</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {users
+            {interesados
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.ultima_actividad}</TableCell>
+              .map((user, index) => (
+                <TableRow key={index}>
+                  <TableCell>{user.nombre || user.name}</TableCell>
+                  <TableCell>{user.correo}</TableCell>
+                  <TableCell>{user.celular}</TableCell>
+                  <TableCell>{user.estado_contacto || "No disponible"}</TableCell>
                 </TableRow>
               ))}
           </TableBody>
@@ -85,7 +62,7 @@ const UserTable = () => {
       </TableContainer>
       <TablePagination
         component="div"
-        count={users.length}
+        count={interesados.length}
         page={page}
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}

@@ -19,13 +19,14 @@ ChartJS.register(
   Legend
 );
 
-const BarChart = ({ titleChart }) => {
+const BarChart = ({ titleChart, series, xAxis }) => {
+  // Configuración de los datos del gráfico
   const data = {
-    labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo"],
+    labels: xAxis[0].data, // Usamos las labels que se pasan por props
     datasets: [
       {
-        label: "Ventas (en USD)",
-        data: [5000, 3000, 4000, 7000, 6000],
+        label: titleChart, // Usamos el título como etiqueta
+        data: series[0].data, // Usamos los datos que se pasan por props
         backgroundColor: "rgba(75, 192, 192, 0.6)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 1,
@@ -41,7 +42,7 @@ const BarChart = ({ titleChart }) => {
       },
       title: {
         display: true,
-        text: "Ventas Mensuales",
+        text: titleChart, // Título dinámico
       },
     },
   };

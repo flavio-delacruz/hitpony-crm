@@ -5,7 +5,6 @@ import { styled } from "@mui/system";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import BotonSideBar from "../buttons/botonSideBar/botonSideBar";
@@ -28,7 +27,6 @@ const buttons = [
   { text: "Usuarios", icon: PeopleIcon, path: "/usuarios" },
   { text: "Crm", icon: ContactPageIcon, path: "/crm" },
   { text: "Metricas", icon: AssessmentIcon, path: "/metricas" },
-  { text: "Perfil", icon: AccountCircleIcon, path: "/perfil" },
 ];
 const SideBarContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

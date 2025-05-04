@@ -7,21 +7,6 @@ import AddModal from "../../components/modals/addModal/addModal";
 
 const UserListPage = () => {
   const [users, setUsers] = useState([
-    // Datos iniciales de ejemplo
-    {
-      nombre: "Juan",
-      apellidos: "Pérez",
-      correo: "juan.perez@example.com",
-      telefono: "123456789",
-      direccion: "Calle 1",
-    },
-    {
-      nombre: "María",
-      apellidos: "López",
-      correo: "maria.lopez@example.com",
-      telefono: "987654321",
-      direccion: "Avenida 2",
-    },
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);

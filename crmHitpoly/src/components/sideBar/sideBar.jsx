@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { Box, Drawer, useMediaQuery } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 import SideBarContent from "./sideBarContent";
 
 const SideBar = () => {
