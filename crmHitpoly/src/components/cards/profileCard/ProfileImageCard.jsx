@@ -64,7 +64,7 @@ import {
     return (
       <Card sx={{ borderRadius: 3, overflow: "hidden", boxShadow: 3 }}>
         {/* Banner */}
-        <Box sx={{ position: "relative", height: 280 }}>
+        <Box sx={{ position: "relative", height: {xs: 160, md: 280} }}>
           <Box
             sx={{
               width: "100%",
@@ -98,7 +98,7 @@ import {
             <Box sx={{ position: "relative", mr: 2, "&:hover .edit": { opacity: 1 } }}>
               <Avatar
                 src={avatarUrl}
-                sx={{ width: 128, height: 128, border: "4px solid white" }}
+                sx={{ width: {xs: 80, md: 128}, height: {xs: 80, md: 128}, border: "4px solid white" }}
               />
               <IconButton
                 component="label"
