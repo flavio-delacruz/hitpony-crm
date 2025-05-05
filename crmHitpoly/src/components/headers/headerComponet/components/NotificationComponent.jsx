@@ -7,19 +7,20 @@ import {
   Badge,
   ListItemText,
   ListItemIcon,
+  Box
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import { useAuth } from "../../../../context/AuthContext";
 
 const LOCAL_STORAGE_KEY = "notificacionesGuardadas";
-const LOCAL_STORAGE_KEY_LEIDAS = "notificacionesLeidas"; // Nueva clave para las notificaciones leídas
+const LOCAL_STORAGE_KEY_LEIDAS = "notificacionesLeidas"; 
 
 const NotificationComponent = () => {
   const { user } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificaciones, setNotificaciones] = useState([]);
-  const [notificacionesLeidas, setNotificacionesLeidas] = useState([]); // Estado de notificaciones leídas
+  const [notificacionesLeidas, setNotificacionesLeidas] = useState([]); 
   const dataAnteriorRef = useRef([]);
   const open = Boolean(anchorEl);
 
@@ -79,14 +80,17 @@ const NotificationComponent = () => {
           const cambiosDetectados = [];
   
           nuevosDatos.forEach((nuevoProspecto) => {
+            // Filtrar los prospectos con origen "interno"
+            if (nuevoProspecto.origen === "interno") return;
+  
             const anterior = dataAnteriorRef.current.find(
               (item) => item.id === nuevoProspecto.id
             );
             const origen = nuevoProspecto.origen || "Desconocido";
             const nombre = nuevoProspecto.nombre || "Sin nombre";
-            const apellido = nuevoProspecto.apellido || "Sin apellido"; // Obtener el apellido
-            const createdAt = nuevoProspecto.created_at || new Date().toISOString(); // Asegúrate de tener created_at
-            const estado = nuevoProspecto.estado_contacto || "No especificado"; // Obtener el estado
+            const apellido = nuevoProspecto.apellido || "Sin apellido";
+            const createdAt = nuevoProspecto.created_at || new Date().toISOString();
+            const estado = nuevoProspecto.estado_contacto || "No especificado";
             const fecha = new Date(createdAt);
             const hora = new Intl.DateTimeFormat("es-ES", {
               hour: "2-digit",
@@ -130,12 +134,12 @@ const NotificationComponent = () => {
   
         dataAnteriorRef.current = nuevosDatos;
       } catch (error) {
-        console.error("Error al traer prospectos:", error);
+        console.error("Error al obtener datos de prospectos:", error);
       }
     };
   
     fetchData();
-    const interval = setInterval(fetchData, 10000); // cada 10 segundos
+    const interval = setInterval(fetchData, 10000);
     return () => clearInterval(interval);
   }, [user]);
   
@@ -157,7 +161,7 @@ const NotificationComponent = () => {
 
   return (
     <>
-      <IconButton onClick={handleOpenMenu}>
+      <Box onClick={handleOpenMenu}>
         <Badge
           badgeContent={
             notificaciones.filter(
@@ -168,7 +172,7 @@ const NotificationComponent = () => {
         >
           <NotificationsIcon />
         </Badge>
-      </IconButton>
+      </Box>
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -179,7 +183,7 @@ const NotificationComponent = () => {
             width: 380,
             height: "85vh",
             maxHeight: "100vh",
-            overflowY: "auto", // scroll automático
+            overflowY: "auto",
           },
         }}
       >
@@ -192,7 +196,7 @@ const NotificationComponent = () => {
               <ListItemText
                 primary={notif.tipo}
                 secondary={notif.mensaje}
-                sx={{ wordWrap: "break-word", whiteSpace: "normal" }} // Asegura que el texto pase a la línea siguiente
+                sx={{ wordWrap: "break-word", whiteSpace: "normal" }} 
               />
             </MenuItem>
           ))

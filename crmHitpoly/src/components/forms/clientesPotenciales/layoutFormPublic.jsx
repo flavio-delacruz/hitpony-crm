@@ -23,9 +23,9 @@ const RegistroClienteForm = () => {
     <Box
       sx={{
         display: "flex",
-        justifyContent: "center", // Centra el contenido horizontalmente
-        alignItems: "center", // Centra el contenido verticalmente
-        minHeight: "100vh", // Asegura que el contenedor tenga al menos el 100% de la altura de la ventana
+        justifyContent: "center", 
+        alignItems: "center", 
+        minHeight: "100vh", 
         p: 2,
       }}
     >

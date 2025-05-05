@@ -6,6 +6,8 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import { useAuth } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+
+
 const reorder = (list, startIndex, endIndex) => {
   const result = [...list];
   const [removed] = result.splice(startIndex, 1);
@@ -84,7 +86,7 @@ const CrmCard = () => {
         const prospectos = Array.isArray(data.resultado) ? data.resultado : [];
 
         const organizedColumns = {
-          Leads: [],
+          leads: [],
           nutrición: [],
           interesado: [],
           agendado: [],
@@ -94,7 +96,7 @@ const CrmCard = () => {
         };
         
         prospectos.forEach((p) => {
-          const estado = p.estado_contacto?.toLowerCase() || "Leads";
+          const estado = p.estado_contacto?.toLowerCase() || "leads";
           if (organizedColumns[estado]) {
             organizedColumns[estado].push(p);
           } else {
@@ -107,10 +109,8 @@ const CrmCard = () => {
         
 
         if (prospectos.length === 0) {
-          console.log("No se encontraron prospectos.");
         }
       } catch (error) {
-        console.error("Error al cargar prospectos:", error);
       }
     };
 
@@ -177,7 +177,6 @@ const CrmCard = () => {
       } catch (e) {
       }
     } catch (error) {
-      console.error("Error de red al actualizar prospecto:", error);
     }
   };
 
@@ -192,7 +191,6 @@ const CrmCard = () => {
     if (id) {
       navigate(`/pagina-de-contacto/${id}`);
     } else {
-      console.warn("ID inválido para navegación.");
     }
   };
 
@@ -223,9 +221,9 @@ const CrmCard = () => {
                 style={{
                   ...getColumnStyle(snapshot.isDraggingOver),
                   display: "flex",
-                  flexDirection: "column", // Asegura que el título y la lista estén en columna
-                  overflow: "hidden", // Oculta cualquier barra de desplazamiento
-                  height: "100%", // Asegura que el box no se desborde
+                  flexDirection: "column", 
+                  overflow: "hidden", 
+                  height: "100%", 
                 }}
               >
                 {/* Título de la columna, que no se desplaza */}
@@ -240,11 +238,11 @@ const CrmCard = () => {
                 {/* Zona desplazable */}
                 <div
                   style={{
-                    flex: 1, // Hace que la lista ocupe el espacio restante
-                    overflowY: "scroll", // Permite el desplazamiento vertical
-                    overflowX: "hidden", // Evita el desplazamiento horizontal
-                    scrollbarWidth: "none", // Esto oculta la barra de desplazamiento en Firefox
-                    msOverflowStyle: "none", // Esto oculta la barra de desplazamiento en Internet Explorer
+                    flex: 1,
+                    overflowY: "scroll",
+                    overflowX: "hidden",
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
                   }}
                 >
                   {items.map((item, index) => (
@@ -306,7 +304,7 @@ const CrmCard = () => {
                             >
                               <EmailIcon sx={{ mr: 1, color: "black" }} />
                               <Typography variant="body2">
-                                {item.correo || "Sin correo"}
+                                {item.email || "Sin correo"}
                               </Typography>
                             </Box>
                           </Box>

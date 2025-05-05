@@ -8,18 +8,20 @@ import {
   Button,
   Box,
   IconButton,
+  Alert,
+  Collapse,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import ProfileImageCard from "./ProfileImageCard";
-import Swal from "sweetalert2";
 
 const ProfileCard = () => {
   const { user, login } = useAuth();
   const [formData, setFormData] = useState(user);
   const [editableFields, setEditableFields] = useState({});
   const [localChanges, setLocalChanges] = useState(null);
+  const [alert, setAlert] = useState({ show: false, type: "", message: "" });
   const prevUserRef = useRef(user);
 
   useEffect(() => {
@@ -39,9 +41,16 @@ const ProfileCard = () => {
     setLocalChanges(updated);
   };
 
+  const showAlert = (type, message) => {
+    setAlert({ show: true, type, message });
+    setTimeout(() => {
+      setAlert({ show: false, type: "", message: "" });
+    }, 4000);
+  };
+
   const handleUpdate = async () => {
     if (!formData.id) {
-      alert("El ID del usuario no está disponible.");
+      showAlert("error", "El ID del usuario no está disponible.");
       return;
     }
 
@@ -71,21 +80,10 @@ const ProfileCard = () => {
       setFormData(updatedUserWithId);
       login(updatedUserWithId);
       setEditableFields({});
-       Swal.fire({
-                icon: 'success',
-                title: '¡Datos actualizados correctamente!',
-                text: 'Has editado los datos correctamente',
-              });
-      
+      showAlert("success", "¡Datos actualizados correctamente!");
     } catch (error) {
       console.error(error);
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Hubo un error actualizando los datos!",
-        footer: '<a href="#">Por que tengo este problema?</a>'
-      });
-    
+      showAlert("error", "Hubo un error actualizando los datos.");
     }
   };
 
@@ -98,7 +96,7 @@ const ProfileCard = () => {
   const fields = [
     { label: "Nombre", name: "nombre" },
     { label: "Apellido", name: "apellido" },
-    { label: "Correo", name: "correo", type: "email" },
+    { label: "Correo", name: "email", type: "email" },
     { label: "Teléfono", name: "telefono" },
     { label: "Dirección", name: "direccion" },
     { label: "Ciudad", name: "ciudad" },
@@ -109,7 +107,46 @@ const ProfileCard = () => {
 
   return (
     <Box>
+      <Box sx={{ position: "relative" }}>
+        <Collapse
+          in={alert.show}
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 10,
+          }}
+        >
+          {alert.show && (
+            <Alert
+              severity={alert.type}
+              sx={{
+                position: "fixed",
+                top: 16,
+                left: "50%",
+                transform: "translateX(-50%)",
+                zIndex: 9999,
+                px: 3,
+                py: 1,
+                borderRadius: 2,
+                backgroundColor:
+                  alert.type === "success" ? "#ffffff" : "#ffebee",
+                color: alert.type === "success" ? "#388e3c" : "#d32f2f",
+                boxShadow: 3,
+                width: "auto",
+                maxWidth: "90%",
+                textAlign: "center",
+              }}
+            >
+              {alert.message}
+            </Alert>
+          )}
+        </Collapse>
+      </Box>
+
       <ProfileImageCard />
+
       <Card
         sx={{ padding: 3, borderRadius: 3, boxShadow: 3, marginTop: "20px" }}
       >

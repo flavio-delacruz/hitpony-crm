@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, TextField, Button, Typography } from "@mui/material";
 import Swal from "sweetalert2";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom"; // Agregar useNavigate
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
@@ -17,6 +17,8 @@ const PublicClientForm = ({ titulo = "Formulario de Registro", subtitulo = "", p
     cargo: "",
     celular: "",
   });
+
+  const navigate = useNavigate(); // Usar useNavigate para la redirección
 
   useEffect(() => {
     if (idSetter !== "0") {
@@ -70,13 +72,10 @@ const PublicClientForm = ({ titulo = "Formulario de Registro", subtitulo = "", p
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-  
-      Swal.fire({
-        icon: "success",
-        title: "Gracias por registrarte",
-        text: "Nos pondremos en contacto pronto.",
-      });
-  
+
+      // Redirigir a una nueva página después del éxito
+      navigate("/gracias-por-confiar-en-hitpoly");  // Cambia a la ruta que deseas
+
       setFormData({
         nombre: "",
         apellido: "",
@@ -92,7 +91,7 @@ const PublicClientForm = ({ titulo = "Formulario de Registro", subtitulo = "", p
       });
     }
   };
-  
+
   if (!mostrarFormulario) return null;
 
   return (

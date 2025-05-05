@@ -56,7 +56,6 @@ import {
         login({ ...user, [type]: url });
       } catch (err) {
         alert(`Error al subir ${type}`);
-        console.error(err);
       } finally {
         setUploading(false);
       }
@@ -65,7 +64,7 @@ import {
     return (
       <Card sx={{ borderRadius: 3, overflow: "hidden", boxShadow: 3 }}>
         {/* Banner */}
-        <Box sx={{ position: "relative", height: 180 }}>
+        <Box sx={{ position: "relative", height: 280 }}>
           <Box
             sx={{
               width: "100%",

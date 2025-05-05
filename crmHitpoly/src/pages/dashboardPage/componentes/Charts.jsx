@@ -67,7 +67,6 @@ const DashboardCharts = () => {
           perdidosPorMes,
         });
       } catch (error) {
-        console.error("Error al obtener prospectos:", error);
       }
     };
 
@@ -92,27 +91,27 @@ const DashboardCharts = () => {
       <ChartCard
         series={[{ data: totalPorMes }]}
         xAxis={[{ data: meses, scaleType: "band" }]}
-        titleChart="Prospectos Totales"
-        title="Todos los estados"
-        subtitle="Por mes"
+        titleChart="Todos los prospectos"
+        title="Desde los últimos 4 meses"
+        subtitle="%+ respecto al mes pasado"
       />
 
       {/* Ganados por mes */}
       <ChartCard
         series={[{ data: ganadosPorMes }]}
         xAxis={[{ data: meses, scaleType: "band" }]}
-        titleChart="Ganados"
-        title="Prospectos ganados"
-        subtitle="Por mes"
+        titleChart="Prospectos Ganados"
+        title="Desde los últimos 4 meses"
+        subtitle="%+ respecto al mes pasado"
       />
 
       {/* Perdidos por mes */}
       <ChartCard
         series={[{ data: perdidosPorMes }]}
         xAxis={[{ data: meses, scaleType: "band" }]}
-        titleChart="Perdidos"
-        title="Prospectos perdidos"
-        subtitle="Por mes"
+        titleChart="Prospectos Perdidos"
+        title="Desde los últimos 4 meses"
+        subtitle="%+ respecto al mes pasado"
       />
     </Box>
   );

@@ -58,7 +58,6 @@ const EditableAvatar = ({ contactData, onAvatarChange }) => {
 
     } catch (err) {
       alert("Error al subir avatar");
-      console.error(err);
     } finally {
       setUploading(false);
     }
@@ -69,15 +68,15 @@ const EditableAvatar = ({ contactData, onAvatarChange }) => {
       sx={{
         position: "relative",
         "&:hover .edit": { opacity: 1 },
-        "&:hover .overlay": { opacity: 1 }, // Mostrar la capa encima al pasar el mouse
+        "&:hover .overlay": { opacity: 1 },
       }}
     >
       <Box
         sx={{
           position: "relative",
           display: "inline-block",
-          borderRadius: "50%", // Asegura que el contorno sea redondo
-          boxShadow: "none", // No aplicamos sombra al contenedor
+          borderRadius: "50%", 
+          boxShadow: "none", 
         }}
       >
         <Avatar
@@ -89,7 +88,7 @@ const EditableAvatar = ({ contactData, onAvatarChange }) => {
             mb: 1,
             border: "2px solid white",
             position: "relative",
-            transition: "box-shadow 0.3s", // Transición suave para la sombra
+            transition: "box-shadow 0.3s", 
           }}
         >
           {contactData.nombre?.charAt(0) || "D"}
@@ -106,11 +105,11 @@ const EditableAvatar = ({ contactData, onAvatarChange }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.6)", // Fondo oscuro para la capa
-            borderRadius: "50%", // Asegura que la capa sea circular
+            backgroundColor: "rgba(0,0,0,0.6)",
+            borderRadius: "50%",
             opacity: 0,
-            transition: "opacity 0.3s", // Transición suave al mostrar la capa
-            zIndex: 1, // Asegura que la capa esté encima del avatar
+            transition: "opacity 0.3s",
+            zIndex: 1, 
           }}
         />
 
@@ -119,18 +118,18 @@ const EditableAvatar = ({ contactData, onAvatarChange }) => {
           className="edit"
           sx={{
             position: "absolute",
-            top: "50%", // Centra el ícono verticalmente
-            left: "50%", // Centra el ícono horizontalmente
-            transform: "translate(-50%, -50%)", // Ajusta para centrar correctamente
-            backgroundColor: "transparent", // Fondo transparente para el ícono
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "transparent",
             color: "white",
             opacity: 0,
             transition: "opacity 0.3s",
             zIndex: 2,
-            borderRadius: "50%", // Hace el fondo circular alrededor del icono
-            p: 1, // Padding para darle espacio al ícono
+            borderRadius: "50%",
+            p: 1, 
             "&:hover": {
-              opacity: 1, // Asegura que el ícono sea visible solo cuando el mouse pase
+              opacity: 1, 
             },
           }}
           disabled={uploading}

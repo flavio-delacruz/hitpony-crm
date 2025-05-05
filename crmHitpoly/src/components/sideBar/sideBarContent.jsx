@@ -33,9 +33,6 @@ const SideBarContent = () => {
   const {  user } = useAuth();
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
-
-
-  console.log("USUARIO ID:", user);
   
 
   return (

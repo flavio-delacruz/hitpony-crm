@@ -6,6 +6,8 @@ import {
   Paper,
   Grid,
   Button,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Email, Phone, MoreVert } from "@mui/icons-material";
 import PhoneInput from "react-phone-input-2";
@@ -28,8 +30,10 @@ const EditableField = ({ label, value, onChange }) => (
 export default function ContactInformation({ prospectId }) {
   const { user } = useAuth();
   const [contactData, setContactData] = useState(null);
-  const [initialData, setInitialData] = useState(null); // Estado para guardar los datos iniciales
-  const [hasChanges, setHasChanges] = useState(false); // Estado para controlar si hay cambios
+  const [initialData, setInitialData] = useState(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
     setHasChanges(false); // Reinicia cambios cuando cambia de prospecto
@@ -56,7 +60,6 @@ export default function ContactInformation({ prospectId }) {
             setContactData(prospect);
             setInitialData(prospect);
           } else {
-            console.error("No se encontró el prospecto con ID:", prospectId);
           }
         })
         .catch(console.error);
@@ -97,8 +100,8 @@ export default function ContactInformation({ prospectId }) {
       funcion: "update",
       id: contactData.id,
       nombre: contactData.nombre,
-      apellidos: contactData.apellidos,
-      correo: contactData.correo,
+      apellido: contactData.apellido,
+      email: contactData.email,
       correo_corporativo: contactData.correo_corporativo,
       celular: contactData.celular,
       descripcion: contactData.descripcion,
@@ -120,18 +123,21 @@ export default function ContactInformation({ prospectId }) {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Respuesta del servidor:", data);
         if (data.status === "success") {
-          alert("Los datos se actualizaron correctamente.");
-          setHasChanges(false); // Reseteamos el estado de cambios después de la actualización
-          setInitialData(updatedData); // Actualizamos los datos iniciales
+          setSnackbarMessage("Los datos se actualizaron correctamente");
+          setOpenSnackbar(true);
+          setHasChanges(false);
+          setInitialData(updatedData);
         } else {
-          alert("Hubo un problema al actualizar. Inténtalo nuevamente.");
+          setSnackbarMessage(
+            "Hubo un problema al actualizar. Inténtalo nuevamente."
+          );
+          setOpenSnackbar(true);
         }
       })
       .catch((error) => {
-        alert("Hubo un error al realizar la solicitud.");
-        console.error(error);
+        setSnackbarMessage("Hubo un error al realizar la solicitud.");
+        setOpenSnackbar(true);
       });
   };
 
@@ -143,7 +149,7 @@ export default function ContactInformation({ prospectId }) {
         flexDirection: "column",
         bgcolor: "#f9f9f9",
         borderRadius: "5px 0px 0px 0px",
-        position: "relative", // Esto es clave para el posicionamiento del botón
+        position: "relative",
       }}
     >
       <Paper
@@ -167,7 +173,7 @@ export default function ContactInformation({ prospectId }) {
           />
           <Typography variant="body1">{contactData.nombre}</Typography>
           <Typography variant="body2" color="text.secondary">
-            {contactData.correo || "Correo no disponible"}
+            {contactData.email || "Correo no disponible"}
           </Typography>
         </Box>
       </Paper>
@@ -188,14 +194,14 @@ export default function ContactInformation({ prospectId }) {
             onChange={updateField("nombre")}
           />
           <EditableField
-            label="Apellidos"
-            value={contactData.apellidos}
-            onChange={updateField("apellidos")}
+            label="Apellido"
+            value={contactData.apellido}
+            onChange={updateField("apellido")}
           />
           <EditableField
             label="Correo"
-            value={contactData.correo}
-            onChange={updateField("correo")}
+            value={contactData.email}
+            onChange={updateField("email")}
           />
           <EditableField
             label="Correo Corporativo"
@@ -267,6 +273,30 @@ export default function ContactInformation({ prospectId }) {
           </Button>
         </Box>
       )}
+
+      {/* Snackbar para mostrar el mensaje */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity="success"
+          sx={{
+            width: "100%",
+            backgroundColor: "white", // Fondo blanco
+            color: "black", // Texto negro
+            border: "1px solid #ccc", // Opcional: borde gris claro (si quieres darle un contorno)
+          }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

@@ -36,7 +36,6 @@ const DashboardPage = () => {
         );
 
         const data = await response.json();
-        console.log("Respuesta de API:", data);
 
         if (Array.isArray(data.resultado)) {
           setProspectosData(data.resultado);
@@ -62,7 +61,6 @@ const DashboardPage = () => {
           setProspectosData([]);
         }
       } catch (error) {
-        console.error("Error al obtener prospectos:", error);
         setTotalProspectos(0);
         setTotalGanados(0);
         setProspectosData([]);

@@ -14,6 +14,7 @@ import ContactPage from "./pages/contactPage/ContactPage";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import RegistroClienteForm from "./components/forms/clientesPotenciales/layoutFormPublic";
 import ProspectosTracker from "./pages/tracker/ProspectosTracker";
+import ThankYouPage from "./components/forms/paginaDeGracias";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -93,6 +94,7 @@ function App() {
             path="/registros/:formName"
             element={<RegistroClienteForm />}
           />
+          <Route path="/gracias-por-confiar-en-hitpoly" element={<ThankYouPage />} />
         </Routes>
       </Router>
     </AuthProvider>

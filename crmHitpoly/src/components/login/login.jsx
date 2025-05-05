@@ -34,12 +34,6 @@ const Login = () => {
 
         login(userData);
 
-        Swal.fire({
-          icon: 'success',
-          title: '¡Bienvenido al CRM de Hitpoly!',
-          text: 'Has iniciado sesión correctamente',
-        });
-
         navigate('/dashboard');
       } else {
         Swal.fire({
