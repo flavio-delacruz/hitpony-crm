@@ -15,7 +15,7 @@ import {useAuth }from "../../context/AuthContext"
 const SidebarContainer = styled(Box)({
   height: "100vh",
   width: "280px",
-  backgroundColor: "hsl(270, 7%, 17%)",
+  backgroundColor:"#2D1638",
   padding: "20px",
   color: "#fff",
   display: "flex",
