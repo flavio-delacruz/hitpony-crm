@@ -57,8 +57,12 @@ export default function ContactInformation({ prospectId }) {
             (p) => Number(p.id) === Number(prospectId)
           );
           if (prospect) {
-            setContactData(prospect);
-            setInitialData(prospect);
+            const normalizedProspect = {
+              ...prospect,
+              email: prospect.email || prospect.correo, // Usa 'correo' si 'email' no está definido
+            };
+            setContactData(normalizedProspect);
+            setInitialData(normalizedProspect);
           } else {
           }
         })
@@ -105,7 +109,6 @@ export default function ContactInformation({ prospectId }) {
       correo_corporativo: contactData.correo_corporativo,
       celular: contactData.celular,
       descripcion: contactData.descripcion,
-      estado_contacto: contactData.estado_contacto,
       sector: contactData.sector,
       direccion: contactData.direccion,
       ciudad: contactData.ciudad,
@@ -223,11 +226,6 @@ export default function ContactInformation({ prospectId }) {
             label="Descripción"
             value={contactData.descripcion}
             onChange={updateField("descripcion")}
-          />
-          <EditableField
-            label="Estado del contacto"
-            value={contactData.estado_contacto}
-            onChange={updateField("estado_contacto")}
           />
           <EditableField
             label="Sector"

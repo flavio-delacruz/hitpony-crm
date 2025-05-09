@@ -15,7 +15,10 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import RegistroClienteForm from "./components/forms/clientesPotenciales/layoutFormPublic";
 import ProspectosTracker from "./pages/tracker/ProspectosTracker";
 import ThankYouPage from "./components/forms/paginaDeGracias";
-
+import FetchAndStoreProspects from "./components/correos/enviados/EnviarCorreo";
+import Listas from "./pages/listas/ListasUser";
+import ListaDetalles from "./pages/listas/components/ListaDetalles";
+import EnviarCorreo from "./components/correos/enviados/EnviarCorreo";
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
@@ -34,7 +37,6 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
-
           {/* Rutas protegidas */}
           <Route
             path="/dashboard"
@@ -85,7 +87,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="formulario-de-contacto-cliente"
             element={<RegistroClienteForm />}
@@ -94,7 +95,15 @@ function App() {
             path="/registros/:formName"
             element={<RegistroClienteForm />}
           />
-          <Route path="/gracias-por-confiar-en-hitpoly" element={<ThankYouPage />} />
+          <Route
+            path="/gracias-por-confiar-en-hitpoly"
+            element={<ThankYouPage />}
+          />
+          <Route path="/prueva" element={<FetchAndStoreProspects />} />
+          <Route path="/listas/:nombreLista" element={<ListaDetalles />} />
+          {/* Ruta dinámica */}
+          <Route path="/todas-las-listas" element={<Listas />} />
+          <Route path="/enviar-correo" element={<EnviarCorreo />} /> 
         </Routes>
       </Router>
     </AuthProvider>
