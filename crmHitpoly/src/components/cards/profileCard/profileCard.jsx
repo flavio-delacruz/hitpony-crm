@@ -54,28 +54,37 @@ const ProfileCard = () => {
       return;
     }
 
+    // Prepara los datos para enviar a la API, renombrando "correo" a "email"
+    const dataToSend = { ...formData, funcion: "update", id: formData.id };
+    if (dataToSend.correo) {
+      dataToSend.email = dataToSend.correo;
+      delete dataToSend.correo; // Elimina la propiedad "correo" para evitar duplicados
+    }
+
     try {
       const response = await fetch(
         "https://apiweb.hitpoly.com/ajax/updateSetterController.php",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            funcion: "update",
-            ...formData,
-            id: formData.id,
-          }),
+          body: JSON.stringify(dataToSend),
         }
       );
 
       if (!response.ok) throw new Error("Error actualizando los datos");
 
-      const updatedUser = await response.json();
+      const updatedUserFromApi = await response.json();
       const updatedUserWithId = {
         ...formData,
-        ...updatedUser,
+        ...updatedUserFromApi,
         id: formData.id,
       };
+
+      // Asegúrate de que el estado formData también use "correo" para la visualización futura
+      if (updatedUserWithId.email) {
+        updatedUserWithId.correo = updatedUserWithId.email;
+        delete updatedUserWithId.email;
+      }
 
       setFormData(updatedUserWithId);
       login(updatedUserWithId);
@@ -96,7 +105,7 @@ const ProfileCard = () => {
   const fields = [
     { label: "Nombre", name: "nombre" },
     { label: "Apellido", name: "apellido" },
-    { label: "Correo", name: "email", type: "email" },
+    { label: "Correo", name: "correo", type: "email" }, // Se mantiene "correo" para la visualización
     { label: "Teléfono", name: "telefono" },
     { label: "Dirección", name: "direccion" },
     { label: "Ciudad", name: "ciudad" },
@@ -182,7 +191,7 @@ const ProfileCard = () => {
                   <TextField
                     fullWidth
                     label={field.label}
-                    name={field.name}
+                    name={field.name} // Sigue siendo "correo"
                     value={formData[field.name] || ""}
                     onChange={handleChange}
                     type={field.type || "text"}

@@ -103,7 +103,7 @@ const DashboardPage = () => {
         </ContentCard>
         <ContentCard
           title="Resumen de Leads"
-          subtitle="Cantidad de leads capturados hoy"
+          subtitle="Todos los movimientos del Lead"
           gridSize={4}
         >
           <OrdersList />

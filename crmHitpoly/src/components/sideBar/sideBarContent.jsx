@@ -4,6 +4,7 @@ import { styled } from "@mui/system";
 
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AssessmentIcon from "@mui/icons-material/Assessment";
@@ -25,6 +26,7 @@ const SidebarContainer = styled(Box)({
 const buttons = [
   { text: "Inicio", icon: HomeIcon, path: "/dashboard" },
   { text: "Usuarios", icon: PeopleIcon, path: "/usuarios" },
+  { text: "Listas", icon: ListAltIcon, path: "/todas-las-listas" },
   { text: "Crm", icon: ContactPageIcon, path: "/crm" },
   { text: "Metricas", icon: AssessmentIcon, path: "/metricas" },
 ];

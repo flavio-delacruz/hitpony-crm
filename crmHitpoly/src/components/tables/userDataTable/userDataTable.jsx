@@ -6,6 +6,7 @@ import Stack from "@mui/material/Stack";
 import Swal from "sweetalert2";
 import { useAuth } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { slugify } from "../../../pages/listas/components/slugify";
 
 const googleBlue = "#4285F4";
 
@@ -122,23 +123,94 @@ function DataTable() {
     }
   };
 
+  const handleAddToLista = (listaNombre) => {
+    if (selectedRows.length === 0) {
+      Swal.fire("Advertencia", "Por favor, selecciona al menos un prospecto.", "warning");
+      return;
+    }
+
+    const storedLists = localStorage.getItem(`userLists_${user?.id}`);
+    let lists = storedLists ? JSON.parse(storedLists) : {};
+    const listaSlug = slugify(listaNombre); // Genera el slug
+
+    if (lists[listaSlug]) {
+      Swal.fire("Error", `La lista "${listaNombre}" ya existe.`, "error");
+      return;
+    } else {
+      lists[listaSlug] = { name: listaNombre, slug: listaSlug, prospectIds: selectedRows.map(id => id.toString()) }; // Guarda el slug
+    }
+
+    localStorage.setItem(`userLists_${user?.id}`, JSON.stringify(lists));
+    Swal.fire("Éxito", `Se añadieron ${selectedRows.length} prospectos a la lista "${listaNombre}".`, "success").then(() => {
+      navigate(`/listas/${listaSlug}`); // Navega usando el slug
+    });
+    setSelectedRows([]);
+  };
+
+  const handleSendMessage = () => {
+    if (selectedRows.length === 0) {
+      Swal.fire("Advertencia", "Por favor, selecciona al menos un prospecto para enviar un mensaje.", "warning");
+      return;
+    }
+    // Navegar al componente de envío de correo con los IDs seleccionados
+    navigate("/enviar-correo", { state: { selectedProspectIds: selectedRows } });
+  };
+
   return (
     <Stack spacing={2}>
       {selectedRows.length > 0 && (
-        <Button
-          variant="contained"
-          color="error"
-          onClick={handleDelete}
-          sx={{ width: "fit-content", alignSelf: "flex-end", mt: 1 }}
-        >
-          Eliminar seleccionados
-        </Button>
+        <Stack direction="row" spacing={1} justifyContent="flex-end">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              Swal.fire({
+                title: '¿Nombre para la lista?',
+                input: 'text',
+                inputValue: '',
+                showCancelButton: true,
+                confirmButtonText: 'Crear lista',
+                preConfirm: (listaName) => {
+                  if (!listaName) {
+                    Swal.showValidationMessage(`Por favor, ingresa un nombre para la lista.`);
+                  }
+                  return listaName;
+                }
+              }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                  handleAddToLista(result.value);
+                }
+              });
+            }}
+            sx={{ width: "fit-content", mt: 1 }}
+          >
+            Añadir a Lista
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDelete}
+            sx={{ width: "fit-content", mt: 1 }}
+          >
+            Eliminar seleccionados
+          </Button>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={handleSendMessage}
+            sx={{ width: "fit-content", mt: 1 }}
+          >
+            Enviar Correo
+          </Button>
+        </Stack>
       )}
       <Paper
         sx={{
           height: "80vh",
           width: "auto",
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          borderRadius: "15px",
+          overflow: "hidden",
         }}
       >
         <DataGrid
@@ -158,6 +230,7 @@ function DataTable() {
             "& .MuiDataGrid-cell:hover": {
               color: googleBlue,
             },
+            border: "none", 
           }}
         />
       </Paper>
