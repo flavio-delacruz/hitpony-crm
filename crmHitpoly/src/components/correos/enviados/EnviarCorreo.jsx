@@ -22,12 +22,6 @@ function EnviarCorreo() {
     const fetchSelectedProspects = async () => {
       if (user?.id && selectedProspectIds.length > 0) {
         try {
-          console.log(
-            "Obteniendo prospectos seleccionados para el usuario:",
-            user.id,
-            "con IDs:",
-            selectedProspectIds
-          );
           const response = await fetch(
             "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
             {
@@ -40,22 +34,16 @@ function EnviarCorreo() {
             }
           );
           const data = await response.json();
-          console.log(
-            "Respuesta de traerProspectosDeSetterConctroller.php:",
-            data
-          );
 
           if (data.success && Array.isArray(data.resultado)) {
             const selectedProspectData = data.resultado.filter((prospecto) =>
               selectedProspectIds.includes(prospecto.id)
             );
-            console.log("Prospectos filtrados:", selectedProspectData);
 
             const emails = selectedProspectData
               .map((prospecto) => prospecto.correo)
               .filter((email) => email);
             setRecipientEmails(emails);
-            console.log("Emails de destinatarios:", emails);
           } else {
             Swal.fire(
               "Error",
@@ -69,7 +57,6 @@ function EnviarCorreo() {
         }
       } else if (selectedProspectIds.length === 0) {
         setRecipientEmails([]);
-        console.log("No hay prospectos seleccionados.");
       }
     };
 
@@ -106,9 +93,6 @@ function EnviarCorreo() {
         message: body,
       });
 
-      console.log("Enviando correo con los siguientes datos:", requestBody);
-      console.log("Información del usuario:", user);
-
       const response = await fetch(
         "https://apiweb.hitpoly.com/ajax/mandarEmailsController.php",
         {
@@ -120,7 +104,7 @@ function EnviarCorreo() {
 
       const data = await response.json();
 
-      console.log("Respuesta del servidor:", data);
+
 
       if (data.status === "success") {
         // Verifica data.status === 'success'
