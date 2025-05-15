@@ -1,14 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import Paper from "@mui/material/Paper";
-import Button from "@mui/material/Button";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useAuth } from "../../../context/AuthContext";
-import Layout from "../../../components/layout/layout";
-import Swal from "sweetalert2";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
+import React, { useContext, useState } from 'react';
+import Layout from '../../../components/layout/layout';
+import { Typography, Button } from '@mui/material';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useProspectos } from '../../../context/ProspectosContext';
+import ReusableTable from '../../../components/tables/userDataTable/ReusableTable';
 
 const columns = [
   { field: "nombre", headerName: "Nombre", width: 150 },
@@ -22,243 +17,82 @@ const columns = [
 ];
 
 function ListaDetalles() {
-  const { nombreLista: listaSlug } = useParams();
+  const { prospectos, loadingProspectos, errorProspectos } = useProspectos();
+  const { nombreLista } = useParams();
+  const { state } = useLocation();
   const navigate = useNavigate();
-  const [lista, setLista] = useState(null);
-  const [usuariosEnLista, setUsuariosEnLista] = useState([]);
-  const { user } = useAuth();
-  const [selectedRowIds, setSelectedRowIds] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [userLists, setUserLists] = useState({});
-  const [loadingInitial, setLoadingInitial] = useState(true);
+  const listaSeleccionada = state?.listaSeleccionada;
+  const [selectedProspectIds, setSelectedProspectIds] = useState([]);
 
-  useEffect(() => {
-    const storedLists = localStorage.getItem(`userLists_${user?.id}`);
-    if (storedLists) {
-      setUserLists(JSON.parse(storedLists));
-    }
-    setLoadingInitial(false);
-  }, [user?.id]);
-
-  useEffect(() => {
-    if (!loadingInitial) {
-      const currentLista = userLists[listaSlug];
-      if (listaSlug && userLists && currentLista) {
-        setLista(currentLista);
-        setError(null);
-        setLoading(false);
-      } else if (listaSlug && userLists) {
-        setLista(null);
-        setError("");
-        setLoading(false);
-      } else if (listaSlug) {
-        setLoading(true);
-        setError(null);
-      } else {
-        setLoading(false);
-        setError(null);
-      }
-    }
-  }, [listaSlug, userLists, loadingInitial]);
-
-  useEffect(() => {
-    const fetchProspectsInList = async () => {
-      if (lista?.prospectIds && lista.prospectIds.length > 0) {
-        setLoading(true);
-        setError(null);
-        try {
-          const response = await fetch(
-            "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                funcion: "getProspectos",
-                ids: lista.prospectIds,
-                id: user?.id || 0,
-              }),
-            }
-          );
-          const data = await response.json();
-          if (data.success && Array.isArray(data.resultado)) {
-            const formattedData = data.resultado.map((item) => ({
-              id: item.id,
-              nombre: item.nombre,
-              apellido: item.apellido,
-              celular: item.celular,
-              correo: item.correo,
-              estado_contacto: item.estado_contacto,
-              ciudad: item.ciudad,
-              sector: item.sector,
-              productos_interes: item.productos_interes,
-            }));
-            setUsuariosEnLista(formattedData);
-          } else {
-            setError("No se pudieron cargar los prospectos de la lista.");
-          }
-        } catch (err) {
-          setError("Error al comunicarse con el servidor.");
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        setUsuariosEnLista([]);
-        setLoading(false);
-      }
-    };
-
-    fetchProspectsInList();
-  }, [lista?.prospectIds, user?.id]);
+  const filteredProspectos = listaSeleccionada?.prospectos
+    ? prospectos.filter((prospecto) =>
+        listaSeleccionada.prospectos.includes(String(prospecto.id))
+      )
+    : [];
 
   const handleRowSelectionChange = (newSelectionModel) => {
-    setSelectedRowIds(newSelectionModel);
+    setSelectedProspectIds(newSelectionModel);
   };
 
-  const handleDeleteSelected = async () => {
-    if (selectedRowIds.length === 0) {
-      Swal.fire(
-        "Advertencia",
-        "Por favor, selecciona al menos un prospecto para eliminar.",
-        "warning"
-      );
-      return;
-    }
-
-    const result = await Swal.fire({
-      title: "¿Eliminar prospectos?",
-      text: "Estás seguro de que quieres eliminar los prospectos seleccionados de esta lista?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-    });
-
-    if (result.isConfirmed) {
-      const updatedUsuariosEnLista = usuariosEnLista.filter(
-        (usuario) => !selectedRowIds.includes(usuario.id)
-      );
-      setUsuariosEnLista(updatedUsuariosEnLista);
-
-      const updatedLists = { ...userLists };
-      if (updatedLists[listaSlug]) {
-        const updatedProspectIds = updatedLists[listaSlug].prospectIds.filter(
-          (id) => !selectedRowIds.map(String).includes(id)
-        );
-        updatedLists[listaSlug].prospectIds = updatedProspectIds;
-        localStorage.setItem(
-          `userLists_${user?.id}`,
-          JSON.stringify(updatedLists)
-        );
-        setUserLists(updatedLists);
-        Swal.fire(
-          "Eliminado",
-          "Los prospectos han sido eliminados de la lista.",
-          "success"
-        );
-        setSelectedRowIds([]);
-      }
+  const handleEnviarCorreoClick = () => {
+    if (selectedProspectIds.length > 0) {
+      navigate('/enviar-correo', { state: { selectedProspectIds } });
+    } else {
+      alert('Por favor, selecciona al menos un prospecto.');
     }
   };
 
-  const handleCellClick = (params, event) => {
-    if (params.field === "__check__") return;
-    const tag = event.target.tagName.toLowerCase();
-    if (tag === "input" || tag === "label") return;
-    const id = params.row.id;
-    if (id) navigate(`/pagina-de-contacto/${id}`);
-  };
-
-  const handleSendMessage = () => {
-    if (selectedRowIds.length === 0) {
-      Swal.fire(
-        "Advertencia",
-        "Por favor, selecciona al menos un prospecto para enviar un correo.",
-        "warning"
-      );
-      return;
+  const handleRowClick = (params) => {
+    const prospecto = params.row;
+    if (prospecto && prospecto.id && prospecto.nombre && prospecto.apellido) {
+      const slug = `${prospecto.nombre
+        .toLowerCase()
+        .replace(/\s+/g, "-")}-${prospecto.apellido
+        .toLowerCase()
+        .replace(/\s+/g, "-")}`;
+      navigate(`/pagina-de-contacto/${slug}-${prospecto.id}`);
+    } else {
+      
     }
-    navigate("/enviar-correo", { state: { selectedProspectIds: selectedRowIds } });
   };
 
-  if (loading || loadingInitial) {
+  if (loadingProspectos) {
     return (
-      <Layout title={"Detalles de la Lista"}>
-        <Typography>Cargando detalles de la lista...</Typography>
+      <Layout title={`Detalles de la Lista: ${nombreLista}`}>
+        <Typography>Cargando prospectos...</Typography>
       </Layout>
     );
   }
 
-  if (error) {
+  if (errorProspectos) {
     return (
-      <Layout title={"Detalles de la Lista"}>
-        <Typography color="error">{error}</Typography>
+      <Layout title={`Detalles de la Lista: ${nombreLista}`}>
+        <Typography color="error">{errorProspectos}</Typography>
       </Layout>
     );
   }
 
   return (
-    <Layout title={lista?.name || "Detalles de la Lista"}>
-      {selectedRowIds.length > 0 && (
-        <Stack direction="row" spacing={1} mt={2} justifyContent="flex-end">
+    <Layout title={`Detalles de la Lista: ${nombreLista}`}>
+      <div style={{ width: '100%' }}>
+        <ReusableTable
+          rows={filteredProspectos}
+          columns={columns}
+          getRowId={(row) => row.id}
+          onRowSelectionChange={handleRowSelectionChange}
+          onRowClick={handleRowClick} 
+        />
+        {selectedProspectIds.length > 0 && (
           <Button
             variant="contained"
-            color="info"
-            onClick={handleSendMessage}
+            color="primary"
+            onClick={handleEnviarCorreoClick}
+            sx={{ mt: 2 }}
           >
-            Enviar Correo
+            Enviar Correo a Seleccionados
           </Button>
-          <Button
-            variant="contained"
-            color="error"
-            startIcon={<DeleteIcon />}
-            onClick={handleDeleteSelected}
-          >
-            Borrar Seleccionados
-          </Button>
-        </Stack>
-      )}
-      <Paper
-        sx={{
-          mt: 2,
-          borderRadius: "15px",
-          overflow: "hidden",
-        }}
-      >
-        <div style={{ height: 650, width: "100%", marginTop: 0 }}>
-          <DataGrid
-            rows={usuariosEnLista}
-            columns={columns}
-            checkboxSelection
-            onRowSelectionModelChange={handleRowSelectionChange}
-            rowSelectionModel={selectedRowIds}
-            getRowId={(row) => row.id}
-            slots={{ toolbar: GridToolbar }}
-            localeText={{
-              toolbarDensity: "Densidad",
-              toolbarDensityCompact: "Compacto",
-              toolbarDensityStandard: "Estándar",
-              toolbarDensityComfortable: "Cómodo",
-              toolbarColumns: "Columnas",
-              toolbarFilters: "Filtros",
-              toolbarQuickFilter: "Búsqueda rápida",
-              toolbarExport: "Exportar",
-            }}
-            onCellClick={handleCellClick}
-            sx={{
-              "& .MuiDataGrid-cell": {
-                cursor: "pointer",
-              },
-              borderRadius: "15px",
-              overflow: "hidden",
-            }}
-          />
-        </div>
-      </Paper>
-      <Button onClick={() => navigate("/todas-las-listas")} sx={{ mt: 2 }}>
-        Volver a Mis Listas
-      </Button>
+        )}
+      </div>
     </Layout>
   );
 }
