@@ -20,7 +20,9 @@ const useProspectos = () => {
       );
 
       const data = await response.json();
-      return Array.isArray(data.resultado) ? data.resultado : [];
+
+      
+      return data.resultado ? data.resultado : [];
     } catch (error) {
       console.error("Error fetching prospectos:", error);
       return null;

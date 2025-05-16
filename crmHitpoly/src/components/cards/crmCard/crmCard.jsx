@@ -29,7 +29,7 @@ const CrmCard = () => {
   const { updateProspectoEstado } = useUpdateProspecto();
   const [columns, setColumns] = useState({
     leads: [],
-    nutrición: [],
+    nutricion: [],
     interesado: [],
     agendado: [],
     ganado: [],
@@ -37,44 +37,40 @@ const CrmCard = () => {
     perdido: [],
   });
   const containerRef = useRef(null);
-  const isInitialLoad = useRef(true);
+
+  const loadProspectos = async () => {
+    console.log("useEffect: Iniciando carga de prospectos");
+    const prospectosData = await fetchProspectos();
+    console.log("PROSPECTOS DATA", prospectosData);
+
+    if (prospectosData) {
+      const organizedColumns = {
+        leads: [],
+        nutricion: [],
+        interesado: [],
+        agendado: [],
+        ganado: [],
+        seguimiento: [],
+        perdido: [],
+      };
+
+      prospectosData.forEach((p) => {
+        const estado = p.estado_contacto?.toLowerCase() || "leads";
+        if (organizedColumns[estado]) {
+          organizedColumns[estado].push(p);
+        } else {
+          organizedColumns["leads"].push(p);
+        }
+      });
+
+      console.log("useEffect: Cargando estado de columnas", organizedColumns);
+      setColumns(organizedColumns);
+    } else {
+      console.log("useEffect: No se recibieron datos de prospectos");
+    }
+  };
 
   useEffect(() => {
-    const loadProspectos = async () => {
-      console.log("useEffect: Iniciando carga de prospectos");
-      const prospectosData = await fetchProspectos();
-      if (prospectosData) {
-        const organizedColumns = {
-          leads: [],
-          nutrición: [],
-          interesado: [],
-          agendado: [],
-          ganado: [],
-          seguimiento: [],
-          perdido: [],
-        };
-
-        prospectosData.forEach((p) => {
-          const estado = p.estado_contacto?.toLowerCase() || "leads";
-          if (organizedColumns[estado]) {
-            organizedColumns[estado].push(p);
-          } else {
-            organizedColumns["leads"].push(p);
-          }
-        });
-
-        if (!isInitialLoad.current) {
-          console.log("useEffect: Actualizando estado de columnas (no carga inicial)", organizedColumns);
-          setColumns(organizedColumns);
-        } else {
-          console.log("useEffect: Carga inicial de columnas", organizedColumns);
-        }
-        isInitialLoad.current = false;
-      } else {
-        console.log("useEffect: No se recibieron datos de prospectos");
-      }
-    };
-
     loadProspectos();
   }, [fetchProspectos]);
 
@@ -84,7 +80,7 @@ const CrmCard = () => {
 
     const movedItem = columns[source.droppableId][source.index];
 
-    // 1. Actualización optimista INMEDIATA
+    // 1. Actualización optimista
     const newColumnsState = (prev) => {
       const sourceClone = [...prev[source.droppableId]];
       const destClone = [...prev[destination.droppableId]];
@@ -100,13 +96,13 @@ const CrmCard = () => {
     };
     setColumns(newColumnsState);
 
-    // 2. Llamada asíncrona a la API
+    // 2. Llamada a la API
     const updateResult = await updateProspectoEstado(
       movedItem.id,
       destination.droppableId
     );
 
-    // 3. Manejar la respuesta de la API
+    // 3. Manejo de error
     if (!updateResult.success) {
       console.log("onDragEnd: Revertiendo la actualización optimista recargando datos");
       loadProspectos();
