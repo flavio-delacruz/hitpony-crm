@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import { Modal, Box, Typography, Button, IconButton, Grid, Snackbar, Alert } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";  // Icono para copiar
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";  
 import { useAuth } from "../../../context/AuthContext";
-import { formsList } from "./formsList"; // Importar la lista de formularios
+import { formsList } from "./formsList"; 
 
 const ShareLinkModal = ({ open, onClose }) => {
   const { user } = useAuth();
   const [links, setLinks] = useState([]);
   const [copiedLink, setCopiedLink] = useState(null);
-  const [openAlert, setOpenAlert] = useState(false); // State to control Snackbar visibility
+  const [openAlert, setOpenAlert] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
-      // Generar enlaces dinámicamente usando formsList
+      
       const generatedLinks = formsList.map((form) => ({
         name: form.titulo,
         link: `${window.location.origin}/registros/${form.name}?idSetter=${user.id}`,
@@ -28,12 +28,12 @@ const ShareLinkModal = ({ open, onClose }) => {
     setCopiedLink(link);  
     setOpenAlert(true); 
 
-    // Cerrar el modal después de copiar
+    
     onClose();
   };
 
   const handleCloseAlert = () => {
-    setOpenAlert(false); // Cerrar la alerta
+    setOpenAlert(false); 
   };
 
   return (
