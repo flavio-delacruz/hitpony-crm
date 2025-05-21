@@ -10,6 +10,10 @@ import {
   IconButton,
   Alert,
   Collapse,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { useState, useEffect, useRef } from "react";
@@ -91,7 +95,6 @@ const ProfileCard = () => {
       setEditableFields({});
       showAlert("success", "¡Datos actualizados correctamente!");
     } catch (error) {
-      console.error(error);
       showAlert("error", "Hubo un error actualizando los datos.");
     }
   };
@@ -112,6 +115,15 @@ const ProfileCard = () => {
     { label: "País", name: "pais" },
     { label: "Código Postal", name: "codigo_postal" },
     { label: "Sobre mí", name: "sobre_mi", multiline: true, rows: 3 },
+    {
+      label: "Rol",
+      name: "rol",
+      type: "select",
+      options: [
+        { value: "closer", label: "Closer" },
+        { value: "setter", label: "Setter" },
+      ],
+    }, // Nuevo campo "rol"
   ];
 
   return (
@@ -188,25 +200,54 @@ const ProfileCard = () => {
                 key={field.name}
               >
                 <Box sx={{ position: "relative" }}>
-                  <TextField
-                    fullWidth
-                    label={field.label}
-                    name={field.name} // Sigue siendo "correo"
-                    value={formData[field.name] || ""}
-                    onChange={handleChange}
-                    type={field.type || "text"}
-                    variant="outlined"
-                    multiline={field.multiline || false}
-                    rows={field.rows || 1}
-                    disabled={!editableFields[field.name]}
-                  />
-                  <IconButton
-                    onClick={() => toggleFieldEdit(field.name)}
-                    size="small"
-                    sx={{ position: "absolute", top: 8, right: 8 }}
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
+                  {field.type === "select" ? (
+                    <FormControl fullWidth variant="outlined" disabled={!editableFields[field.name]}>
+                      <InputLabel id={`${field.name}-label`}>{field.label}</InputLabel>
+                      <Select
+                        labelId={`${field.name}-label`}
+                        id={field.name}
+                        name={field.name}
+                        value={formData[field.name] || ""}
+                        onChange={handleChange}
+                        label={field.label}
+                      >
+                        {field.options.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <IconButton
+                        onClick={() => toggleFieldEdit(field.name)}
+                        size="small"
+                        sx={{ position: "absolute", top: 8, right: 8 }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </FormControl>
+                  ) : (
+                    <TextField
+                      fullWidth
+                      label={field.label}
+                      name={field.name}
+                      value={formData[field.name] || ""}
+                      onChange={handleChange}
+                      type={field.type || "text"}
+                      variant="outlined"
+                      multiline={field.multiline || false}
+                      rows={field.rows || 1}
+                      disabled={!editableFields[field.name]}
+                    />
+                  )}
+                  {field.type !== "select" && (
+                    <IconButton
+                      onClick={() => toggleFieldEdit(field.name)}
+                      size="small"
+                      sx={{ position: "absolute", top: 8, right: 8 }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  )}
                 </Box>
               </Grid>
             ))}

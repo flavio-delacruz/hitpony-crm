@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, TextField, Button, Typography } from "@mui/material";
 import Swal from "sweetalert2";
-import { useSearchParams, useNavigate } from "react-router-dom"; // Agregar useNavigate
+import { useSearchParams, useNavigate } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 

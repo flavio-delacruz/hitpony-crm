@@ -22,6 +22,7 @@ import FetchAndStoreProspects from "./components/correos/enviados/EnviarCorreo";
 import Listas from "./pages/listas/ListasUser";
 import ListaDetalles from "./pages/listas/components/ListaDetalles";
 import EnviarCorreo from "./components/correos/enviados/EnviarCorreo";
+import AdminDashboard from "./pages/admin/AdminDashboard"
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -32,8 +33,6 @@ function App() {
   return (
     <AuthProvider>
       <ProspectosProvider>
-        {" "}
-        {/* Envuelve los componentes que necesitan los prospectos */}
         <Router>
           <Routes>
             <Route path="/" element={<Login />} />
@@ -95,10 +94,6 @@ function App() {
               }
             />
             <Route
-              path="formulario-de-contacto-cliente"
-              element={<RegistroClienteForm />}
-            />
-            <Route
               path="/registros/:formName"
               element={<RegistroClienteForm />}
             />
@@ -129,6 +124,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EnviarCorreo />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-dashboard"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
                 </ProtectedRoute>
               }
             />
