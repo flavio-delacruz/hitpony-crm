@@ -6,10 +6,10 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
 
-import SideBarContent from "../../sideBar/sideBarContent";
-import NotificationComponent from "./components/NotificationComponent";
-import Search from "../../search/SearchComponent"; // Asegúrate que esté importado correctamente
-import { useAuth } from "../../../context/AuthContext"; // Para obtener el usuario
+import SideBarContent from "../../../sideBar/sideBarContent";
+import NotificationComponent from "../components/NotificationComponent";
+import Search from "../../../search/SearchComponent"; // Asegúrate que esté importado correctamente
+import { useAuth } from "../../../../context/AuthContext"; // Para obtener el usuario
 
 const Header = styled(Box)({
   display: "flex",
@@ -42,14 +42,8 @@ const HeaderComponentMovile = ({ title }) => {
       </Drawer>
 
       <Typography sx={{ fontWeight: "bold", color: "#000", flex: 1, ml: 2 }} variant="h6">
-        Página / {title}
+        {title}
       </Typography>
-
-      {/* Buscador (puedes ocultarlo si no cabe en pantallas muy pequeñas) */}
-      <Box sx={{ display: { xs: "none", sm: "block" }, mr: 2 }}>
-        <Search />
-      </Box>
-
       <Box display="flex" alignItems="center">
         <IconButton>
           <NotificationComponent />

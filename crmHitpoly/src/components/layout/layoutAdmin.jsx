@@ -1,9 +1,9 @@
 import { Box } from "@mui/material";
 import { styled } from "@mui/system";
 import SideBar from "../sideBar/sideBar";
-import HeaderComponent from "../headers/headerComponet/usuarios/headerComponent";
+import HeaderComponent from "../headers/headerComponet/admins/headerComponent";
 import { useMediaQuery } from "@mui/material";
-import HeaderComponentMovile from "../headers/headerComponet/usuarios/headerComponentMovile";
+import HeaderComponentMovile from "../headers/headerComponet/admins/headerComponentMovile";
 
 const MainContent = styled(Box)({
   flex: 1,
@@ -12,7 +12,7 @@ const MainContent = styled(Box)({
   overflow: "auto",
 });
 
-const Layout = ({ children, title }) => {
+const LayoutAdmin = ({ children, title }) => {
   const isMobile = useMediaQuery("(max-width:600px)");
   return (
     <Box
@@ -36,4 +36,4 @@ const Layout = ({ children, title }) => {
   );
 };
 
-export default Layout;
+export default LayoutAdmin;

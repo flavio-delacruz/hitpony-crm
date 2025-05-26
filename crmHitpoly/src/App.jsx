@@ -22,6 +22,7 @@ import FetchAndStoreProspects from "./components/correos/enviados/EnviarCorreo";
 import Listas from "./pages/listas/ListasUser";
 import ListaDetalles from "./pages/listas/components/ListaDetalles";
 import EnviarCorreo from "./components/correos/enviados/EnviarCorreo";
+import EnviarCorreoAdmin from "./components/correos/enviados/EnviarCorreoAdmin";
 import AdminDashboard from "./pages/admin/AdminDashboard"
 
 const ProtectedRoute = ({ children }) => {
@@ -124,6 +125,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EnviarCorreo />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/enviar-correo-empresa"
+              element={
+                <ProtectedRoute>
+                  <EnviarCorreoAdmin />
                 </ProtectedRoute>
               }
             />

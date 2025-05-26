@@ -1,245 +1,152 @@
-import React, { useState, useEffect, useCallback } from "react";
-import {
-  Typography,
-  Box,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TextField // Importa TextField para el buscador
-} from "@mui/material";
-import { styled } from '@mui/material/styles';
-import SetterProspectos from "./components/SetterProspectos";
-import Layout from "../../components/layout/layout";
+// src/pages/AdminDashboard.jsx
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Typography, Box, CircularProgress, Button, Alert } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import LayoutAdmin from "../../components/layout/layoutAdmin";
+import ProspectsTable from "./components/ProspectsTable";
+import SearchSetterControl from "./components/SearchSetterControl";
+import EstadoFilterControl from "./components/EstadoFilterControl";
+import Swal from "sweetalert2";
+import useAdminDashboardData from "./components/useAdminDashboardData"; // Ruta correcta
 
-// Estilos personalizados
-const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  borderRadius: 8,
-  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-  overflow: 'auto', // Habilitar scroll horizontal y vertical si es necesario
-  maxHeight: '70vh', // Altura máxima de la tabla
-  margin: theme.spacing(2, 0),
-}));
-
-const StyledTable = styled(Table)(({ theme }) => ({
-  minWidth: 700,
-  backgroundColor: theme.palette.background.paper,
-}));
-
-const StyledTableHead = styled(TableHead)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  position: 'sticky', // Mantener la cabecera visible al hacer scroll
-  top: 0,
-  zIndex: 1,
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
-  },
-  '&:hover': {
-    backgroundColor: theme.palette.action.selected,
-    cursor: 'pointer',
-  },
-}));
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  padding: theme.spacing(1.5, 2),
-  borderBottom: `1px solid ${theme.palette.divider}`,
-}));
-
-const StyledHeaderTableCell = styled(TableCell)(({ theme }) => ({
-  color: theme.palette.common.white,
-  fontWeight: 'bold',
-  padding: theme.spacing(2, 2),
-  borderBottom: `2px solid ${theme.palette.primary.dark}`,
-}));
+export const estadoOptions = [
+  { value: "all", label: "Todos los estados" },
+  { value: "leads", label: "Leads" },
+  { value: "nutricion", label: "Nutrición" },
+  { value: "interesado", label: "Interesado" },
+  { value: "agendado", label: "Agendado" },
+  { value: "ganado", label: "Ganado" },
+  { value: "seguimiento", label: "Seguimiento" },
+  { value: "perdido", label: "Perdido" },
+];
 
 const AdminDashboard = () => {
-  const [setters, setSetters] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedSetterId, setSelectedSetterId] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(''); // Nuevo estado para el término de búsqueda
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("all");
+  const [selectedProspectIds, setSelectedProspectIds] = useState([]);
 
-  const fetchSetters = useCallback(async () => {
-    try {
-      const response = await fetch(
-        "https://apiweb.hitpoly.com/ajax/getSettersController.php",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ funcion: "get" }),
-        }
-      );
+  // Destructuramos los valores que realmente se usan aquí
+  const { data, loading, error, updateProspectoEstado } = useAdminDashboardData();
+  const navigate = useNavigate();
 
-      if (!response.ok) {
-        // console.error(`HTTP error! status: ${response.status}`); // Eliminado
-        const errorData = await response.json();
-        throw new Error(`HTTP error! status: ${response.status}`);
+  const handleEstadoChange = useCallback(async (event, prospectId) => {
+    const nuevoEstado = event.target.value;
+    await updateProspectoEstado({
+      prospectId,
+      nuevoEstado,
+    });
+  }, [updateProspectoEstado]);
+
+  const filteredData = useMemo(() => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+    const matchingSetterIds = new Set();
+    data.forEach((item) => {
+      if (
+        (item.setterNombre || "").toLowerCase().includes(lowerCaseSearchTerm) ||
+        (item.setterApellido || "").toLowerCase().includes(lowerCaseSearchTerm) ||
+        (item.correoSetter || "").toLowerCase().includes(lowerCaseSearchTerm) ||
+        (item.telefonoSetter || "").includes(lowerCaseSearchTerm)
+      ) {
+        matchingSetterIds.add(item.setterId);
       }
+    });
 
-      const data = await response.json();
+    return data.filter((item) => {
+      const belongsToMatchedSetter = searchTerm
+        ? matchingSetterIds.has(item.setterId)
+        : true;
 
-      if (data && data.data && Array.isArray(data.data)) {
-        const formattedSetters = data.data.map((setter) => ({
-          id: setter.id,
-          nombre: setter.nombre || '', // Asegúrate de que no sea undefined
-          apellido: setter.apellido || '', // Asegúrate de que no sea undefined
-          correo: setter.correo || '', // Asegúrate de que no sea undefined
-          telefono: setter.telefono || '', // Asegúrate de que no sea undefined
-          direccion: setter.direccion || '',
-          ciudad: setter.ciudad || '',
-          pais: setter.pais || '',
-          codigo_postal: setter.codigo_postal || '',
-          sobre_mi: setter.sobre_mi || '',
-          rol: setter.rol || '',
-          condicion: setter.condicion || '',
-          segundo_apellido: setter.segundo_apellido || '',
-          correo_corporativo: setter.correo_corporativo || '',
-          cargo: setter.cargo || '',
-          estado_usuario: setter.estado_usuario || '',
-          documento_identidad: setter.documento_identidad || '',
-          sector: setter.sector || '',
-          cantidad_contactos: setter.cantidad_contactos || 0,
-          reuniones_agendadas: setter.reuniones_agendadas || 0,
-          ventas_concretadas: setter.ventas_concretadas || 0,
-          ganancias: setter.ganancias || 0,
-          textos_completos: setter.textos_completos || '',
-          banner: setter.banner || '',
-        }));
-        setSetters(formattedSetters);
-        setLoading(false);
-      } else {
-        // console.error("Error: Los datos recibidos no tienen la estructura esperada.", data); // Eliminado
-        setError("Error: Los datos recibidos no tienen la estructura esperada.");
-        setLoading(false);
-      }
-    } catch (e) {
-      // console.error("Error al obtener setters:", e); // Eliminado
-      setError(e.message);
-      setLoading(false);
-    }
+      const matchesEstado =
+        filtroEstado === "all" || item.estado_contacto === filtroEstado;
+
+      return belongsToMatchedSetter && matchesEstado;
+    });
+  }, [data, searchTerm, filtroEstado]);
+
+  const handleSelectProspect = useCallback((id) => {
+    setSelectedProspectIds((prevSelected) => {
+      const newSelected = prevSelected.includes(id)
+        ? prevSelected.filter((prospectId) => prospectId !== id)
+        : [...prevSelected, id];
+      console.log("Selected IDs (individual):", newSelected);
+      return newSelected;
+    });
   }, []);
 
-  useEffect(() => {
-    fetchSetters();
-  }, [fetchSetters]);
+  const handleSelectAllProspects = useCallback((event) => {
+    if (event.target.checked) {
+      const allVisibleProspectIds = filteredData.map((p) => p.id);
+      setSelectedProspectIds(allVisibleProspectIds);
+      console.log("Selected IDs (all visible):", allVisibleProspectIds);
+    } else {
+      setSelectedProspectIds([]);
+      console.log("Selected IDs (none):", []);
+    }
+  }, [filteredData]);
 
-  const handleRowClick = (setterId) => {
-    setSelectedSetterId(setterId);
+  const handleEnviarCorreosClick = () => {
+    if (selectedProspectIds.length === 0) {
+      Swal.fire(
+        "Advertencia",
+        "Por favor, selecciona al menos un prospecto para enviar un correo.",
+        "warning"
+      );
+      return;
+    }
+    console.log("Sending to EnviarCorreo with IDs:", selectedProspectIds);
+    // ¡CORRECCIÓN AQUÍ! Solo pasamos los IDs de los prospectos seleccionados.
+    // La función `getProspectsDataFromLoadedData` se obtendrá directamente en EnviarCorreoAdmin.
+    navigate("/enviar-correo-empresa", { state: { selectedProspectIds } });
   };
-
-  const handleCloseProspectos = () => {
-    setSelectedSetterId(null);
-  };
-
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  // Filtrar setters basado en el término de búsqueda
-  const filteredSetters = setters.filter(setter => {
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return (
-      setter.nombre.toLowerCase().includes(lowerCaseSearchTerm) ||
-      setter.apellido.toLowerCase().includes(lowerCaseSearchTerm) ||
-      setter.correo.toLowerCase().includes(lowerCaseSearchTerm) ||
-      setter.telefono.toLowerCase().includes(lowerCaseSearchTerm)
-    );
-  });
 
   return (
-    <Layout title={"adminDashboard"}>
+    <LayoutAdmin title={"AdminDashboard"}>
       <Box sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Panel de Administración de Setters
-        </Typography>
-        {selectedSetterId ? (
-          <SetterProspectos setterId={selectedSetterId} onClose={handleCloseProspectos} />
-        ) : (
-          <>
-            {/* Buscador de Setters */}
-            <Box sx={{ mb: 3 }}>
-              <TextField
-                label="Buscar Setter por Nombre, Apellido, Correo o Teléfono"
-                variant="outlined"
-                fullWidth
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-            </Box>
+        <Box sx={{ display: "flex", gap: 2, mb: 3, alignItems: "center", flexWrap: "wrap" }}>
+          <SearchSetterControl searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+          <EstadoFilterControl
+            filtroEstado={filtroEstado}
+            onFiltroEstadoChange={setFiltroEstado}
+            estadoOptions={estadoOptions}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleEnviarCorreosClick}
+            disabled={selectedProspectIds.length === 0}
+            sx={{ flexShrink: 0 }}
+          >
+            Enviar Correo a ({selectedProspectIds.length}) Prospecto(s)
+          </Button>
+        </Box>
 
-            <StyledTableContainer component={Paper}>
-              <StyledTable>
-                <StyledTableHead>
-                  <TableRow>
-                    <StyledHeaderTableCell>ID</StyledHeaderTableCell>
-                    <StyledHeaderTableCell>Nombre</StyledHeaderTableCell>
-                    <StyledHeaderTableCell>Apellido</StyledHeaderTableCell>
-                    <StyledHeaderTableCell>Correo</StyledHeaderTableCell>
-                    <StyledHeaderTableCell>Teléfono</StyledHeaderTableCell>
-                    <StyledHeaderTableCell>Ciudad</StyledHeaderTableCell>
-                    <StyledHeaderTableCell>País</StyledHeaderTableCell>
-                    <StyledHeaderTableCell>Rol</StyledHeaderTableCell>
-                    <StyledHeaderTableCell>Estado Usuario</StyledHeaderTableCell>
-                    <StyledHeaderTableCell>Cantidad Contactos</StyledHeaderTableCell>
-                    <StyledHeaderTableCell>Reuniones Agendadas</StyledHeaderTableCell>
-                    <StyledHeaderTableCell>Ventas Concretadas</StyledHeaderTableCell>
-                  </TableRow>
-                </StyledTableHead>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <StyledTableCell colSpan={12} align="center">
-                        <CircularProgress />
-                        <Typography sx={{ ml: 2 }}>Cargando setters...</Typography>
-                      </StyledTableCell>
-                    </TableRow>
-                  ) : error ? (
-                    <TableRow>
-                      <StyledTableCell colSpan={12} align="center" style={{ color: 'red' }}>
-                        {error}
-                      </StyledTableCell>
-                    </TableRow>
-                  ) : filteredSetters.length > 0 ? (
-                    filteredSetters.map((setter) => (
-                      <StyledTableRow key={setter.id} onClick={() => handleRowClick(setter.id)}>
-                        <StyledTableCell>{setter.id}</StyledTableCell>
-                        <StyledTableCell>{setter.nombre}</StyledTableCell>
-                        <StyledTableCell>{setter.apellido}</StyledTableCell>
-                        <StyledTableCell>{setter.correo}</StyledTableCell>
-                        <StyledTableCell>{setter.telefono}</StyledTableCell>
-                        <StyledTableCell>{setter.ciudad}</StyledTableCell>
-                        <StyledTableCell>{setter.pais}</StyledTableCell>
-                        <StyledTableCell>{setter.rol}</StyledTableCell>
-                        <StyledTableCell>{setter.estado_usuario}</StyledTableCell>
-                        <StyledTableCell>{setter.cantidad_contactos}</StyledTableCell>
-                        <StyledTableCell>{setter.reuniones_agendadas}</StyledTableCell>
-                        <StyledTableCell>{setter.ventas_concretadas}</StyledTableCell>
-                      </StyledTableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <StyledTableCell colSpan={12} align="center">
-                        No se encontraron setters que coincidan con la búsqueda.
-                      </StyledTableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </StyledTable>
-            </StyledTableContainer>
-          </>
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "50vh",
+            }}
+          >
+            <CircularProgress />
+            <Typography sx={{ ml: 2 }}>Cargando datos...</Typography>
+          </Box>
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : (
+          <ProspectsTable
+            data={filteredData}
+            onEstadoChange={handleEstadoChange}
+            estadoOptions={estadoOptions}
+            selectedProspects={selectedProspectIds}
+            onSelectProspect={handleSelectProspect}
+            onSelectAllProspects={handleSelectAllProspects}
+          />
         )}
       </Box>
-    </Layout>
+    </LayoutAdmin>
   );
 };
 
