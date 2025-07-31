@@ -1,4 +1,3 @@
-// TraerListas.jsx
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -6,8 +5,8 @@ const TraerListas = ({ setListas }) => {
   const { user } = useAuth();
 
   useEffect(() => {
-    const fetchLists = async () => {
-      if (user?.id) {
+    const fetchLists = async () => {      
+      if (user?.id) {       
         try {
           const response = await fetch(
             "https://apiweb.hitpoly.com/ajax/traerListaController.php",
@@ -22,7 +21,6 @@ const TraerListas = ({ setListas }) => {
               }),
             }
           );
-
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -35,16 +33,16 @@ const TraerListas = ({ setListas }) => {
                 ? lista.prospectos
                 : [],
             };
-            console.log(
-              `${listaConProspectos.nombre_lista} (${listaConProspectos.prospectos.length})`
-            );
             return listaConProspectos;
           });
+          
           setListas(listasConProspectos);
+          
         } catch (error) {
           setListas([]);
         }
-      }
+      } else {
+     }
     };
 
     fetchLists();

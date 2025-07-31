@@ -1,5 +1,3 @@
-// En useProspectos.js
-
 import { useCallback } from 'react';
 import { useAuth } from "../../../../context/AuthContext";
 
@@ -24,7 +22,6 @@ const useProspectos = () => {
       
       return data.resultado ? data.resultado : [];
     } catch (error) {
-      console.error("Error fetching prospectos:", error);
       return null;
     }
   }, [user?.id]); // Dependencia del useCallback

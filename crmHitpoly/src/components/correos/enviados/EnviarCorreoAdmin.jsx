@@ -4,73 +4,79 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Swal from "sweetalert2";
-import Layout from "../../layout/layout"; // Asegúrate de la ruta correcta
+import Layout from "../../layout/layout";
 import { useAuth } from "../../../context/AuthContext";
-// Importa useAdminDashboardData directamente aquí
 import useAdminDashboardData from "../../../pages/admin/components/useAdminDashboardData";
+
+const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 
 function EnviarCorreoAdmin() {
   const location = useLocation();
   const navigate = useNavigate();
   const { selectedProspectIds } = location.state || { selectedProspectIds: [] };
-
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [recipientEmails, setRecipientEmails] = useState([]);
   const [loadingEmails, setLoadingEmails] = useState(true);
   const { user } = useAuth();
   const defaultSenderEmail = "no-reply@hitpoly.com";
+  const senderEmail = user?.correo || defaultSenderEmail;
 
-  // IMPORTANTE: Utiliza useAdminDashboardData aquí para acceder a los datos cargados.
-  // Esto es seguro porque useAdminDashboardData ya maneja su propia caché y carga.
-  const { data: allProspectsData, getProspectsDataFromLoadedData } = useAdminDashboardData();
+  useEffect(() => {}, [user, senderEmail]);
+
+  const { data: allProspectsData, getProspectsDataFromLoadedData } =
+    useAdminDashboardData();
 
   useEffect(() => {
     const loadProspectEmails = () => {
       setLoadingEmails(true);
-      console.log("EnviarCorreoAdmin: IDs de prospectos recibidos:", selectedProspectIds);
-
-      if (selectedProspectIds.length > 0 && allProspectsData.length > 0 && typeof getProspectsDataFromLoadedData === 'function') {
-        // Usa la función del hook para filtrar los prospectos de los datos ya cargados
-        const prospectsData = getProspectsDataFromLoadedData(selectedProspectIds);
-        console.log("EnviarCorreoAdmin: Datos de prospectos obtenidos de useAdminDashboardData:", prospectsData);
-
+      if (
+        selectedProspectIds.length > 0 &&
+        allProspectsData.length > 0 &&
+        typeof getProspectsDataFromLoadedData === "function"
+      ) {
+        const prospectsData =
+          getProspectsDataFromLoadedData(selectedProspectIds);
         const emails = prospectsData
           .map((prospecto) => prospecto.correo || prospecto.email)
-          .filter((email) => email && email.trim() !== "");
+          .filter(
+            (email) => email && email.trim() !== "" && EMAIL_REGEX.test(email)
+          );
 
         setRecipientEmails(emails);
 
         if (emails.length === 0 && prospectsData.length > 0) {
           Swal.fire(
             "Advertencia",
-            "Algunos prospectos seleccionados no tienen una dirección de correo electrónico válida.",
+            "Algunos prospectos seleccionados no tienen una dirección de correo electrónico válida o con el formato correcto.",
+            "warning"
+          );
+        } else if (emails.length < selectedProspectIds.length) {
+          const invalidCount = selectedProspectIds.length - emails.length;
+          Swal.fire(
+            "Advertencia",
+            `Se encontraron ${invalidCount} prospectos con direcciones de correo inválidas o vacías. Solo se enviará a las direcciones válidas.`,
             "warning"
           );
         }
       } else if (selectedProspectIds.length === 0) {
-          setRecipientEmails([]);
+        setRecipientEmails([]);
       } else {
-          // Si no hay datos cargados aún, es posible que el hook todavía esté en proceso
-          // Podrías mostrar un spinner aquí si es necesario
-          console.log("Esperando que useAdminDashboardData cargue los datos...");
-          // No hacemos nada hasta que allProspectsData tenga datos
       }
-      // Solo establece loadingEmails en false cuando el proceso de búsqueda ha terminado
-      // y tenemos datos (o sabemos que no hay)
-      if (selectedProspectIds.length === 0 || (allProspectsData.length > 0 && typeof getProspectsDataFromLoadedData === 'function')) {
-          setLoadingEmails(false);
+
+      if (
+        selectedProspectIds.length === 0 ||
+        (allProspectsData.length > 0 &&
+          typeof getProspectsDataFromLoadedData === "function")
+      ) {
+        setLoadingEmails(false);
       }
     };
 
-    // Esto se ejecutará cada vez que selectedProspectIds cambie o allProspectsData cambie
-    // (lo cual sucederá cuando useAdminDashboardData termine de cargar/actualizar)
     loadProspectEmails();
   }, [selectedProspectIds, allProspectsData, getProspectsDataFromLoadedData]);
 
-
   const handleEnviarCorreo = async () => {
-    // ... (Tu lógica existente para enviar correos, no cambia)
     if (recipientEmails.length === 0) {
       Swal.fire(
         "Advertencia",
@@ -90,17 +96,14 @@ function EnviarCorreoAdmin() {
     }
 
     try {
-      const senderEmail = user?.correo || defaultSenderEmail;
       const requestBody = JSON.stringify({
         accion: "emails",
-        name: user?.nombre || "Administrador",
+        name: user?.nombre || "Usuario",
         email: senderEmail,
         destinatarios: recipientEmails,
         motivo: subject,
         message: body,
       });
-
-      console.log("Cuerpo de la solicitud para enviar correo:", requestBody);
 
       const response = await fetch(
         "https://apiweb.hitpoly.com/ajax/mandarEmailsController.php",
@@ -112,9 +115,8 @@ function EnviarCorreoAdmin() {
       );
 
       const data = await response.json();
-      console.log("Respuesta de la API de envío de correos:", data);
 
-      if (data.status === "success") {
+      if (data.status === "success" || data.status === "completed") {
         Swal.fire(
           "Éxito",
           `Los correos a ${recipientEmails.length} prospectos han sido enviados correctamente.`,
@@ -123,11 +125,16 @@ function EnviarCorreoAdmin() {
           navigate(-1);
         });
       } else if (data.message?.includes("Invalid address:")) {
-        Swal.fire(
-          "Error",
-          "La dirección de correo electrónico del remitente no es válida. Por favor, actualice su perfil con una dirección de correo electrónico válida.",
-          "error"
-        );
+        let errorMessage = "Una dirección de correo electrónico no es válida.";
+        if (data.message.includes("(to):")) {
+          errorMessage = `Una dirección de correo de destinatario es inválida: "${data.message
+            .split("(to):")[1]
+            .trim()}"`;
+        } else if (data.message.includes("(from):")) {
+          errorMessage = `La dirección de correo electrónico del remitente es inválida: "${senderEmail}". Por favor, contacte al soporte o verifique su perfil.`;
+        }
+
+        Swal.fire("Error", errorMessage, "error");
       } else if (data.error) {
         Swal.fire(
           "Error",
@@ -138,15 +145,14 @@ function EnviarCorreoAdmin() {
         Swal.fire("Error", "Hubo un problema al enviar los correos.", "error");
       }
     } catch (error) {
-      console.error("Error al enviar correos:", error);
       Swal.fire("Error", "No se pudieron enviar los correos.", "error");
     }
   };
 
   return (
-    <Layout title={"Enviar Emails a Administrador"}>
+    <Layout title={"Enviar Emails"}>
       <Stack spacing={3} sx={{ p: 3 }}>
-        <h2>Enviar Correo a Prospectos Seleccionados (Admin)</h2>
+        <h2>Enviar Correo a Prospectos Seleccionados</h2>
         {loadingEmails ? (
           <p>Cargando correos de prospectos...</p>
         ) : (
@@ -177,7 +183,6 @@ function EnviarCorreoAdmin() {
             </Button>
             <Button onClick={() => navigate(-1)}>Cancelar</Button>
 
-            {/* Mensajes de estado */}
             {selectedProspectIds.length > 0 && recipientEmails.length > 0 && (
               <p>
                 Se enviará correo a **{recipientEmails.length}** prospecto(s)

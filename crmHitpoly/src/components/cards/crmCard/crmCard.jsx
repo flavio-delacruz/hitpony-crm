@@ -1,4 +1,3 @@
-// CrmCard.js
 import React, { useState, useEffect, useRef } from "react";
 import { DragDropContext } from "@hello-pangea/dnd";
 import useProspectos from "./components/prospectosService";
@@ -39,9 +38,7 @@ const CrmCard = () => {
   const containerRef = useRef(null);
 
   const loadProspectos = async () => {
-    console.log("useEffect: Iniciando carga de prospectos");
     const prospectosData = await fetchProspectos();
-    console.log("PROSPECTOS DATA", prospectosData);
 
     if (prospectosData) {
       const organizedColumns = {
@@ -62,11 +59,8 @@ const CrmCard = () => {
           organizedColumns["leads"].push(p);
         }
       });
-
-      console.log("useEffect: Cargando estado de columnas", organizedColumns);
       setColumns(organizedColumns);
     } else {
-      console.log("useEffect: No se recibieron datos de prospectos");
     }
   };
 
@@ -76,38 +70,55 @@ const CrmCard = () => {
 
   const onDragEnd = async (result) => {
     const { source, destination } = result;
-    if (!destination) return;
 
-    const movedItem = columns[source.droppableId][source.index];
+    if (!destination) {
+     return;
+    }
 
-    // 1. Actualización optimista
-    const newColumnsState = (prev) => {
-      const sourceClone = [...prev[source.droppableId]];
-      const destClone = [...prev[destination.droppableId]];
-      const [removed] = sourceClone.splice(source.index, 1);
-      destClone.splice(destination.index, 0, removed);
-      const newState = {
-        ...prev,
-        [source.droppableId]: sourceClone,
-        [destination.droppableId]: destClone,
-      };
-      console.log("onDragEnd: Actualización optimista del estado", newState);
-      return newState;
-    };
-    setColumns(newColumnsState);
+    const sourceDroppableId = source.droppableId;
+    const destinationDroppableId = destination.droppableId;
 
-    // 2. Llamada a la API
+    if (sourceDroppableId === destinationDroppableId && source.index === destination.index) {
+      return;
+    }
+
+    const movedItem = columns[sourceDroppableId][source.index];
+
+    setColumns((prev) => {
+      let newColumns;
+      if (sourceDroppableId === destinationDroppableId) {
+        const items = reorder(
+          prev[sourceDroppableId],
+          source.index,
+          destination.index
+        );
+        newColumns = {
+          ...prev,
+          [sourceDroppableId]: items,
+        };
+      }
+      else {
+        const result = move(
+          prev[sourceDroppableId],
+          prev[destinationDroppableId],
+          source,
+          destination
+        );
+        newColumns = {
+          ...prev,
+          [sourceDroppableId]: result[sourceDroppableId],
+          [destinationDroppableId]: result[destinationDroppableId],
+        };
+      }
+      return newColumns;
+    });
+
     const updateResult = await updateProspectoEstado(
       movedItem.id,
-      destination.droppableId
+      destinationDroppableId
     );
-
-    // 3. Manejo de error
     if (!updateResult.success) {
-      console.log("onDragEnd: Revertiendo la actualización optimista recargando datos");
-      loadProspectos();
     } else {
-      console.log("onDragEnd: Actualización exitosa en la API");
     }
   };
 

@@ -1,3 +1,4 @@
+// CrmItem.js
 import React from "react";
 import { Draggable } from "@hello-pangea/dnd";
 import { Avatar, Typography, Box } from "@mui/material";
@@ -27,7 +28,7 @@ const CrmItem = ({ item, index }) => {
   };
 
   return (
-    <Draggable draggableId={String(item.id)} index={index}>
+    <Draggable key={String(item.id)} draggableId={String(item.id)} index={index}>
       {(provided, snapshot) => (
         <div
           ref={provided.innerRef}
@@ -85,7 +86,7 @@ const CrmItem = ({ item, index }) => {
         </div>
       )}
     </Draggable>
-  );
+  ); // <--- Y este paréntesis de cierre también es crucial
 };
 
 export default CrmItem;

@@ -1,13 +1,19 @@
 // src/pages/AdminDashboard.jsx
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Typography, Box, CircularProgress, Button, Alert } from "@mui/material";
+import {
+  Typography,
+  Box,
+  CircularProgress,
+  Button,
+  Alert,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LayoutAdmin from "../../components/layout/layoutAdmin";
 import ProspectsTable from "./components/ProspectsTable";
 import SearchSetterControl from "./components/SearchSetterControl";
 import EstadoFilterControl from "./components/EstadoFilterControl";
 import Swal from "sweetalert2";
-import useAdminDashboardData from "./components/useAdminDashboardData"; // Ruta correcta
+import useAdminDashboardData from "./components/useAdminDashboardData";
 
 export const estadoOptions = [
   { value: "all", label: "Todos los estados" },
@@ -25,22 +31,21 @@ const AdminDashboard = () => {
   const [filtroEstado, setFiltroEstado] = useState("all");
   const [selectedProspectIds, setSelectedProspectIds] = useState([]);
 
-  // Destructuramos los valores que realmente se usan aquí
   const { data, loading, error, updateProspectoEstado } = useAdminDashboardData();
   const navigate = useNavigate();
 
-  const handleEstadoChange = useCallback(async (event, prospectId) => {
-    const nuevoEstado = event.target.value;
-    await updateProspectoEstado({
-      prospectId,
-      nuevoEstado,
-    });
-  }, [updateProspectoEstado]);
+  const handleEstadoChange = useCallback(
+    async (event, prospectId) => {
+      const nuevoEstado = event.target.value;
+      await updateProspectoEstado({ prospectId, nuevoEstado });
+    },
+    [updateProspectoEstado]
+  );
 
   const filteredData = useMemo(() => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-
     const matchingSetterIds = new Set();
+
     data.forEach((item) => {
       if (
         (item.setterNombre || "").toLowerCase().includes(lowerCaseSearchTerm) ||
@@ -56,34 +61,37 @@ const AdminDashboard = () => {
       const belongsToMatchedSetter = searchTerm
         ? matchingSetterIds.has(item.setterId)
         : true;
-
       const matchesEstado =
         filtroEstado === "all" || item.estado_contacto === filtroEstado;
-
       return belongsToMatchedSetter && matchesEstado;
     });
   }, [data, searchTerm, filtroEstado]);
 
   const handleSelectProspect = useCallback((id) => {
     setSelectedProspectIds((prevSelected) => {
-      const newSelected = prevSelected.includes(id)
+      const isAlreadySelected = prevSelected.includes(id);
+      const newSelection = isAlreadySelected
         ? prevSelected.filter((prospectId) => prospectId !== id)
         : [...prevSelected, id];
-      console.log("Selected IDs (individual):", newSelected);
-      return newSelected;
+      return newSelection;
     });
   }, []);
 
-  const handleSelectAllProspects = useCallback((event) => {
-    if (event.target.checked) {
-      const allVisibleProspectIds = filteredData.map((p) => p.id);
-      setSelectedProspectIds(allVisibleProspectIds);
-      console.log("Selected IDs (all visible):", allVisibleProspectIds);
-    } else {
-      setSelectedProspectIds([]);
-      console.log("Selected IDs (none):", []);
-    }
-  }, [filteredData]);
+  // Recibe los prospectos visibles en la página actual
+  const handleSelectAllProspects = useCallback((visibleProspects) => {
+    const visibleIds = visibleProspects.map((p) => p.id);
+    const allVisibleSelected = visibleIds.every((id) =>
+      selectedProspectIds.includes(id)
+    );
+
+    setSelectedProspectIds((prevSelected) => {
+      if (allVisibleSelected) {
+        return prevSelected.filter((id) => !visibleIds.includes(id));
+      } else {
+        return [...new Set([...prevSelected, ...visibleIds])];
+      }
+    });
+  }, [selectedProspectIds]);
 
   const handleEnviarCorreosClick = () => {
     if (selectedProspectIds.length === 0) {
@@ -94,17 +102,25 @@ const AdminDashboard = () => {
       );
       return;
     }
-    console.log("Sending to EnviarCorreo with IDs:", selectedProspectIds);
-    // ¡CORRECCIÓN AQUÍ! Solo pasamos los IDs de los prospectos seleccionados.
-    // La función `getProspectsDataFromLoadedData` se obtendrá directamente en EnviarCorreoAdmin.
     navigate("/enviar-correo-empresa", { state: { selectedProspectIds } });
   };
 
   return (
     <LayoutAdmin title={"AdminDashboard"}>
       <Box sx={{ p: 3 }}>
-        <Box sx={{ display: "flex", gap: 2, mb: 3, alignItems: "center", flexWrap: "wrap" }}>
-          <SearchSetterControl searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            mb: 3,
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <SearchSetterControl
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
           <EstadoFilterControl
             filtroEstado={filtroEstado}
             onFiltroEstadoChange={setFiltroEstado}

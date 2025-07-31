@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Swal from "sweetalert2";
 import Layout from "../../layout/layout";
-import { useAuth } from "../../../context/AuthContext"; // Importa el contexto de autenticación
+import { useAuth } from "../../../context/AuthContext";
 
 function EnviarCorreo() {
   const location = useLocation();
@@ -52,7 +52,6 @@ function EnviarCorreo() {
             );
           }
         } catch (error) {
-          console.error("Error al obtener prospectos:", error);
           Swal.fire("Error", "Error al obtener los prospectos.", "error");
         }
       } else if (selectedProspectIds.length === 0) {
@@ -106,8 +105,7 @@ function EnviarCorreo() {
 
 
 
-      if (data.status === "success") {
-        // Verifica data.status === 'success'
+      if (data.status === "success" || data.status === "completed") {
         Swal.fire(
           "Éxito",
           "Los correos han sido enviados correctamente.",
@@ -131,7 +129,6 @@ function EnviarCorreo() {
         Swal.fire("Error", "Hubo un problema al enviar los correos.", "error");
       }
     } catch (error) {
-      console.error("Error al enviar correos:", error);
       Swal.fire("Error", "No se pudieron enviar los correos.", "error");
     }
   };

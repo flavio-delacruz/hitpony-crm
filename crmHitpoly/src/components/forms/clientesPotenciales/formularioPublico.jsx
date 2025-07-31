@@ -18,7 +18,7 @@ const PublicClientForm = ({ titulo = "Formulario de Registro", subtitulo = "", p
     celular: "",
   });
 
-  const navigate = useNavigate(); // Usar useNavigate para la redirección
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (idSetter !== "0") {
@@ -62,7 +62,8 @@ const PublicClientForm = ({ titulo = "Formulario de Registro", subtitulo = "", p
     const payload = {
       funcion: "registrar",
       idSetter,
-      origen: "formulario",  // Añadido para indicar que este registro es externo
+      estado_contacto: "leads",
+      origen: "formulario", 
       ...formData,
     };
   
@@ -73,8 +74,7 @@ const PublicClientForm = ({ titulo = "Formulario de Registro", subtitulo = "", p
         body: JSON.stringify(payload),
       });
 
-      // Redirigir a una nueva página después del éxito
-      navigate("/gracias-por-confiar-en-hitpoly");  // Cambia a la ruta que deseas
+      navigate("/gracias-por-confiar-en-hitpoly"); 
 
       setFormData({
         nombre: "",

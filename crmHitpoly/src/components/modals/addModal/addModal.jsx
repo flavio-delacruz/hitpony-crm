@@ -45,6 +45,7 @@ const AddModal = ({ open, onClose, onSave }) => {
     const payload = {
       funcion: "registrar",
       idSetter: user?.id || "0",
+      estado_contacto: "leads",
       ...formData,
       origen: "interno",
     };

@@ -25,7 +25,7 @@ const ThankYouPage = () => {
 
       <Box sx={{ mb: 3 }}>
         <img
-          src="/public/logo-hitpoly.svg" // Puedes reemplazar esta URL con una imagen de agradecimiento personalizada
+          src="/public/images/logohitpoly.png" // Puedes reemplazar esta URL con una imagen de agradecimiento personalizada
           alt="Thank you"
           style={{
             maxWidth: "200px",
