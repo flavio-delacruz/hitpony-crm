@@ -9,7 +9,7 @@ export const formsList = [
     {
       name: "formulario-de-servicios",
       titulo: "Formulario de Servicios",
-      subtitulo: "Completa tu información para asesorarte",
+      subtitulo: "Déjanos tus datos para ponernos en contacto contigo",
       portada: "/images/servicios.png",
     },
     {
