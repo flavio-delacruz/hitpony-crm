@@ -27,8 +27,6 @@ const UserListPage = () => {
           onAddNew={handleAddNew}
           onShareForm={() => console.log("Compartir Formulario clickeado")}
         />
-
-        {/* Tabla */}
         <DataTable />
       </Box>
       <AddModal

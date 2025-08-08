@@ -23,7 +23,10 @@ import ProfileImageCard from "./ProfileImageCard";
 const ProfileCard = () => {
   const { user, login } = useAuth();
   const [formData, setFormData] = useState(user);
-  const [editableFields, setEditableFields] = useState({});
+  
+  // **CAMBIO AÑADIDO**: Inicializa el campo 'rol' como editable por defecto
+  const [editableFields, setEditableFields] = useState({ rol: true });
+
   const [localChanges, setLocalChanges] = useState(null);
   const [alert, setAlert] = useState({ show: false, type: "", message: "" });
   const prevUserRef = useRef(user);
@@ -33,7 +36,10 @@ const ProfileCard = () => {
     if (JSON.stringify(prevUser) !== JSON.stringify(user)) {
       setFormData(user);
       setLocalChanges(null);
-      setEditableFields({});
+      
+      // **CAMBIO AÑADIDO**: Restablece 'rol' como editable al recibir un nuevo 'user'
+      setEditableFields({ rol: true });
+      
       prevUserRef.current = user;
     }
   }, [user]);
@@ -58,11 +64,10 @@ const ProfileCard = () => {
       return;
     }
 
-    // Prepara los datos para enviar a la API, renombrando "correo" a "email"
     const dataToSend = { ...formData, funcion: "update", id: formData.id };
     if (dataToSend.correo) {
       dataToSend.email = dataToSend.correo;
-      delete dataToSend.correo; // Elimina la propiedad "correo" para evitar duplicados
+      delete dataToSend.correo;
     }
 
     try {
@@ -84,7 +89,6 @@ const ProfileCard = () => {
         id: formData.id,
       };
 
-      // Asegúrate de que el estado formData también use "correo" para la visualización futura
       if (updatedUserWithId.email) {
         updatedUserWithId.correo = updatedUserWithId.email;
         delete updatedUserWithId.email;
@@ -92,7 +96,7 @@ const ProfileCard = () => {
 
       setFormData(updatedUserWithId);
       login(updatedUserWithId);
-      setEditableFields({});
+      setEditableFields({ rol: true }); // Restablece los campos a su estado inicial, con rol editable
       showAlert("success", "¡Datos actualizados correctamente!");
     } catch (error) {
       showAlert("error", "Hubo un error actualizando los datos.");
@@ -108,7 +112,7 @@ const ProfileCard = () => {
   const fields = [
     { label: "Nombre", name: "nombre" },
     { label: "Apellido", name: "apellido" },
-    { label: "Correo", name: "correo", type: "email" }, // Se mantiene "correo" para la visualización
+    { label: "Correo", name: "correo", type: "email" },
     { label: "Teléfono", name: "telefono" },
     { label: "Dirección", name: "direccion" },
     { label: "Ciudad", name: "ciudad" },
@@ -119,11 +123,8 @@ const ProfileCard = () => {
       label: "Rol",
       name: "rol",
       type: "select",
-      options: [
-        { value: "closer", label: "Closer" },
-        { value: "setter", label: "Setter" },
-      ],
-    }, // Nuevo campo "rol"
+      options: [{ value: "closer", label: "Closer" }, { value: "setter", label: "Setter" }],
+    },
   ];
 
   return (
@@ -151,8 +152,7 @@ const ProfileCard = () => {
                 px: 3,
                 py: 1,
                 borderRadius: 2,
-                backgroundColor:
-                  alert.type === "success" ? "#ffffff" : "#ffebee",
+                backgroundColor: alert.type === "success" ? "#ffffff" : "#ffebee",
                 color: alert.type === "success" ? "#388e3c" : "#d32f2f",
                 boxShadow: 3,
                 width: "auto",
@@ -174,8 +174,7 @@ const ProfileCard = () => {
         <CardHeader
           title="Editar perfil"
           action={
-            localChanges &&
-            JSON.stringify(localChanges) !== JSON.stringify(user) ? (
+            localChanges && JSON.stringify(localChanges) !== JSON.stringify(user) ? (
               <Button variant="contained" onClick={handleUpdate}>
                 Actualizar
               </Button>
@@ -217,13 +216,6 @@ const ProfileCard = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      <IconButton
-                        onClick={() => toggleFieldEdit(field.name)}
-                        size="small"
-                        sx={{ position: "absolute", top: 8, right: 8 }}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
                     </FormControl>
                   ) : (
                     <TextField

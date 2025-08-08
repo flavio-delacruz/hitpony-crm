@@ -37,8 +37,13 @@ const ProspectFilter = ({ columns, filterModel, setFilterModel, rows }) => {
         label="Filtrar por Nombre"
         value={nombreFilter}
         onChange={(e) => setNombreFilter(e.target.value)}
+        size="small" // Hace el campo de texto más pequeño
+        sx={{ minWidth: 200 }} // Establece un ancho mínimo
       />
-      <FormControl>
+      <FormControl
+        size="small" // Hace el control del select más pequeño
+        sx={{ minWidth: 200 }} // Establece un ancho mínimo
+      >
         <InputLabel id="estado-select-label">Filtrar por Estado</InputLabel>
         <Select
           labelId="estado-select-label"
