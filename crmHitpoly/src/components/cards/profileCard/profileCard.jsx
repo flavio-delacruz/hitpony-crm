@@ -23,7 +23,10 @@ import ProfileImageCard from "./ProfileImageCard";
 const ProfileCard = () => {
   const { user, login } = useAuth();
   const [formData, setFormData] = useState(user);
+  
+  // **CAMBIO AÑADIDO**: Inicializa el campo 'rol' como editable por defecto
   const [editableFields, setEditableFields] = useState({ rol: true });
+
   const [localChanges, setLocalChanges] = useState(null);
   const [alert, setAlert] = useState({ show: false, type: "", message: "" });
   const prevUserRef = useRef(user);
@@ -33,16 +36,17 @@ const ProfileCard = () => {
     if (JSON.stringify(prevUser) !== JSON.stringify(user)) {
       setFormData(user);
       setLocalChanges(null);
+      
+      // **CAMBIO AÑADIDO**: Restablece 'rol' como editable al recibir un nuevo 'user'
       setEditableFields({ rol: true });
+      
       prevUserRef.current = user;
     }
   }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Asegurarnos de que 'rol' sea número
-    const val = name === "rol" ? (value === "" ? "" : Number(value)) : value;
-    const updated = { ...formData, [name]: val };
+    const updated = { ...formData, [name]: value };
     setFormData(updated);
     setLocalChanges(updated);
   };
@@ -55,11 +59,13 @@ const ProfileCard = () => {
   };
 
   const handleUpdate = async () => {
-    if (!formData?.id) {
+    if (!formData.id) {
       showAlert("error", "El ID del usuario no está disponible.");
       return;
     }
 
+
+    // Mapear "rol" a "id_tipo" (asumiendo rol contiene el valor numérico 2 o 3)
     const dataToSend = {
       ...formData,
       funcion: "update",
@@ -67,7 +73,9 @@ const ProfileCard = () => {
       id_tipo: formData.rol,
     };
 
-    delete dataToSend.rol;
+    delete dataToSend.rol; // Eliminar "rol" para evitar duplicados
+
+    // Mapear "correo" a "email" para backend si aplica
 
     if (dataToSend.correo) {
       dataToSend.email = dataToSend.correo;
@@ -88,6 +96,7 @@ const ProfileCard = () => {
 
       const updatedUserFromApi = await response.json();
 
+      // Reconstruir objeto para estado, mapeando email a correo para UI
       const updatedUserWithId = {
         ...formData,
         ...updatedUserFromApi,
@@ -101,7 +110,7 @@ const ProfileCard = () => {
 
       setFormData(updatedUserWithId);
       login(updatedUserWithId);
-      setEditableFields({ rol: true });
+      setEditableFields({ rol: true }); // Restablece los campos a su estado inicial, con rol editable
       showAlert("success", "¡Datos actualizados correctamente!");
     } catch (error) {
       showAlert("error", "Hubo un error actualizando los datos.");
@@ -128,10 +137,14 @@ const ProfileCard = () => {
       label: "Rol",
       name: "rol",
       type: "select",
+<<<<<<< HEAD
+      options: [{ value: "closer", label: "Closer" }, { value: "setter", label: "Setter" }],
+=======
       options: [
         { value: 2, label: "Setter" },
         { value: 3, label: "Closer" },
       ],
+>>>>>>> dac90aa (cambios de roles string por numericos)
     },
   ];
 
@@ -196,7 +209,6 @@ const ProfileCard = () => {
           >
             Información del usuario
           </Typography>
-
           <Grid container spacing={2}>
             {fields.map((field) => (
               <Grid
@@ -213,7 +225,7 @@ const ProfileCard = () => {
                         labelId={`${field.name}-label`}
                         id={field.name}
                         name={field.name}
-                        value={formData[field.name] ?? ""}
+                        value={formData[field.name] || ""}
                         onChange={handleChange}
                         label={field.label}
                       >
@@ -229,7 +241,7 @@ const ProfileCard = () => {
                       fullWidth
                       label={field.label}
                       name={field.name}
-                      value={formData[field.name] ?? ""}
+                      value={formData[field.name] || ""}
                       onChange={handleChange}
                       type={field.type || "text"}
                       variant="outlined"
@@ -238,15 +250,15 @@ const ProfileCard = () => {
                       disabled={!editableFields[field.name]}
                     />
                   )}
-
-                  {/* Botón editar para todos los campos */}
-                  <IconButton
-                    onClick={() => toggleFieldEdit(field.name)}
-                    size="small"
-                    sx={{ position: "absolute", top: 8, right: 8 }}
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
+                  {field.type !== "select" && (
+                    <IconButton
+                      onClick={() => toggleFieldEdit(field.name)}
+                      size="small"
+                      sx={{ position: "absolute", top: 8, right: 8 }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  )}
                 </Box>
               </Grid>
             ))}
