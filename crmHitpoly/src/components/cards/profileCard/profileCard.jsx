@@ -137,14 +137,7 @@ const ProfileCard = () => {
       label: "Rol",
       name: "rol",
       type: "select",
-<<<<<<< HEAD
-      options: [{ value: "closer", label: "Closer" }, { value: "setter", label: "Setter" }],
-=======
-      options: [
-        { value: 2, label: "Setter" },
-        { value: 3, label: "Closer" },
-      ],
->>>>>>> dac90aa (cambios de roles string por numericos)
+      options: [{ value: 3, label: "Closer" }, { value: 2, label: "Setter" }],
     },
   ];
 
