@@ -59,7 +59,7 @@ const UserListHeader = ({ onAddNew }) => {
         </Toolbar>
       </AppBar>
 
-      {/* Modal para compartir */}
+     
       <ShareLinkModal open={shareModalOpen} onClose={() => setShareModalOpen(false)} />
     </>
   );
