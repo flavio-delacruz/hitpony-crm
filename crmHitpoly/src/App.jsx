@@ -23,29 +23,56 @@ import ListaDetalles from "./pages/listas/components/ListaDetalles";
 import EnviarCorreo from "./components/correos/enviados/EnviarCorreo";
 import EnviarCorreoAdmin from "./components/correos/enviados/EnviarCorreoAdmin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import GestorDeAsignaciones from "./pages/admin/pages/GestorDeAsignaciones";
+
+// Función auxiliar para mapear id_tipo a un rol legible
+const getRoleFromIdTipo = (id_tipo) => {
+  switch (id_tipo) {
+    case 1:
+      return 'admin';
+    case 2:
+      return 'setter';
+    case 3:
+      return 'closer';
+    case 4:
+      return 'cliente';
+    default:
+      return 'undefined';
+  }
+};
 
 // Componente de ruta protegida general (solo verifica si está autenticado)
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  // Log para ver si el usuario está autenticado y su rol usando id_tipo
+  console.log('ProtectedRoute - isAuthenticated:', isAuthenticated);
+  console.log('ProtectedRoute - user id_tipo:', user?.id_tipo);
+  
   return isAuthenticated ? children : <Navigate to="/" />;
 };
 
 // Componente de ruta protegida que verifica el rol
 const ProtectedRouteWithRole = ({ children, requiredRoles }) => {
   const { isAuthenticated, user } = useAuth();
+  const userRole = getRoleFromIdTipo(user?.id_tipo);
+
+  // Log para ver el tipo de usuario que está intentando acceder
+  console.log('ProtectedRouteWithRole - isAuthenticated:', isAuthenticated);
+  console.log('ProtectedRouteWithRole - user:', user);
+  console.log('ProtectedRouteWithRole - user rol:', userRole);
+  console.log('ProtectedRouteWithRole - required roles:', requiredRoles);
 
   // Si no está autenticado, redirige a la página de login
   if (!isAuthenticated) {
     return <Navigate to="/" />;
   }
 
-  // Verifica si el usuario existe y si su rol está en la lista de roles requeridos
-  if (user && requiredRoles.includes(user.rol)) {
+  // Verifica si el usuario existe y si su rol (mapeado de id_tipo) está en la lista de roles requeridos
+  if (user && requiredRoles.includes(userRole)) {
     return children;
   }
 
   // Si no cumple los requisitos, lo redirige a un dashboard por defecto.
-  // Es importante tener un dashboard al que cualquier usuario logueado pueda acceder.
   return <Navigate to="/dashboard" />;
 };
 
@@ -71,9 +98,17 @@ function App() {
             <Route
               path="/admin-dashboard"
               element={
-                <ProtectedRouteWithRole requiredRoles={["administrador", "setter", "closer"]}>
+                <ProtectedRouteWithRole requiredRoles={["admin", "setter", "closer"]}>
                   <AdminDashboard />
                 </ProtectedRouteWithRole>
+              }
+            />
+            <Route
+              path="/gestor-de-asignaciones"
+              element={
+                <ProtectedRoute requiredRoles={["admin", "setter", "closer"]}>
+                  <GestorDeAsignaciones />
+                </ProtectedRoute>
               }
             />
 

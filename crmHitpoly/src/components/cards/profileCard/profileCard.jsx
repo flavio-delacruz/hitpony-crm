@@ -24,7 +24,6 @@ const ProfileCard = () => {
   const { user, login } = useAuth();
   const [formData, setFormData] = useState(user);
   
-  // **CAMBIO AÑADIDO**: Inicializa el campo 'rol' como editable por defecto
   const [editableFields, setEditableFields] = useState({ rol: true });
 
   const [localChanges, setLocalChanges] = useState(null);
@@ -37,7 +36,6 @@ const ProfileCard = () => {
       setFormData(user);
       setLocalChanges(null);
       
-      // **CAMBIO AÑADIDO**: Restablece 'rol' como editable al recibir un nuevo 'user'
       setEditableFields({ rol: true });
       
       prevUserRef.current = user;
@@ -64,8 +62,6 @@ const ProfileCard = () => {
       return;
     }
 
-
-    // Mapear "rol" a "id_tipo" (asumiendo rol contiene el valor numérico 2 o 3)
     const dataToSend = {
       ...formData,
       funcion: "update",
@@ -73,9 +69,7 @@ const ProfileCard = () => {
       id_tipo: formData.rol,
     };
 
-    delete dataToSend.rol; // Eliminar "rol" para evitar duplicados
-
-    // Mapear "correo" a "email" para backend si aplica
+    delete dataToSend.rol;
 
     if (dataToSend.correo) {
       dataToSend.email = dataToSend.correo;
@@ -96,7 +90,6 @@ const ProfileCard = () => {
 
       const updatedUserFromApi = await response.json();
 
-      // Reconstruir objeto para estado, mapeando email a correo para UI
       const updatedUserWithId = {
         ...formData,
         ...updatedUserFromApi,
@@ -110,7 +103,7 @@ const ProfileCard = () => {
 
       setFormData(updatedUserWithId);
       login(updatedUserWithId);
-      setEditableFields({ rol: true }); // Restablece los campos a su estado inicial, con rol editable
+      setEditableFields({ rol: true });
       showAlert("success", "¡Datos actualizados correctamente!");
     } catch (error) {
       showAlert("error", "Hubo un error actualizando los datos.");
