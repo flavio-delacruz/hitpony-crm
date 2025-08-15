@@ -16,7 +16,7 @@ const SideBar = () => {
             anchor="left"
             open={drawerOpen}
             onClose={toggleDrawer}
-            ModalProps={{ keepMounted: true }} // Mejora el rendimiento en móviles
+            ModalProps={{ keepMounted: true }}
           >
             <SideBarContent />
           </Drawer>

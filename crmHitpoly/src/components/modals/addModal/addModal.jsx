@@ -66,10 +66,9 @@ const AddModal = ({ open, onClose, onSave }) => {
         email: "",
         cargo: "",
         celular: "",
-      });  // Limpiar los campos después de registrar correctamente
+      });
       onClose();
     } catch (error) {
-      console.error("Error:", error);
       setAlertMessage("Hubo un error al registrar el prospecto. Intenta nuevamente.");
       setOpenAlert(true);
     }

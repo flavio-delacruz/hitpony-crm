@@ -1,8 +1,7 @@
-// src/pages/AdminDashboard/components/DashboardControls.jsx
 import React from "react";
 import { Box } from "@mui/material";
-import SearchSetterControl from "./SearchSetterControl"; // Asegúrate de que la ruta sea correcta
-import EstadoFilterControl from "./EstadoFilterControl"; // Asegúrate de que la ruta sea correcta
+import SearchSetterControl from "./SearchSetterControl"; 
+import EstadoFilterControl from "./EstadoFilterControl";
 
 const DashboardControls = ({
   searchTerm,

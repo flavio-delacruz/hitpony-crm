@@ -1,11 +1,11 @@
 // src/context/ProspectosContext.js
 import React, {
-  createContext,
-  useState,
-  useEffect,
-  useContext,
-  useCallback,
-  useRef,
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  useRef,
 } from "react";
 import { useAuth } from "./AuthContext";
 
@@ -14,111 +14,131 @@ const ProspectosContext = createContext();
 export const useProspectos = () => useContext(ProspectosContext);
 
 export const ProspectosProvider = ({ children }) => {
-  const { user } = useAuth();
-  const [prospectos, setProspectos] = useState(() => {
-    try {
-      const localData = localStorage.getItem("prospectos");
-      return localData ? JSON.parse(localData) : [];
-    } catch (error) {
-      return [];
-    }
-  });
-  const [loadingProspectos, setLoadingProspectos] = useState(false);
-  const [errorProspectos, setErrorProspectos] = useState(null);
-  const isCheckingForChanges = useRef(false);
+  const { user } = useAuth();
+  const [prospectos, setProspectos] = useState(() => {
+    try {
+      const localData = localStorage.getItem("prospectos");
+      return localData ? JSON.parse(localData) : [];
+    } catch (error) {
+      return [];
+    }
+  });
+  const [loadingProspectos, setLoadingProspectos] = useState(false);
+  const [errorProspectos, setErrorProspectos] = useState(null);
+  const isCheckingForChanges = useRef(false);
 
-  const fetchProspectos = useCallback(
-    async (isInitialLoad = false) => {
-      if (!user?.id || isCheckingForChanges.current) {
-        return;
-      }
+  const fetchAllProspects = useCallback(async () => {
+    if (!user || !user.id || isCheckingForChanges.current) {
+      return;
+    }
+    
+    isCheckingForChanges.current = true;
+    setLoadingProspectos(true);
+    setErrorProspectos(null);
 
-      if (isInitialLoad) {
-        setLoadingProspectos(true);
-      }
-      isCheckingForChanges.current = true;
-      setErrorProspectos(null);
+    try {
+      let allProspects = [];
+      const { id, id_tipo } = user;
 
-      try {
-        const response = await fetch(
-          "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ funcion: "getProspectos", id: user.id }),
-          }
-        );
+      if (id_tipo === "3" || id_tipo === 3) {
+        const asignacionesResponse = await fetch(
+          "https://apiweb.hitpoly.com/ajax/traerAsignacionesController.php",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ accion: "get" }),
+          }
+        );
+        const asignacionesData = await asignacionesResponse.json();
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        let setterIds = [];
+        if (asignacionesData.data && asignacionesData.data.length > 0) {
+          const asignacionDelCloser = asignacionesData.data.find(asignacion => Number(asignacion.id_closer) === Number(id));
+          if (asignacionDelCloser && asignacionDelCloser.setters_ids) {
+            try {
+              const parsedSetters = JSON.parse(asignacionDelCloser.setters_ids);
+              if (Array.isArray(parsedSetters)) {
+                setterIds = parsedSetters;
+              }
+            } catch (e) {
+            }
+          }
+        }
+        const promises = setterIds.map(setterId =>
+          fetch("https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ funcion: "getProspectos", id: setterId }),
+          }).then(res => res.json())
+        );
+        const allProspectsFromSetters = await Promise.all(promises);
+        allProspects = allProspectsFromSetters.flatMap(data => data.resultado || []);
+      }
 
-        const data = await response.json();
-        const nuevosProspectos = data?.resultado || data || [];
-        const nuevosProspectosFormatted = nuevosProspectos.map((item) => ({
-          id: item.id,
-          ...item,
-        }));
+      const userProspectsResponse = await fetch(
+        "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ funcion: "getProspectos", id: id }),
+        }
+      );
+      const userProspectsData = await userProspectsResponse.json();
+      const prospectsFromUser = userProspectsData.resultado || [];
+      
+      const finalProspects = (user.id_tipo === "3" || user.id_tipo === 3)
+        ? [...allProspects, ...prospectsFromUser]
+        : prospectsFromUser;
 
-        const localData = localStorage.getItem("prospectos");
-        const localProspectos = localData ? JSON.parse(localData) : [];
+      const nuevosProspectosFormatted = finalProspects.map((item) => ({
+        id: item.id,
+        ...item,
+      }));
+      
+      setProspectos(nuevosProspectosFormatted);
+      localStorage.setItem("prospectos", JSON.stringify(nuevosProspectosFormatted));
 
-        if (
-          JSON.stringify(localProspectos) !==
-          JSON.stringify(nuevosProspectosFormatted)
-        ) {
-          setProspectos(nuevosProspectosFormatted);
-          try {
-            localStorage.setItem(
-              "prospectos",
-              JSON.stringify(nuevosProspectosFormatted)
-            );
-          } catch (error) {}
-        } else {
-        }
-      } catch (error) {
-        setErrorProspectos("Error al cargar prospectos: " + error.message);
-      } finally {
-        setLoadingProspectos(false);
-        isCheckingForChanges.current = false;
-      }
-    },
-    [user?.id]
-  );
+    } catch (error) {
+      setErrorProspectos("Error al cargar prospectos: " + error.message);
+    } finally {
+      setLoadingProspectos(false);
+      isCheckingForChanges.current = false;
+    }
+  }, [user]);
 
-  useEffect(() => {
-    fetchProspectos(true);
-    const intervalId = setInterval(fetchProspectos, 6000);
+  useEffect(() => {
+    if (user?.id) {
+      fetchAllProspects();
+      const intervalId = setInterval(() => fetchAllProspects(), 60000);
+      return () => clearInterval(intervalId);
+    }
+  }, [user, fetchAllProspects]);
 
-    return () => clearInterval(intervalId);
-  }, [fetchProspectos]);
+  const actualizarProspecto = useCallback((prospectoActualizado) => {
+    setProspectos((prevProspectos) => {
+      const updatedProspectos = prevProspectos.map((prospecto) =>
+        prospecto.id === prospectoActualizado.id
+          ? prospectoActualizado
+          : prospecto
+      );
+      try {
+        localStorage.setItem("prospectos", JSON.stringify(updatedProspectos));
+      } catch (error) {}
+      return updatedProspectos;
+    });
+  }, []);
 
-  const actualizarProspecto = useCallback((prospectoActualizado) => {
-    setProspectos((prevProspectos) => {
-      const updatedProspectos = prevProspectos.map((prospecto) =>
-        prospecto.id === prospectoActualizado.id
-          ? prospectoActualizado
-          : prospecto
-      );
-      try {
-        localStorage.setItem("prospectos", JSON.stringify(updatedProspectos));
-      } catch (error) {}
-      return updatedProspectos;
-    });
-  }, []);
+  const value = {
+    prospectos,
+    loadingProspectos,
+    errorProspectos,
+    fetchProspectos: fetchAllProspects,
+    actualizarProspecto,
+  };
 
-  const value = {
-    prospectos,
-    loadingProspectos,
-    errorProspectos,
-    fetchProspectos,
-    actualizarProspecto,
-  };
-
-  return (
-    <ProspectosContext.Provider value={value}>
-      {children}
-    </ProspectosContext.Provider>
-  );
+  return (
+    <ProspectosContext.Provider value={value}>
+      {children}
+    </ProspectosContext.Provider>
+  );
 };

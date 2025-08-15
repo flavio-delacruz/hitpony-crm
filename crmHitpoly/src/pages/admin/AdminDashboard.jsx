@@ -77,7 +77,6 @@ const AdminDashboard = () => {
     });
   }, []);
 
-  // Recibe los prospectos visibles en la página actual
   const handleSelectAllProspects = useCallback((visibleProspects) => {
     const visibleIds = visibleProspects.map((p) => p.id);
     const allVisibleSelected = visibleIds.every((id) =>

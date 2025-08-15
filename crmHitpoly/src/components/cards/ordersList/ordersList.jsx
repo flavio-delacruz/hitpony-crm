@@ -13,27 +13,25 @@ import { useAuth } from "../../../context/AuthContext";
 
 const OrdersList = () => {
   const { user } = useAuth();
-  const [orders, setOrders] = useState([]); // Estado vacío inicialmente
+  const [orders, setOrders] = useState([]); 
   const dataAnteriorRef = useRef([]);
 
-  // Cargar datos guardados al montar el componente
   useEffect(() => {
     const savedOrders = localStorage.getItem("orders");
     const savedDataAnterior = localStorage.getItem("dataAnterior");
 
     if (savedOrders) {
-      setOrders(JSON.parse(savedOrders)); // Cargar las notificaciones anteriores
+      setOrders(JSON.parse(savedOrders)); 
     }
 
     if (savedDataAnterior) {
-      dataAnteriorRef.current = JSON.parse(savedDataAnterior); // Cargar los datos anteriores de prospectos
+      dataAnteriorRef.current = JSON.parse(savedDataAnterior); 
     }
   }, []);
 
-  // Guardar en localStorage cuando se actualiza la lista de órdenes
   useEffect(() => {
     if (orders.length > 0) {
-      localStorage.setItem("orders", JSON.stringify(orders)); // Guardar las notificaciones actuales
+      localStorage.setItem("orders", JSON.stringify(orders)); 
     }
   }, [orders]);
 
@@ -88,7 +86,7 @@ const OrdersList = () => {
 
                 nuevosEventos.push({
                   id: nuevo.id + "-update-" + Date.now(),
-                  icon: "update", // Guardar solo el nombre del icono
+                  icon: "update", 
                   name: `Actualización: ${nuevo.nombre || ""} ${nuevo.apellido || ""}`,
                   detalles: detallesFormateados,
                   date: `📅 (${new Date().toLocaleDateString()}, ${new Date().toLocaleTimeString([], {
@@ -107,7 +105,7 @@ const OrdersList = () => {
             if (!nuevosIds.includes(anterior.id)) {
               nuevosEventos.push({
                 id: anterior.id + "-delete-" + Date.now(),
-                icon: "delete", // Guardar solo el nombre del icono
+                icon: "delete", 
                 name: `Eliminado: ${anterior.nombre || ""} ${anterior.apellido || ""}`,
                 detalles: "El prospecto fue eliminado.",
                 date: `📅 (${new Date().toLocaleDateString()}, ${new Date().toLocaleTimeString([], {
@@ -121,7 +119,7 @@ const OrdersList = () => {
         }
 
         dataAnteriorRef.current = nuevosDatos;
-        localStorage.setItem("dataAnterior", JSON.stringify(nuevosDatos)); // Guardar datos anteriores en localStorage
+        localStorage.setItem("dataAnterior", JSON.stringify(nuevosDatos)); 
 
         if (nuevosEventos.length > 0) {
           setOrders((prev) => {
@@ -129,20 +127,18 @@ const OrdersList = () => {
             const unicos = Array.from(
               new Map(nuevos.map((item) => [item.id, item])).values()
             );
-            return unicos.slice(0, 50); // Limitar a las 50 notificaciones más recientes
+            return unicos.slice(0, 50); 
           });
         }
       } catch (error) {
-        console.error("❌ Error al obtener prospectos:", error);
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 10000); // Reintentar cada 10 segundos
-    return () => clearInterval(interval); // Limpiar el intervalo cuando el componente se desmonte
+    const interval = setInterval(fetchData, 10000);
+    return () => clearInterval(interval); 
   }, [user]);
 
-  // Mapeo de iconos para las notificaciones
   const getIcon = (iconType) => {
     if (iconType === "update") return <UpdateIcon color="secondary" />;
     if (iconType === "delete") return <HighlightOffIcon color="error" />;
@@ -164,7 +160,7 @@ const OrdersList = () => {
           {orders.map((order) => (
             <ListItem key={order.id} alignItems="flex-start">
               <ListItemIcon>
-                {getIcon(order.icon)} {/* Asignar el icono basado en el tipo guardado */}
+                {getIcon(order.icon)} 
               </ListItemIcon>
               <ListItemText
                 primary={order.name}

@@ -32,23 +32,15 @@ const EditModal = () => {
   const handleClose = () => setOpen(false);
 
   const handleSubmit = () => {
-    console.log("Información actualizada:", formData);
     handleClose();
   };
 
   return (
     <div>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleOpen}
-      >
+      <Button variant="contained" color="primary" onClick={handleOpen}>
         Editar Información
       </Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-      >
+      <Modal open={open} onClose={handleClose}>
         <Box sx={modalStyle}>
           <Typography
             variant="h6"
@@ -57,14 +49,8 @@ const EditModal = () => {
           >
             Editar Información Personal
           </Typography>
-          <Grid
-            container
-            spacing={2}
-          >
-            <Grid
-              item
-              xs={12}
-            >
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
               <TextField
                 fullWidth
                 label="Nombre"
@@ -73,10 +59,7 @@ const EditModal = () => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid
-              item
-              xs={12}
-            >
+            <Grid item xs={12}>
               <TextField
                 fullWidth
                 label="Apellidos"
@@ -85,10 +68,7 @@ const EditModal = () => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid
-              item
-              xs={12}
-            >
+            <Grid item xs={12}>
               <TextField
                 fullWidth
                 label="Correo"
@@ -97,10 +77,7 @@ const EditModal = () => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid
-              item
-              xs={12}
-            >
+            <Grid item xs={12}>
               <TextField
                 fullWidth
                 label="Teléfono"
@@ -109,10 +86,7 @@ const EditModal = () => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid
-              item
-              xs={12}
-            >
+            <Grid item xs={12}>
               <TextField
                 fullWidth
                 label="Dirección"
@@ -122,22 +96,11 @@ const EditModal = () => {
               />
             </Grid>
           </Grid>
-          <Box
-            mt={3}
-            sx={{ display: "flex", justifyContent: "space-between" }}
-          >
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={handleClose}
-            >
+          <Box mt={3} sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Button variant="outlined" color="secondary" onClick={handleClose}>
               Cancelar
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSubmit}
-            >
+            <Button variant="contained" color="primary" onClick={handleSubmit}>
               Guardar
             </Button>
           </Box>

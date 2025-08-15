@@ -4,7 +4,6 @@ import { TextField, Paper } from "@mui/material";
 import { useProspectos } from "../../../../context/ProspectosContext";
 
 export default function Novedades({ prospectId }) {
-  console.log("Prospect ID recibida en Novedades:", prospectId);
   const { prospectos } = useProspectos();
   const [nuevaActividad, setNuevaActividad] = useState({
     estado_anterior: "",
@@ -22,7 +21,6 @@ export default function Novedades({ prospectId }) {
       const prospecto = prospectos.find((p) => p.id === parseInt(prospectId));
       setProspectoLocal(prospecto);
       if (prospecto) {
-        console.log("Prospecto encontrado:", prospecto); // 👈 Agregar este log
         setNuevaActividad((prevState) => ({
           ...prevState,
           estado_anterior: prospecto.estado_contacto || "",
@@ -35,8 +33,7 @@ export default function Novedades({ prospectId }) {
         }));
       }
     }
-    console.log("Nueva actividad inicial:", nuevaActividad); // 👈 Agregar este log
-  }, [prospectos, prospectId]);
+    }, [prospectos, prospectId]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;

@@ -1,9 +1,18 @@
 import { useState, useEffect } from "react";
-import { Modal, Box, Typography, Button, IconButton, Grid, Snackbar, Alert } from "@mui/material";
+import {
+  Modal,
+  Box,
+  Typography,
+  Button,
+  IconButton,
+  Grid,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";  
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useAuth } from "../../../context/AuthContext";
-import { formsList } from "./formsList"; 
+import { formsList } from "./formsList";
 
 const ShareLinkModal = ({ open, onClose }) => {
   const { user } = useAuth();
@@ -13,27 +22,25 @@ const ShareLinkModal = ({ open, onClose }) => {
 
   useEffect(() => {
     if (user?.id) {
-      
       const generatedLinks = formsList.map((form) => ({
         name: form.titulo,
         link: `${window.location.origin}/registros/${form.name}?idSetter=${user.id}`,
       }));
-      
-      setLinks(generatedLinks);  
+
+      setLinks(generatedLinks);
     }
   }, [user]);
 
   const copiarAlPortapapeles = (link) => {
     navigator.clipboard.writeText(link);
-    setCopiedLink(link);  
-    setOpenAlert(true); 
+    setCopiedLink(link);
+    setOpenAlert(true);
 
-    
     onClose();
   };
 
   const handleCloseAlert = () => {
-    setOpenAlert(false); 
+    setOpenAlert(false);
   };
 
   return (
@@ -59,12 +66,12 @@ const ShareLinkModal = ({ open, onClose }) => {
               top: 8,
               right: 8,
               backgroundColor: "rgba(0, 0, 0, 0.1)",
-              '&:hover': { backgroundColor: "rgba(0, 0, 0, 0.2)" },
+              "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.2)" },
             }}
           >
             <CloseIcon />
           </IconButton>
-          <Typography variant="h6" gutterBottom sx={{marginBottom: 4}}> 
+          <Typography variant="h6" gutterBottom sx={{ marginBottom: 4 }}>
             Formularios para el cliente
           </Typography>
 
@@ -83,7 +90,9 @@ const ShareLinkModal = ({ open, onClose }) => {
                   }}
                 >
                   <Typography variant="body1">{linkObj.name}</Typography>
-                  <IconButton onClick={() => copiarAlPortapapeles(linkObj.link)}>
+                  <IconButton
+                    onClick={() => copiarAlPortapapeles(linkObj.link)}
+                  >
                     <ContentCopyIcon />
                   </IconButton>
                 </Box>
@@ -91,7 +100,12 @@ const ShareLinkModal = ({ open, onClose }) => {
             ))}
           </Grid>
 
-          <Button fullWidth variant="contained" sx={{ mt: 2 }} onClick={onClose}>
+          <Button
+            fullWidth
+            variant="contained"
+            sx={{ mt: 2 }}
+            onClick={onClose}
+          >
             Cerrar
           </Button>
         </Box>
@@ -100,9 +114,9 @@ const ShareLinkModal = ({ open, onClose }) => {
       {/* Snackbar for custom alert */}
       <Snackbar
         open={openAlert}
-        autoHideDuration={3000} 
+        autoHideDuration={3000}
         onClose={handleCloseAlert}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert
           onClose={handleCloseAlert}
@@ -112,7 +126,7 @@ const ShareLinkModal = ({ open, onClose }) => {
             color: "black",
             width: "100%",
             borderRadius: 1,
-            fontWeight: 'bold',
+            fontWeight: "bold",
           }}
         >
           ¡Enlace copiado al portapapeles!

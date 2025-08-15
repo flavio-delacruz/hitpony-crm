@@ -22,7 +22,6 @@ const Login = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Texto dinámico
   const words = [
     "Le damos resultados tangibles a tu visión",
     "Revolucionamos tu camino hacia el éxito",
@@ -70,7 +69,6 @@ const Login = () => {
         });
       }
     } catch (error) {
-      console.error("Error:", error);
       Swal.fire({
         icon: "error",
         title: "Error del servidor",

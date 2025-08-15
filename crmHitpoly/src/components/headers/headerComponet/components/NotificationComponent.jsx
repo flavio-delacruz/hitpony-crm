@@ -27,7 +27,6 @@ const NotificationComponent = () => {
   const handleOpen = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
 
-  // Cargar desde localStorage al iniciar
   useEffect(() => {
     const almacenadas = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (almacenadas) {
@@ -40,7 +39,6 @@ const NotificationComponent = () => {
     }
   }, []);
 
-  // Guardar en localStorage cada vez que cambien
   useEffect(() => {
     if (notificaciones.length > 0) {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notificaciones));
@@ -80,7 +78,6 @@ const NotificationComponent = () => {
           const cambiosDetectados = [];
   
           nuevosDatos.forEach((nuevoProspecto) => {
-            // Filtrar los prospectos con origen "interno"
             if (nuevoProspecto.origen === "interno") return;
   
             const anterior = dataAnteriorRef.current.find(
@@ -98,7 +95,6 @@ const NotificationComponent = () => {
               second: "2-digit",
             }).format(fecha);
   
-            // Filtrar y agregar las notificaciones de tipo "Nuevo prospecto" y "Actualización"
             if (!anterior) {
               cambiosDetectados.push({
                 id: nuevoProspecto.id,
@@ -118,13 +114,11 @@ const NotificationComponent = () => {
             }
           });
   
-          // Filtrar las notificaciones eliminadas
           const cambiosFiltrados = cambiosDetectados.filter(
             (cambio) => cambio.tipo !== "Eliminado"
           );
   
           if (cambiosFiltrados.length > 0) {
-            // Actualizar el estado con las nuevas notificaciones
             setNotificaciones((prev) => {
               const nuevasNotificaciones = [...prev, ...cambiosFiltrados];
               return nuevasNotificaciones;
@@ -134,7 +128,6 @@ const NotificationComponent = () => {
   
         dataAnteriorRef.current = nuevosDatos;
       } catch (error) {
-        console.error("Error al obtener datos de prospectos:", error);
       }
     };
   
@@ -143,11 +136,8 @@ const NotificationComponent = () => {
     return () => clearInterval(interval);
   }, [user]);
   
-
-  // Marcar notificaciones como leídas al abrir el menú
   const handleOpenMenu = (event) => {
     setAnchorEl(event.currentTarget);
-    // Marcar todas las notificaciones como leídas
     const notificacionesNoLeidas = notificaciones.filter(
       (notif) => !notificacionesLeidas.includes(notif.id)
     );

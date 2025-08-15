@@ -20,11 +20,9 @@ const useUpdateProspecto = () => {
         const result = JSON.parse(text);
         return { success: result.status === "success", data: result };
       } catch (e) {
-        console.error("Error parsing JSON response:", e);
         return { success: false, error: e };
       }
     } catch (error) {
-      console.error("Error updating prospecto state:", error);
       return { success: false, error };
     }
   };

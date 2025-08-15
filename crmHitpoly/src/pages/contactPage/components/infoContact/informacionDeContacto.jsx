@@ -1,3 +1,5 @@
+// src/components/ContactInformation.js
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -14,6 +16,79 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/material.css";
 import { useAuth } from "../../../../context/AuthContext";
 import EditableAvatar from "./editInformation/EditableAvatar";
+
+const fetchProspectsAndFindById = async (user, prospectId) => {
+  if (!user || !user.id) return null;
+
+  const { id, id_tipo } = user;
+
+  try {
+    let allProspects = [];
+    if (id_tipo === "3" || id_tipo === 3) {
+      const asignacionesResponse = await fetch(
+        "https://apiweb.hitpoly.com/ajax/traerAsignacionesController.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ accion: "get" }),
+        }
+      );
+      const asignacionesData = await asignacionesResponse.json();
+      let setterIds = [];
+      if (asignacionesData.data && asignacionesData.data.length > 0) {
+        const asignacionDelCloser = asignacionesData.data.find(
+          (asignacion) => Number(asignacion.id_closer) === Number(id)
+        );
+        if (asignacionDelCloser && asignacionDelCloser.setters_ids) {
+          try {
+            const parsedSetters = JSON.parse(asignacionDelCloser.setters_ids);
+            if (Array.isArray(parsedSetters)) {
+              setterIds = parsedSetters;
+            }
+          } catch (e) {}
+        }
+      }
+      const promises = setterIds.map((setterId) =>
+        fetch(
+          "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ funcion: "getProspectos", id: setterId }),
+          }
+        ).then((res) => res.json())
+      );
+      const allProspectsFromSetters = await Promise.all(promises);
+      allProspects = allProspectsFromSetters.flatMap(
+        (data) => data.resultado || []
+      );
+    }
+
+    // Cargar prospectos del usuario actual
+    const userProspectsResponse = await fetch(
+      "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ funcion: "getProspectos", id: id }),
+      }
+    );
+    const userProspectsData = await userProspectsResponse.json();
+    const prospectsFromUser = userProspectsData.resultado || [];
+
+    const finalProspects =
+      id_tipo === "3" || id_tipo === 3
+        ? [...allProspects, ...prospectsFromUser]
+        : prospectsFromUser;
+
+    const prospect = finalProspects.find(
+      (p) => Number(p.id) === Number(prospectId)
+    );
+    return prospect;
+  } catch (error) {
+    return null;
+  }
+};
 
 const EditableField = ({ label, value, onChange }) => (
   <Grid item xs={12}>
@@ -36,37 +111,25 @@ export default function ContactInformation({ prospectId }) {
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
-    setHasChanges(false); // Reinicia cambios cuando cambia de prospecto
+    setHasChanges(false);
     const savedData = localStorage.getItem(`contactData-${prospectId}`);
     if (savedData) {
       const data = JSON.parse(savedData);
       setContactData(data);
       setInitialData(data);
     } else {
-      fetch(
-        "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ funcion: "getProspectos", id: user?.id || 0 }),
+      fetchProspectsAndFindById(user, prospectId).then((prospect) => {
+        if (prospect) {
+          const normalizedProspect = {
+            ...prospect,
+            email: prospect.email || prospect.correo,
+          };
+          setContactData(normalizedProspect);
+          setInitialData(normalizedProspect);
+        } else {
+          setContactData({});
         }
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          const prospect = data?.resultado?.find(
-            (p) => Number(p.id) === Number(prospectId)
-          );
-          if (prospect) {
-            const normalizedProspect = {
-              ...prospect,
-              email: prospect.email || prospect.correo, // Usa 'correo' si 'email' no está definido
-            };
-            setContactData(normalizedProspect);
-            setInitialData(normalizedProspect);
-          } else {
-          }
-        })
-        .catch(console.error);
+      });
     }
   }, [prospectId, user]);
 
@@ -75,22 +138,18 @@ export default function ContactInformation({ prospectId }) {
   const updateField = (field) => (value) => {
     setContactData((prev) => {
       const updatedData = { ...prev, [field]: value };
-      // Guardamos los cambios en localStorage cada vez que se actualiza un campo
       localStorage.setItem(
         `contactData-${prospectId}`,
         JSON.stringify(updatedData)
       );
-
-      // Detectamos si hubo algún cambio
       checkForChanges(updatedData);
-
       return updatedData;
     });
   };
 
   const checkForChanges = (updatedData) => {
     const isChanged = Object.keys(updatedData).some((key) => {
-      if (key === "avatar") return false; // Ignorar cambios en el avatar
+      if (key === "avatar") return false;
       const initial = initialData?.[key] ?? "";
       const current = updatedData?.[key] ?? "";
       return initial !== current;
@@ -99,7 +158,6 @@ export default function ContactInformation({ prospectId }) {
   };
 
   const handleUpdate = () => {
-    // Actualizamos los datos en el backend
     const updatedData = {
       funcion: "update",
       id: contactData.id,
@@ -115,10 +173,8 @@ export default function ContactInformation({ prospectId }) {
       pais: contactData.pais,
     };
 
-    // Actualización local de los datos
     setContactData((prev) => ({ ...prev, ...updatedData }));
 
-    // Realizar la actualización al backend
     fetch("https://apiweb.hitpoly.com/ajax/updateProspectoController.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -169,7 +225,7 @@ export default function ContactInformation({ prospectId }) {
                   `contactData-${prospectId}`,
                   JSON.stringify(updatedData)
                 );
-                checkForChanges(updatedData); // Se verifica si hubo cambios
+                checkForChanges(updatedData);
                 return updatedData;
               })
             }
@@ -272,7 +328,6 @@ export default function ContactInformation({ prospectId }) {
         </Box>
       )}
 
-      {/* Snackbar para mostrar el mensaje */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
@@ -287,9 +342,9 @@ export default function ContactInformation({ prospectId }) {
           severity="success"
           sx={{
             width: "100%",
-            backgroundColor: "white", // Fondo blanco
-            color: "black", // Texto negro
-            border: "1px solid #ccc", // Opcional: borde gris claro (si quieres darle un contorno)
+            backgroundColor: "white",
+            color: "black",
+            border: "1px solid #ccc",
           }}
         >
           {snackbarMessage}

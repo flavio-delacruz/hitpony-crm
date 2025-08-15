@@ -21,7 +21,7 @@ export default function ContactActivity({ prospectId }) {
         textColor="primary"
         indicatorColor="primary"
       >
-        <Tab label="Novedades" /> {/* Cambia la etiqueta */}
+        <Tab label="Novedades" />
         <Tab label="Actividades" />
       </Tabs>
 

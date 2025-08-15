@@ -1,8 +1,4 @@
 import React from "react";
-// import Instagram from "../../assets/instagram-icon.svg";
-// import Twitter from "../../assets/twitter-icon.svg";
-// import Linkedin from "../../assets/linkedin-icon.svg";
-// import Facebook from "../../assets/facebook-icon.svg";
 import { Box, Grid, Typography, Link } from "@mui/material";
 import styled from "@emotion/styled";
 import Logo from "../../assets/logohitpoly.png";

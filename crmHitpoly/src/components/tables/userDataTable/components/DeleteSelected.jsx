@@ -41,7 +41,6 @@ export const DeleteSelected = ({ selectedRows, setSelectedRows, setRows }) => {
       setSelectedRows([]);
       Swal.fire("Eliminado", "Los prospectos han sido eliminados.", "success");
     } catch (error) {
-      console.error("Error eliminando:", error);
       Swal.fire("Error", "No se pudieron eliminar los prospectos.", "error");
     }
   };

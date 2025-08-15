@@ -13,7 +13,6 @@ import Layout from "../../components/layout/layout";
 import ChartCard from "../../components/cards/chartCard/chartCard";
 
 const MetricasPage = () => {
-  // Datos de ejemplo para el crecimiento del usuario
   const data = [
     { name: "Enero", users: 400 },
     { name: "Febrero", users: 600 },

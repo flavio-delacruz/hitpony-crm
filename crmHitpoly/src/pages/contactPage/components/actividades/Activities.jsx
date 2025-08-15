@@ -35,8 +35,8 @@ export default function Activities() {
       ...prevActividad,
       tipo_actividad: tipo,
       canal: canal,
-      detalle_actividad: `Se va a realizar una acción de ${tipo} al prospecto`, // Mensaje inicial
-      estado_nuevo: tipo === 'nota' ? "contactado" : "seguimiento", // Estado inicial sugerido
+      detalle_actividad: `Se va a realizar una acción de ${tipo} al prospecto`,
+      estado_nuevo: tipo === 'nota' ? "contactado" : "seguimiento",
     }));
     setOpen(true);
   };
@@ -52,9 +52,6 @@ export default function Activities() {
   };
 
   const handleGuardarActividad = () => {
-    // Aquí iría la lógica para guardar la actividad (enviar al backend, etc.)
-    console.log("Actividad a guardar:", actividad);
-    // **ELIMINAMOS LA ALERTA**
     handleClose();
   };
 

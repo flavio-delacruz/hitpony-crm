@@ -1,9 +1,8 @@
-// UseProspectos.jsx
 import { useCallback } from 'react';
 import { useAuth } from "../../../context/AuthContext";
 
 const UseProspectos = () => {
-  const { user } = useAuth(); // Aunque 'user' no se usa en este archivo, se mantiene por si es necesario en el futuro.
+  const { user } = useAuth(); 
 
   const updateProspectoEstado = useCallback(async ({ prospectId, nuevoEstado }) => {
     if (!prospectId || !nuevoEstado) {

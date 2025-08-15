@@ -8,7 +8,6 @@ const EditableAvatar = ({ contactData, onAvatarChange }) => {
   const [avatarUrl, setAvatarUrl] = useState("");
 
   useEffect(() => {
-    // Al montar, primero intenta obtener la imagen local, si no, usa la de contactData
     const localAvatar = localStorage.getItem(`avatar-${contactData.id}`);
     if (localAvatar) {
       setAvatarUrl(localAvatar);
@@ -35,7 +34,6 @@ const EditableAvatar = ({ contactData, onAvatarChange }) => {
       );
       const url = res.data.url;
 
-      // 2. Actualizar backend
       await fetch(
         "https://apiweb.hitpoly.com/ajax/updateProspectoController.php",
         {
@@ -49,11 +47,9 @@ const EditableAvatar = ({ contactData, onAvatarChange }) => {
         }
       );
 
-      // 3. Actualizar avatar localmente
       setAvatarUrl(url);
       localStorage.setItem(`avatar-${contactData.id}`, url);
 
-      // 4. Notificar al componente padre
       if (onAvatarChange) onAvatarChange(url);
 
     } catch (err) {
@@ -94,7 +90,6 @@ const EditableAvatar = ({ contactData, onAvatarChange }) => {
           {contactData.nombre?.charAt(0) || "D"}
         </Avatar>
 
-        {/* Capa oscura que cubre el avatar */}
         <Box
           className="overlay"
           sx={{

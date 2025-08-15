@@ -19,7 +19,6 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem("isAuthenticated", "true");
     localStorage.setItem("user", JSON.stringify(userData));
-    console.log("Datos del usuario logueado:", userData);
   };
 
   const logout = () => {

@@ -20,13 +20,12 @@ ChartJS.register(
 );
 
 const BarChart = ({ titleChart, series, xAxis }) => {
-  // Configuración de los datos del gráfico
   const data = {
-    labels: xAxis[0].data, // Usamos las labels que se pasan por props
+    labels: xAxis[0].data, 
     datasets: [
       {
-        label: titleChart, // Usamos el título como etiqueta
-        data: series[0].data, // Usamos los datos que se pasan por props
+        label: titleChart,
+        data: series[0].data,
         backgroundColor: "rgba(75, 192, 192, 0.6)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 1,
@@ -42,7 +41,7 @@ const BarChart = ({ titleChart, series, xAxis }) => {
       },
       title: {
         display: true,
-        text: titleChart, // Título dinámico
+        text: titleChart,
       },
     },
   };

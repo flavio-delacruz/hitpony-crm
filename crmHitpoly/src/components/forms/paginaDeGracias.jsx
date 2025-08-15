@@ -1,7 +1,7 @@
 import { Box, Typography, Button } from "@mui/material";
 
 const ThankYouPage = () => {
-  const externalLink = "https://hitpoly.com/"; // Cambia esto por el enlace al que deseas redirigir
+  const externalLink = "https://hitpoly.com/"; 
 
   return (
     <Box
@@ -25,7 +25,7 @@ const ThankYouPage = () => {
 
       <Box sx={{ mb: 3 }}>
         <img
-          src="/public/images/logohitpoly.png" // Puedes reemplazar esta URL con una imagen de agradecimiento personalizada
+          src="/public/images/logohitpoly.png" 
           alt="Thank you"
           style={{
             maxWidth: "200px",
@@ -37,7 +37,7 @@ const ThankYouPage = () => {
         variant="contained"
         color="primary"
         size="large"
-        onClick={() => window.location.href = externalLink} // Redirige al enlace externo
+        onClick={() => window.location.href = externalLink}
         sx={{
           backgroundColor: "#1976d2",
           "&:hover": { backgroundColor: "#1565c0" },

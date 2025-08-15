@@ -4,7 +4,6 @@ import { TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/mater
 const ProspectFilter = ({ columns, filterModel, setFilterModel, rows }) => {
   const [nombreFilter, setNombreFilter] = useState('');
   const [estadoFilter, setEstadoFilter] = useState('');
-  // ... otros estados para otros filtros
 
   useEffect(() => {
     const newFilterModel = { items: [] };
@@ -28,7 +27,6 @@ const ProspectFilter = ({ columns, filterModel, setFilterModel, rows }) => {
     setFilterModel(newFilterModel);
   }, [nombreFilter, estadoFilter, setFilterModel]);
 
-  // Obtener opciones únicas para el filtro de estado
   const estadoOptions = [...new Set(rows.map(row => row.estado_contacto))];
 
   return (
@@ -37,12 +35,12 @@ const ProspectFilter = ({ columns, filterModel, setFilterModel, rows }) => {
         label="Filtrar por Nombre"
         value={nombreFilter}
         onChange={(e) => setNombreFilter(e.target.value)}
-        size="small" // Hace el campo de texto más pequeño
-        sx={{ minWidth: 200 }} // Establece un ancho mínimo
+        size="small" 
+        sx={{ minWidth: 200 }} 
       />
       <FormControl
-        size="small" // Hace el control del select más pequeño
-        sx={{ minWidth: 200 }} // Establece un ancho mínimo
+        size="small" 
+        sx={{ minWidth: 200 }} 
       >
         <InputLabel id="estado-select-label">Filtrar por Estado</InputLabel>
         <Select
@@ -58,7 +56,6 @@ const ProspectFilter = ({ columns, filterModel, setFilterModel, rows }) => {
           ))}
         </Select>
       </FormControl>
-      {/* ... otros controles de filtro */}
     </div>
   );
 };

@@ -29,25 +29,22 @@ import GestorDeAsignaciones from "./pages/admin/pages/GestorDeAsignaciones";
 const getRoleFromIdTipo = (id_tipo) => {
   switch (id_tipo) {
     case 1:
-      return 'admin';
+      return "admin";
     case 2:
-      return 'setter';
+      return "setter";
     case 3:
-      return 'closer';
+      return "closer";
     case 4:
-      return 'cliente';
+      return "cliente";
     default:
-      return 'undefined';
+      return "undefined";
   }
 };
 
 // Componente de ruta protegida general (solo verifica si está autenticado)
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuth();
-  // Log para ver si el usuario está autenticado y su rol usando id_tipo
-  console.log('ProtectedRoute - isAuthenticated:', isAuthenticated);
-  console.log('ProtectedRoute - user id_tipo:', user?.id_tipo);
-  
+
   return isAuthenticated ? children : <Navigate to="/" />;
 };
 
@@ -55,12 +52,6 @@ const ProtectedRoute = ({ children }) => {
 const ProtectedRouteWithRole = ({ children, requiredRoles }) => {
   const { isAuthenticated, user } = useAuth();
   const userRole = getRoleFromIdTipo(user?.id_tipo);
-
-  // Log para ver el tipo de usuario que está intentando acceder
-  console.log('ProtectedRouteWithRole - isAuthenticated:', isAuthenticated);
-  console.log('ProtectedRouteWithRole - user:', user);
-  console.log('ProtectedRouteWithRole - user rol:', userRole);
-  console.log('ProtectedRouteWithRole - required roles:', requiredRoles);
 
   // Si no está autenticado, redirige a la página de login
   if (!isAuthenticated) {
@@ -98,7 +89,9 @@ function App() {
             <Route
               path="/admin-dashboard"
               element={
-                <ProtectedRouteWithRole requiredRoles={["admin", "setter", "closer"]}>
+                <ProtectedRouteWithRole
+                  requiredRoles={["admin",]}
+                >
                   <AdminDashboard />
                 </ProtectedRouteWithRole>
               }
@@ -106,13 +99,12 @@ function App() {
             <Route
               path="/gestor-de-asignaciones"
               element={
-                <ProtectedRoute requiredRoles={["admin", "setter", "closer"]}>
+                <ProtectedRoute requiredRoles={["admin",]}>
                   <GestorDeAsignaciones />
                 </ProtectedRoute>
               }
             />
 
-            {/* Rutas protegidas que requieren autenticación, pero no un rol específico */}
             <Route
               path="/dashboard"
               element={

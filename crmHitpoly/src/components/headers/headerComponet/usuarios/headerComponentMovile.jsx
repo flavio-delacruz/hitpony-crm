@@ -8,8 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 import SideBarContent from "../../../sideBar/sideBarContent";
 import NotificationComponent from "../components/NotificationComponent";
-import Search from "../../../search/SearchComponent"; // Asegúrate que esté importado correctamente
-import { useAuth } from "../../../../context/AuthContext"; // Para obtener el usuario
+import Search from "../../../search/SearchComponent"; 
+import { useAuth } from "../../../../context/AuthContext";
 
 const Header = styled(Box)({
   display: "flex",
@@ -45,7 +45,6 @@ const HeaderComponentMovile = ({ title }) => {
         Página / {title}
       </Typography>
 
-      {/* Buscador (puedes ocultarlo si no cabe en pantallas muy pequeñas) */}
       <Box sx={{ display: { xs: "none", sm: "block" }, mr: 2 }}>
         <Search />
       </Box>

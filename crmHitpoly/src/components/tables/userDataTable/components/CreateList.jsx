@@ -34,7 +34,6 @@ const CreateList = ({ open, onClose, onListCreated, prospectosSeleccionados }) =
     const [selectedExistingListId, setSelectedExistingListId] = useState("");
 
     useEffect(() => {
-        console.log("Prospectos seleccionados recibidos:", prospectosSeleccionados);
         if (prospectosSeleccionados && prospectosSeleccionados.length > 0) {
             setSelectedProspectIds(prospectosSeleccionados);
         } else {
@@ -49,7 +48,6 @@ const CreateList = ({ open, onClose, onListCreated, prospectosSeleccionados }) =
         const fetchExistingLists = async () => {
             if (open && user?.id) {
                 setLoadingLists(true);
-                console.log("Intentando obtener listas existentes para el usuario:", user.id);
                 try {
                     const response = await fetch(
                         "https://apiweb.hitpoly.com/ajax/traerListaController.php",
@@ -60,10 +58,9 @@ const CreateList = ({ open, onClose, onListCreated, prospectosSeleccionados }) =
                         }
                     );
                     const data = await response.json();
-                    console.log("Respuesta de la API al obtener listas:", data);
                     setExistingLists(data.resultado || []);
                 } catch (error) {
-                    console.error("Error al obtener las listas:", error);
+                    
                     Swal.fire({
                         icon: "error",
                         title: "Error de carga",
@@ -108,8 +105,6 @@ const CreateList = ({ open, onClose, onListCreated, prospectosSeleccionados }) =
                     idProspecto: selectedProspectIds,
                 };
             }
-            // LOG para verificar el payload antes de enviar
-            console.log("Enviando payload a la API:", payload);
 
             const response = await fetch(endpoint, {
                 method: "POST",
@@ -117,8 +112,6 @@ const CreateList = ({ open, onClose, onListCreated, prospectosSeleccionados }) =
                 body: JSON.stringify(payload),
             });
             const data = await response.json();
-
-            console.log("Respuesta de la API:", data);
 
             if (data.status === "success") {
                 Swal.fire("Éxito", data.message || `Prospecto(s) añadido(s) a la lista.`, "success");
@@ -128,7 +121,6 @@ const CreateList = ({ open, onClose, onListCreated, prospectosSeleccionados }) =
                 Swal.fire("Error", data.message || "No se pudo realizar la acción en la lista.", "error");
             }
         } catch (error) {
-            console.error("Error al procesar la solicitud:", error);
             Swal.fire({ icon: "error", title: "Error de conexión", text: "Ocurrió un error al comunicarse con el servidor." });
         } finally {
             setLoading(false);

@@ -4,7 +4,7 @@ import { TextField, Box } from "@mui/material";
 
 const SearchSetterControl = ({ searchTerm, onSearchChange }) => {
   return (
-    <Box sx={{ flexGrow: 1 }}> {/* flexGrow para que ocupe el espacio restante */}
+    <Box sx={{ flexGrow: 1 }}>
       <TextField
         label="Buscar Setter"
         variant="outlined"

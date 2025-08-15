@@ -16,7 +16,6 @@ import {
   IconButton,
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
-
 import LayoutAdmin from "../../../components/layout/layoutAdmin";
 
 const GestorDeAsignaciones = () => {
@@ -55,7 +54,6 @@ const GestorDeAsignaciones = () => {
         setSetters(settersFiltrados);
       }
     } catch (err) {
-      console.error("❌ Error al obtener los usuarios:", err);
       setError("No se pudieron cargar los usuarios.");
     } finally {
       setCargando(false);
@@ -86,7 +84,6 @@ const GestorDeAsignaciones = () => {
         setAsignaciones([]);
       }
     } catch (err) {
-      console.error("❌ Error al obtener las asignaciones:", err);
     }
   };
 
@@ -106,7 +103,6 @@ const GestorDeAsignaciones = () => {
       setSelectedCloserId("");
       setSettersToAssign([]);
     } catch (err) {
-      console.error("❌ Error al asignar setters:", err);
     }
   };
 
@@ -126,7 +122,6 @@ const GestorDeAsignaciones = () => {
       setSelectedCloserId("");
       setSettersToAssign([]);
     } catch (err) {
-      console.error("❌ Error al agregar el setter:", err);
     }
   };
 
@@ -144,7 +139,6 @@ const GestorDeAsignaciones = () => {
       await respuesta.json();
       obtenerAsignaciones();
     } catch (err) {
-      console.error("❌ Error al eliminar el setter:", err);
     }
   };
 
@@ -221,7 +215,6 @@ const GestorDeAsignaciones = () => {
         width: '100%',
         flexDirection: { xs: 'column', md: 'row' }
       }}>
-        {/* Panel Izquierdo: Controles de Asignación */}
         <Box sx={{ 
             flex: { xs: 1, md: '0 0 300px' },
             p: 2, 

@@ -4,10 +4,10 @@ import Grid from "@mui/material/Grid";
 import ContactInformation from "./components/infoContact/informacionDeContacto";
 import ContactActivity from "./components/actividades/actividadDeContacto";
 import ContactRelation from "./components/relacionesDeContacto";
-import { useEffect, useState } from "react"; // Importa useState y useEffect si no los tienes
+import { useEffect, useState } from "react";
 
 export default function ContactPage() {
-  const { prospectId } = useParams(); // ← obtener el string con nombre-apellido-ID
+  const { prospectId } = useParams();
   const [extractedProspectId, setExtractedProspectId] = useState(null);
 
   useEffect(() => {

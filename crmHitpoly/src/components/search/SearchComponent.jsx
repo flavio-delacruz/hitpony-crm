@@ -43,7 +43,6 @@ function Search() {
           throw new Error("Formato de datos incorrecto");
         }
       } catch (error) {
-        console.error("Error al cargar prospectos:", error);
         Swal.fire({
           icon: "error",
           title: "Error al cargar datos",
@@ -70,7 +69,6 @@ function Search() {
     if (id) {
       navigate(`/pagina-de-contacto/${id}`);
     } else {
-      console.warn("ID inválido para navegación.");
     }
   };
 

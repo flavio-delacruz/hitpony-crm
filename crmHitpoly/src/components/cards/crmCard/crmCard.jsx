@@ -72,13 +72,16 @@ const CrmCard = () => {
     const { source, destination } = result;
 
     if (!destination) {
-     return;
+      return;
     }
 
     const sourceDroppableId = source.droppableId;
     const destinationDroppableId = destination.droppableId;
 
-    if (sourceDroppableId === destinationDroppableId && source.index === destination.index) {
+    if (
+      sourceDroppableId === destinationDroppableId &&
+      source.index === destination.index
+    ) {
       return;
     }
 
@@ -96,8 +99,7 @@ const CrmCard = () => {
           ...prev,
           [sourceDroppableId]: items,
         };
-      }
-      else {
+      } else {
         const result = move(
           prev[sourceDroppableId],
           prev[destinationDroppableId],

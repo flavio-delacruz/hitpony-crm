@@ -33,14 +33,11 @@ const ProspectosTracker = () => {
             }
           );
   
-          console.log("Respuesta de la API:", response.data);
-  
           const nuevosDatos = Array.isArray(response.data.resultado)
             ? response.data.resultado
             : [];
   
           if (nuevosDatos.length === 0) {
-            console.error("No hay prospectos para procesar");
             return;
           }
   
@@ -52,7 +49,7 @@ const ProspectosTracker = () => {
                 (item) => item.id === nuevoProspecto.id
               );
   
-              const origen = nuevoProspecto.origen || "Desconocido"; // Verifica si el campo origen existe
+              const origen = nuevoProspecto.origen || "Desconocido";
   
               if (!anterior) {
                 cambiosDetectados.push({
@@ -74,7 +71,6 @@ const ProspectosTracker = () => {
               }
             });
   
-            // Detectar eliminaciones
             const idsNuevos = nuevosDatos.map((item) => item.id);
             dataAnteriorRef.current.forEach((anterior) => {
               if (!idsNuevos.includes(anterior.id)) {
@@ -92,14 +88,13 @@ const ProspectosTracker = () => {
             }
           }
   
-          dataAnteriorRef.current = nuevosDatos; // Guardamos los datos actuales como referencia
+          dataAnteriorRef.current = nuevosDatos; 
         } catch (error) {
-          console.error("Error al traer prospectos:", error);
         }
       };
   
       fetchData();
-      const interval = setInterval(fetchData, 10000); // Repetir cada 10 segundos
+      const interval = setInterval(fetchData, 10000); 
       return () => clearInterval(interval);
     }, [user]);
   

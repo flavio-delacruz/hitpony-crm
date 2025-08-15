@@ -5,7 +5,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/AuthContext";
 import { styled } from '@mui/material/styles';
-import Search from "../../../search/SearchComponent"; // Import the new SearchComponent
+import Search from "../../../search/SearchComponent";
 import NotificationComponent from "../components/NotificationComponent";
 
 const Header = styled(Box)({

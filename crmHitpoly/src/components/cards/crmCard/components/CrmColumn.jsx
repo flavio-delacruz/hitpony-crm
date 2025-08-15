@@ -15,7 +15,7 @@ const getColumnStyle = (isDraggingOver) => ({
   display: "flex",
   flexDirection: "column",
   overflow: "hidden",
-  height: "100%", // Asegura que la columna ocupe toda la altura disponible
+  height: "100%",
 });
 
 const CrmColumn = ({ columnId, items, onWheel }) => {

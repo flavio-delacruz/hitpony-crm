@@ -1,10 +1,9 @@
-// src/hooks/useAdminDashboardData.jsx
 import { useState, useEffect, useCallback } from "react";
 import useProspectos from "./UsuariosDeProspectos";
 
 const CACHE_KEY = "adminDashboardProspectsData";
-const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
-const POLLING_INTERVAL_MS = 60 * 500; // 30 seconds
+const CACHE_DURATION_MS = 5 * 60 * 1000;
+const POLLING_INTERVAL_MS = 60 * 500;
 
 const useAdminDashboardData = () => {
   const [data, setData] = useState([]);
@@ -31,7 +30,6 @@ const useAdminDashboardData = () => {
         cacheWasUsedForInstantDisplay = true;
       }
     } catch (e) {
-      console.error("Error parsing or reading localStorage data:", e);
       setError("Error al parsear o leer datos de localStorage. Se intentará cargar desde la API.");
       localStorage.removeItem(CACHE_KEY);
     }
@@ -45,25 +43,26 @@ const useAdminDashboardData = () => {
 
     if (shouldFetchFromApi) {
       try {
-        const settersResponse = await fetch(
-          "https://apiweb.hitpoly.com/ajax/getSettersController.php",
+        const usersResponse = await fetch(
+          "https://apiweb.hitpoly.com/ajax/traerUsuariosController.php",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ funcion: "get" }),
+            body: JSON.stringify({ accion: "getDataUsuarios" }),
           }
         );
 
-        if (!settersResponse.ok) {
-          throw new Error(`HTTP error! status: ${settersResponse.status}`);
+        if (!usersResponse.ok) {
+          throw new Error(`HTTP error! status: ${usersResponse.status}`);
         }
-        const settersData = await settersResponse.json();
+        const usersData = await usersResponse.json();
 
-        if (!settersData?.data || !Array.isArray(settersData.data)) {
-          throw new Error("Error: Los datos de setters no tienen la estructura esperada.");
+        if (!usersData?.data || !Array.isArray(usersData.data)) {
+          throw new Error("Error: Los datos de usuarios no tienen la estructura esperada.");
         }
+        const settersData = usersData.data.filter(user => user.id_tipo === "2" || user.id_tipo === 2);
 
-        const formattedSetters = settersData.data.map((setter) => ({
+        const formattedSetters = settersData.map((setter) => ({
           id: setter.id,
           nombreSetter: setter.nombre || "",
           apellidoSetter: setter.apellido || "",
@@ -91,7 +90,7 @@ const useAdminDashboardData = () => {
               setterId: setterProspects.setterId,
               setterNombre: setterProspects.setterNombre,
               setterApellido: setterProspects.setterApellido,
-              email: prospecto.correo || "", // Asegurarse de tener el email aquí
+              email: prospecto.correo || "",
               telefono: prospecto.celular || "",
               nombre: prospecto.nombre || "",
               apellido: prospecto.apellido || "",
@@ -109,7 +108,6 @@ const useAdminDashboardData = () => {
         setLoading(false);
 
       } catch (e) {
-        console.error("Error fetching data from API:", e);
         if (cacheWasUsedForInstantDisplay) {
           setError(`Error al obtener nuevos datos: ${e.message}. Se mantienen datos cacheados.`);
         } else {
@@ -150,7 +148,6 @@ const useAdminDashboardData = () => {
               }));
             }
         } catch (e) {
-            console.error("Error updating localStorage cache:", e);
         }
         return updatedData;
       });
@@ -158,14 +155,12 @@ const useAdminDashboardData = () => {
     return actualizado;
   }, [updateProspectoEstado]);
 
-  // Esta es la función CLAVE: busca prospectos por ID dentro de los datos YA CARGADOS
   const getProspectsDataFromLoadedData = useCallback((prospectIdsToFind) => {
     if (!Array.isArray(prospectIdsToFind) || prospectIdsToFind.length === 0 || data.length === 0) {
       return [];
     }
-    // Filtra los prospectos de la 'data' principal que tienen IDs que coinciden con los seleccionados
     return data.filter(p => prospectIdsToFind.includes(p.id));
-  }, [data]); // Depende de 'data' para re-evaluarse si los datos cambian
+  }, [data]);
 
   return {
     data,
@@ -173,7 +168,7 @@ const useAdminDashboardData = () => {
     error,
     updateProspectoEstado: updateProspectoEstadoInCache,
     fetchData,
-    getProspectsDataFromLoadedData // ¡Asegúrate de exportar esta función!
+    getProspectsDataFromLoadedData
   };
 };
 

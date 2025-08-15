@@ -25,7 +25,6 @@ import { styled } from "@mui/material/styles";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import * as XLSX from "xlsx";
 
-// Estilos personalizados
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   borderRadius: 8,
   boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
@@ -133,7 +132,6 @@ const ProspectsTable = ({
           <MUIMenuItem onClick={() => { handleDownloadExcel(); handleMenuClose(); }}>
             Descargar Excel
           </MUIMenuItem>
-          {/* Puedes añadir más acciones aquí */}
         </Menu>
       </Box>
 
