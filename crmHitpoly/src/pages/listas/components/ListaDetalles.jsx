@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from '../../../components/layout/layout';
 import { Typography, Button } from '@mui/material';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
@@ -6,95 +6,187 @@ import { useProspectos } from '../../../context/ProspectosContext';
 import ReusableTable from '../../../components/tables/userDataTable/ReusableTable';
 
 const columns = [
-  { field: "nombre", headerName: "Nombre", width: 150 },
-  { field: "apellido", headerName: "Apellido", width: 150 },
-  { field: "celular", headerName: "Celular", width: 130 },
-  { field: "correo", headerName: "Correo", width: 250 },
-  { field: "estado_contacto", headerName: "Estado", width: 150 },
-  { field: "ciudad", headerName: "Ciudad", width: 150 },
-  { field: "sector", headerName: "Sector", width: 150 },
-  { field: "productos_interes", headerName: "Intereses", width: 200 },
+    { field: "nombre", headerName: "Nombre", width: 150 },
+    { field: "apellido", headerName: "Apellido", width: 150 },
+    { field: "celular", headerName: "Celular", width: 130 },
+    { field: "correo", headerName: "Correo", width: 250 },
+    { field: "estado_contacto", headerName: "Estado", width: 150 },
+    { field: "ciudad", headerName: "Ciudad", width: 150 },
+    { field: "sector", headerName: "Sector", width: 150 },
+    { field: "productos_interes", headerName: "Intereses", width: 200 },
 ];
 
 function ListaDetalles() {
-  const { prospectos, loadingProspectos, errorProspectos } = useProspectos();
-  const { nombreLista } = useParams();
-  const { state } = useLocation();
-  const navigate = useNavigate();
-  const listaSeleccionada = state?.listaSeleccionada;
-  const [selectedProspectIds, setSelectedProspectIds] = useState([]);
+    const { prospectos, loadingProspectos, errorProspectos } = useProspectos();
+    const { nombreLista } = useParams();
+    const { state } = useLocation();
+    const navigate = useNavigate();
+    const listaSeleccionada = state?.listaSeleccionada;
+    const [selectedProspectIds, setSelectedProspectIds] = useState([]);
+    
+    const [listProspectsIds, setListProspectsIds] = useState([]);
+    const [isLoadingIds, setIsLoadingIds] = useState(false);
+    
+    // **Nueva y mejorada lógica para limpiar y formatear el nombre**
+    const formattedName = nombreLista.replace(/-(\d+)$/, '').replace(/-/g, ' ');
+    const displayNombreLista = formattedName.split(' ').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
 
-  const filteredProspectos = listaSeleccionada?.prospectos
-    ? prospectos.filter((prospecto) =>
-        listaSeleccionada.prospectos.includes(String(prospecto.id))
-      )
-    : [];
+    const fetchListProspectsIds = useCallback(async () => {
+        if (!listaSeleccionada?.id) return;
+        setIsLoadingIds(true);
+        try {
+            const response = await fetch('https://apiweb.hitpoly.com/ajax/traerProspectosPorListaIdController.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accion: 'getProspectosIds', id_lista: listaSeleccionada.id }),
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                setListProspectsIds(data.data);
+            } else {
+                console.error('Error al obtener IDs de prospectos:', data.message);
+                setListProspectsIds([]);
+            }
+        } catch (error) {
+            console.error('Error de conexión al obtener IDs de prospectos:', error);
+            setListProspectsIds([]);
+        } finally {
+            setIsLoadingIds(false);
+        }
+    }, [listaSeleccionada]);
 
-  const handleRowSelectionChange = (newSelectionModel) => {
-    setSelectedProspectIds(newSelectionModel);
-  };
+    useEffect(() => {
+        fetchListProspectsIds();
+    }, [fetchListProspectsIds]);
 
-  const handleEnviarCorreoClick = () => {
-    if (selectedProspectIds.length > 0) {
-      navigate('/enviar-correo', { state: { selectedProspectIds } });
-    } else {
-      alert('Por favor, selecciona al menos un prospecto.');
+    const filteredProspectos = listProspectsIds.length > 0 
+        ? prospectos.filter(prospecto => listProspectsIds.includes(Number(prospecto.id)))
+        : [];
+
+    const handleRowSelectionChange = (newSelectionModel) => {
+        setSelectedProspectIds(newSelectionModel);
+    };
+
+    const handleEnviarCorreoClick = () => {
+        if (selectedProspectIds.length > 0) {
+            navigate('/enviar-correo', { state: { selectedProspectIds } });
+        } else {
+            alert('Por favor, selecciona al menos un prospecto.');
+        }
+    };
+
+    const handleDeleteProspectsClick = async () => {
+        if (selectedProspectIds.length === 0) {
+            alert('Por favor, selecciona al menos un prospecto para eliminar.');
+            return;
+        }
+        if (!listaSeleccionada || !listaSeleccionada.id) {
+            alert('Error: No se encontró el ID de la lista.');
+            return;
+        }
+
+        if (window.confirm(`¿Estás seguro de que quieres eliminar ${selectedProspectIds.length} prospectos de esta lista?`)) {
+            const prevListProspectsIds = [...listProspectsIds];
+            
+            setListProspectsIds(currentIds => currentIds.filter(id => !selectedProspectIds.includes(Number(id))));
+            setSelectedProspectIds([]);
+
+            try {
+                const deletePromises = selectedProspectIds.map(prospectId =>
+                    fetch('https://apiweb.hitpoly.com/ajax/borrarSetterListaController.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            accion: "BorrarSetter",
+                            id: prospectId,
+                            id_lista: listaSeleccionada.id,
+                        }),
+                    })
+                );
+
+                const results = await Promise.all(deletePromises);
+                
+                const allSucceeded = results.every(response => response.ok);
+                
+                if (!allSucceeded) {
+                    setListProspectsIds(prevListProspectsIds);
+                    alert('Hubo un error al eliminar uno o más prospectos. La lista se ha restaurado.');
+                }
+
+            } catch (error) {
+                console.error('Error de conexión al eliminar los prospectos:', error);
+                setListProspectsIds(prevListProspectsIds);
+                alert('Hubo un error de conexión, la lista se ha restaurado.');
+            }
+        }
+    };
+
+    const handleRowClick = (params) => {
+        const prospecto = params.row;
+        if (prospecto && prospecto.id && prospecto.nombre && prospecto.apellido) {
+            const slug = `${prospecto.nombre
+                .toLowerCase()
+                .replace(/\s+/g, "-")}-${prospecto.apellido
+                .toLowerCase()
+                .replace(/\s+/g, "-")}`;
+            navigate(`/pagina-de-contacto/${slug}-${prospecto.id}`);
+        } else {
+            // Manejo de error o caso de prospecto no válido
+        }
+    };
+
+    if (loadingProspectos || isLoadingIds) {
+        return (
+            <Layout title={`Detalles de la Lista: ${displayNombreLista}`}>
+                <Typography>Cargando prospectos...</Typography>
+            </Layout>
+        );
     }
-  };
 
-  const handleRowClick = (params) => {
-    const prospecto = params.row;
-    if (prospecto && prospecto.id && prospecto.nombre && prospecto.apellido) {
-      const slug = `${prospecto.nombre
-        .toLowerCase()
-        .replace(/\s+/g, "-")}-${prospecto.apellido
-        .toLowerCase()
-        .replace(/\s+/g, "-")}`;
-      navigate(`/pagina-de-contacto/${slug}-${prospecto.id}`);
-    } else {
-      
+    if (errorProspectos) {
+        return (
+            <Layout title={`Detalles de la Lista: ${displayNombreLista}`}>
+                <Typography color="error">{errorProspectos}</Typography>
+            </Layout>
+        );
     }
-  };
 
-  if (loadingProspectos) {
     return (
-      <Layout title={`Detalles de la Lista: ${nombreLista}`}>
-        <Typography>Cargando prospectos...</Typography>
-      </Layout>
+        <Layout title={`${displayNombreLista}`}>
+            <div style={{ width: '100%' }}>
+                <ReusableTable
+                    rows={filteredProspectos}
+                    columns={columns}
+                    getRowId={(row) => row.id}
+                    onRowSelectionChange={handleRowSelectionChange}
+                    onRowClick={handleRowClick} 
+                />
+                <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
+                    {selectedProspectIds.length > 0 && (
+                        <>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleEnviarCorreoClick}
+                            >
+                                Enviar Correo a Seleccionados
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                onClick={handleDeleteProspectsClick}
+                            >
+                                Eliminar Seleccionados
+                            </Button>
+                        </>
+                    )}
+                </div>
+            </div>
+        </Layout>
     );
-  }
-
-  if (errorProspectos) {
-    return (
-      <Layout title={`Detalles de la Lista: ${nombreLista}`}>
-        <Typography color="error">{errorProspectos}</Typography>
-      </Layout>
-    );
-  }
-
-  return (
-    <Layout title={`Detalles de la Lista: ${nombreLista}`}>
-      <div style={{ width: '100%' }}>
-        <ReusableTable
-          rows={filteredProspectos}
-          columns={columns}
-          getRowId={(row) => row.id}
-          onRowSelectionChange={handleRowSelectionChange}
-          onRowClick={handleRowClick} 
-        />
-        {selectedProspectIds.length > 0 && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleEnviarCorreoClick}
-            sx={{ mt: 2 }}
-          >
-            Enviar Correo a Seleccionados
-          </Button>
-        )}
-      </div>
-    </Layout>
-  );
 }
 
 export default ListaDetalles;

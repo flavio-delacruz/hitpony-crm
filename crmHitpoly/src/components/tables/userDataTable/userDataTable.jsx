@@ -1,24 +1,21 @@
-// src/components/DataTable.js
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Stack from "@mui/material/Stack";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { useAuth } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useProspectos } from "../../../context/ProspectosContext"; 
 import { columns } from "./components/columns";
-import { fetchData } from "./components/dataFetching";
-import { DeleteSelected } from "./components/DeleteSelected";
-import ProspectFilter from "./components/Filter";
 import CreateList from "./components/CreateList";
 import Swal from "sweetalert2";
 import ReusableTable from "./ReusableTable";
+import ProspectFilter from "./components/Filter";
 
 const googleBlue = "#4285F4";
 
 function DataTable() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [rows, setRows] = useState([]);
+  const { prospectos, loadingProspectos, errorProspectos, deleteProspectsFromList } = useProspectos();
   const [selectedRows, setSelectedRows] = useState([]);
   const [filterModel, setFilterModel] = useState({
     items: [],
@@ -26,15 +23,6 @@ function DataTable() {
     quickFilterLogicOperator: "or",
   });
   const [isCreateListOpen, setIsCreateListOpen] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-    }
-  }, [user]);
-
-  useEffect(() => {
-    fetchData(user, setRows);
-  }, [user]);
 
   const handleRowSelectionChange = (newSelectionModel) => {
     setSelectedRows(newSelectionModel);
@@ -70,6 +58,16 @@ function DataTable() {
 
   const handleListCreated = () => {};
 
+  const handleDeleteSelected = async () => {
+    if (selectedRows.length > 0) {
+        if (window.confirm(`¿Estás seguro de que quieres eliminar ${selectedRows.length} prospectos?`)) {
+            await deleteProspectsFromList(selectedRows);
+            setSelectedRows([]); 
+        }
+    }
+ };
+
+
   const handleRowClick = (params) => {
     const prospecto = params.row;
     if (prospecto && prospecto.id && prospecto.nombre && prospecto.apellido) {
@@ -83,13 +81,21 @@ function DataTable() {
     }
   };
 
+  if (loadingProspectos) {
+    return <Typography>Cargando prospectos...</Typography>;
+  }
+
+  if (errorProspectos) {
+    return <Typography color="error">{errorProspectos}</Typography>;
+  }
+
   return (
     <Stack spacing={2}>
       <ProspectFilter
         columns={columns}
         filterModel={filterModel}
         setFilterModel={setFilterModel}
-        rows={rows}
+        rows={prospectos}
       />
       {selectedRows.length > 0 && (
         <Stack direction="row" spacing={1} justifyContent="flex-end">
@@ -101,11 +107,14 @@ function DataTable() {
           >
             Crear Lista
           </Button>
-          <DeleteSelected
-            selectedRows={selectedRows}
-            setSelectedRows={setSelectedRows}
-            setRows={setRows}
-          />
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={handleDeleteSelected}
+            sx={{ width: "fit-content", mt: 1 }}
+          >
+            Eliminar Seleccionados
+          </Button>
           <Button
             variant="contained"
             color="info"
@@ -117,7 +126,7 @@ function DataTable() {
         </Stack>
       )}
       <ReusableTable
-        rows={rows}
+        rows={prospectos}
         columns={columns}
         onRowSelectionChange={(ids) => handleRowSelectionChange(ids)}
         onCellClick={handleCellClick}
