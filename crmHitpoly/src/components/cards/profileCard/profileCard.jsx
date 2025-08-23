@@ -23,8 +23,8 @@ import ProfileImageCard from "./ProfileImageCard";
 const ProfileCard = () => {
   const { user, login } = useAuth();
   const [formData, setFormData] = useState(user);
-  
-  const [editableFields, setEditableFields] = useState({ rol: true });
+
+  const [editableFields, setEditableFields] = useState({});
 
   const [localChanges, setLocalChanges] = useState(null);
   const [alert, setAlert] = useState({ show: false, type: "", message: "" });
@@ -35,9 +35,9 @@ const ProfileCard = () => {
     if (JSON.stringify(prevUser) !== JSON.stringify(user)) {
       setFormData(user);
       setLocalChanges(null);
-      
-      setEditableFields({ rol: true });
-      
+
+      setEditableFields({});
+
       prevUserRef.current = user;
     }
   }, [user]);
@@ -69,7 +69,8 @@ const ProfileCard = () => {
       id_tipo: formData.rol,
     };
 
-    delete dataToSend.rol;
+    // La propiedad 'rol' ya no está en formData, por lo que no es necesario eliminarla.
+    // Simplemente se envía 'id_tipo' si existe, lo cual es manejado por el backend.
 
     if (dataToSend.correo) {
       dataToSend.email = dataToSend.correo;
@@ -103,7 +104,7 @@ const ProfileCard = () => {
 
       setFormData(updatedUserWithId);
       login(updatedUserWithId);
-      setEditableFields({ rol: true });
+      setEditableFields({});
       showAlert("success", "¡Datos actualizados correctamente!");
     } catch (error) {
       showAlert("error", "Hubo un error actualizando los datos.");
@@ -126,12 +127,6 @@ const ProfileCard = () => {
     { label: "País", name: "pais" },
     { label: "Código Postal", name: "codigo_postal" },
     { label: "Sobre mí", name: "sobre_mi", multiline: true, rows: 3 },
-    {
-      label: "Rol",
-      name: "rol",
-      type: "select",
-      options: [{ value: 3, label: "Closer" }, { value: 2, label: "Setter" }],
-    },
   ];
 
   return (
@@ -204,47 +199,25 @@ const ProfileCard = () => {
                 key={field.name}
               >
                 <Box sx={{ position: "relative" }}>
-                  {field.type === "select" ? (
-                    <FormControl fullWidth variant="outlined" disabled={!editableFields[field.name]}>
-                      <InputLabel id={`${field.name}-label`}>{field.label}</InputLabel>
-                      <Select
-                        labelId={`${field.name}-label`}
-                        id={field.name}
-                        name={field.name}
-                        value={formData[field.name] || ""}
-                        onChange={handleChange}
-                        label={field.label}
-                      >
-                        {field.options.map((option) => (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  ) : (
-                    <TextField
-                      fullWidth
-                      label={field.label}
-                      name={field.name}
-                      value={formData[field.name] || ""}
-                      onChange={handleChange}
-                      type={field.type || "text"}
-                      variant="outlined"
-                      multiline={field.multiline || false}
-                      rows={field.rows || 1}
-                      disabled={!editableFields[field.name]}
-                    />
-                  )}
-                  {field.type !== "select" && (
-                    <IconButton
-                      onClick={() => toggleFieldEdit(field.name)}
-                      size="small"
-                      sx={{ position: "absolute", top: 8, right: 8 }}
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  )}
+                  <TextField
+                    fullWidth
+                    label={field.label}
+                    name={field.name}
+                    value={formData[field.name] || ""}
+                    onChange={handleChange}
+                    type={field.type || "text"}
+                    variant="outlined"
+                    multiline={field.multiline || false}
+                    rows={field.rows || 1}
+                    disabled={!editableFields[field.name]}
+                  />
+                  <IconButton
+                    onClick={() => toggleFieldEdit(field.name)}
+                    size="small"
+                    sx={{ position: "absolute", top: 8, right: 8 }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
                 </Box>
               </Grid>
             ))}
