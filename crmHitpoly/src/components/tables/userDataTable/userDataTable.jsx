@@ -9,6 +9,12 @@ import Swal from "sweetalert2";
 import ProspectFilter from "./components/Filter";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
+// Importamos los componentes del modal y los iconos
+import AddModal from "../../modals/addModal/addModal";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import ShareIcon from '@mui/icons-material/Share';
+// 🆕 Importamos el modal de compartir
+import ShareLinkModal from "../../forms/clientesPotenciales/ShareLinkModal"; 
 
 const googleBlue = "#4285F4";
 
@@ -41,6 +47,10 @@ function DataTable() {
     pageSize: 10,
     page: 0,
   });
+
+  // 🆕 Estados para los modales
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false); // 🆕 Nuevo estado para el modal de compartir
 
   const fetchAllProspects = useCallback(async () => {
     if (!user || !user.id || isCheckingForChanges.current) {
@@ -128,9 +138,8 @@ function DataTable() {
     }
   }, [user]);
 
-  // Lógica para eliminar prospectos
   const deleteProspectsFromList = useCallback(
-    async (prospectIds) => { // Removido listId, ya que no se usará
+    async (prospectIds) => { 
       const previousProspects = [...prospectos];
 
       const updatedProspects = previousProspects.filter(
@@ -141,8 +150,8 @@ function DataTable() {
       try {
         const deletePromises = prospectIds.map((prospectId) => {
           const bodyData = JSON.stringify({
-            funcion: "delete", // Usando el endpoint correcto que requiere 'funcion'
-            id: prospectId, // Solo se necesita el ID del prospecto
+            funcion: "delete", 
+            id: prospectId,
           });
           return fetch(
             "https://apiweb.hitpoly.com/ajax/eliminarProspectoTempController.php",
@@ -247,7 +256,6 @@ function DataTable() {
           `¿Estás seguro de que quieres eliminar ${selectedRows.length} prospectos?`
         )
       ) {
-        // Llama a la función de eliminación. El id_lista ya no es necesario aquí.
         await deleteProspectsFromList(selectedRows);
         setSelectedRows([]);
         setRowSelectionModel([]);
@@ -267,6 +275,15 @@ function DataTable() {
     }
   };
 
+  const handleAddNew = () => {
+    setIsAddModalOpen(true);
+  };
+
+  // 🆕 La nueva función que abre el modal de compartir
+  const handleShareForm = () => {
+    setIsShareModalOpen(true);
+  };
+
   if (loadingProspectos) {
     return <Typography>Cargando prospectos...</Typography>;
   }
@@ -277,12 +294,34 @@ function DataTable() {
 
   return (
     <Stack spacing={2}>
-      <ProspectFilter
-        columns={columns}
-        filterModel={filterModel}
-        setFilterModel={setFilterModel}
-        rows={prospectos}
-      />
+      <Stack 
+        direction="row" 
+        alignItems="center" 
+        justifyContent="space-between"
+      >
+        <ProspectFilter
+          columns={columns}
+          filterModel={filterModel}
+          setFilterModel={setFilterModel}
+          rows={prospectos}
+        />
+        <Stack direction="row" spacing={2}>
+          <Button 
+            variant="outlined" 
+            startIcon={<ShareIcon />} 
+            onClick={handleShareForm}
+          >
+            Compartir Formulario
+          </Button>
+          <Button 
+            variant="contained" 
+            startIcon={<PersonAddIcon />} 
+            onClick={handleAddNew}
+          >
+            Añadir Nuevo Prospecto
+          </Button>
+        </Stack>
+      </Stack>
       {selectedRows.length > 0 && (
         <Stack direction="row" spacing={1} justifyContent="flex-end">
           <Button
@@ -357,6 +396,20 @@ function DataTable() {
           onListCreated={handleListCreated}
         />
       )}
+      {/* Agregamos el AddModal aquí */}
+      <AddModal
+        open={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSave={(newUser) => {
+          console.log("Nuevo usuario guardado:", newUser);
+          setIsAddModalOpen(false);
+        }}
+      />
+      {/* 🆕 Renderizamos el nuevo modal de compartir aquí */}
+      <ShareLinkModal
+        open={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+      />
     </Stack>
   );
 }

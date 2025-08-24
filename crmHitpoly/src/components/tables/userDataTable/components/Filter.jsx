@@ -9,9 +9,10 @@ const ProspectFilter = ({ columns, filterModel, setFilterModel, rows }) => {
     const newFilterModel = { items: [] };
 
     if (nombreFilter) {
+      // 🆕 Cambiamos el operador a 'startsWith' para buscar desde el inicio
       newFilterModel.items.push({
         field: 'nombre',
-        operator: 'contains',
+        operator: 'startsWith',
         value: nombreFilter,
       });
     }
