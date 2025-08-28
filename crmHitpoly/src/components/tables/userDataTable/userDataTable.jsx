@@ -320,7 +320,7 @@ function DataTable() {
           >
             Añadir Nuevo Prospecto
           </Button>
-        </Stack>
+        </Stack> 
       </Stack>
       {selectedRows.length > 0 && (
         <Stack direction="row" spacing={1} justifyContent="flex-end">
