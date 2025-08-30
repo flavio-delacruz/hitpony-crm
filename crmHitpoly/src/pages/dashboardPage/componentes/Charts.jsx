@@ -13,26 +13,71 @@ const DashboardCharts = () => {
   });
 
   useEffect(() => {
-    const fetchProspectos = async () => {
+    const fetchAllProspectsAndProcess = async () => {
       if (!user?.id) return;
 
       try {
-        const response = await fetch(
+        let finalProspects = [];
+        const { id, id_tipo } = user;
+
+        // Lógica para traer prospectos de setters si el usuario es closer (id_tipo === 3)
+        if (id_tipo === "3" || id_tipo === 3) {
+          const asignacionesResponse = await fetch(
+            "https://apiweb.hitpoly.com/ajax/traerAsignacionesController.php",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ accion: "get" }),
+            }
+          );
+          const asignacionesData = await asignacionesResponse.json();
+
+          let setterIds = [];
+          if (asignacionesData.data && asignacionesData.data.length > 0) {
+            const asignacionDelCloser = asignacionesData.data.find(
+              (asignacion) => Number(asignacion.id_closer) === Number(id)
+            );
+            if (asignacionDelCloser && asignacionDelCloser.setters_ids) {
+              try {
+                const parsedSetters = JSON.parse(asignacionDelCloser.setters_ids);
+                if (Array.isArray(parsedSetters)) {
+                  setterIds = parsedSetters;
+                }
+              } catch (e) {
+                console.error("Error parsing setters_ids:", e);
+              }
+            }
+          }
+          const promises = setterIds.map((setterId) =>
+            fetch("https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ funcion: "getProspectos", id: setterId }),
+            }).then((res) => res.json())
+          );
+          const allProspectsFromSetters = await Promise.all(promises);
+          finalProspects = allProspectsFromSetters.flatMap((data) => data.resultado || []);
+        }
+
+        // Traer los prospectos del usuario actual
+        const userProspectsResponse = await fetch(
           "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              funcion: "getProspectos",
-              id: user.id,
-            }),
+            body: JSON.stringify({ funcion: "getProspectos", id: id }),
           }
         );
+        const userProspectsData = await userProspectsResponse.json();
+        const prospectsFromUser = userProspectsData.resultado || [];
 
-        const data = await response.json();
-        if (!data.success || !Array.isArray(data.resultado)) return;
+        // Combinar todos los prospectos
+        finalProspects =
+          id_tipo === "3" || id_tipo === 3
+            ? [...finalProspects, ...prospectsFromUser]
+            : prospectsFromUser;
 
-        const resultado = data.resultado;
+        const resultado = finalProspects;
         const hoy = new Date();
         const mesesLabels = [];
 
@@ -42,7 +87,7 @@ const DashboardCharts = () => {
 
         for (let i = 3; i >= 0; i--) {
           const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
-          const mes = fecha.toLocaleString("default", { month: "short" });
+          const mes = fecha.toLocaleString("es-ES", { month: "short" });
           const label = `${mes} ${fecha.getFullYear()}`;
           mesesLabels.push(label);
         }
@@ -67,10 +112,16 @@ const DashboardCharts = () => {
           perdidosPorMes,
         });
       } catch (error) {
+        setProspectosPorMes({
+          meses: [],
+          totalPorMes: [],
+          ganadosPorMes: [],
+          perdidosPorMes: [],
+        });
       }
     };
 
-    fetchProspectos();
+    fetchAllProspectsAndProcess();
   }, [user]);
 
   const { meses, totalPorMes, ganadosPorMes, perdidosPorMes } = prospectosPorMes;

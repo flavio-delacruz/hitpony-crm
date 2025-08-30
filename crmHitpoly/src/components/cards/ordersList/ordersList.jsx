@@ -13,27 +13,41 @@ import { useAuth } from "../../../context/AuthContext";
 
 const OrdersList = () => {
   const { user } = useAuth();
-  const [orders, setOrders] = useState([]); 
+  const [orders, setOrders] = useState([]);
   const dataAnteriorRef = useRef([]);
 
   useEffect(() => {
-    const savedOrders = localStorage.getItem("orders");
+    // Lectura de localStorage
+    const savedOrdersData = localStorage.getItem("orders");
+    if (savedOrdersData) {
+      const parsedOrdersData = JSON.parse(savedOrdersData);
+      // Solo carga las órdenes si pertenecen al usuario actual
+      if (parsedOrdersData.userId === user?.id) {
+        setOrders(parsedOrdersData.list);
+        console.log("Órdenes cargadas de localStorage para el usuario actual:", parsedOrdersData.list);
+      } else {
+        console.log("Ignorando órdenes de localStorage, no coinciden con el usuario actual.");
+        setOrders([]);
+      }
+    }
+
     const savedDataAnterior = localStorage.getItem("dataAnterior");
-
-    if (savedOrders) {
-      setOrders(JSON.parse(savedOrders)); 
-    }
-
     if (savedDataAnterior) {
-      dataAnteriorRef.current = JSON.parse(savedDataAnterior); 
+      dataAnteriorRef.current = JSON.parse(savedDataAnterior);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    if (orders.length > 0) {
-      localStorage.setItem("orders", JSON.stringify(orders)); 
+    // Lógica para guardar las órdenes en localStorage
+    if (orders.length > 0 && user) {
+      const ordersToSave = {
+        userId: user.id,
+        list: orders
+      };
+      localStorage.setItem("orders", JSON.stringify(ordersToSave));
+      console.log("Órdenes guardadas en localStorage:", ordersToSave);
     }
-  }, [orders]);
+  }, [orders, user]);
 
   useEffect(() => {
     if (!user) return;
@@ -53,9 +67,15 @@ const OrdersList = () => {
           }
         );
 
+        console.log("Respuesta completa de la API:", response.data);
+
         const nuevosDatos = Array.isArray(response.data.resultado)
           ? response.data.resultado
           : [];
+
+        console.log("Comparando...");
+        console.log("Datos anteriores (dataAnteriorRef):", dataAnteriorRef.current);
+        console.log("Nuevos datos de la API:", nuevosDatos);
 
         const nuevosEventos = [];
 
@@ -73,7 +93,8 @@ const OrdersList = () => {
                   nuevo.hasOwnProperty(key) &&
                   anterior.hasOwnProperty(key) &&
                   nuevo[key] !== anterior[key] &&
-                  key !== "updated_at"
+                  key !== "updated_at" &&
+                  key !== "usuario_master_id" // Ignorar este campo en la comparación de diferencias
                 ) {
                   diferencias.push(
                     `${anterior[key] ?? "vacío"} → ${nuevo[key] ?? "vacío"}`
@@ -83,10 +104,9 @@ const OrdersList = () => {
 
               if (diferencias.length > 0) {
                 const detallesFormateados = diferencias.join("\n");
-
                 nuevosEventos.push({
                   id: nuevo.id + "-update-" + Date.now(),
-                  icon: "update", 
+                  icon: "update",
                   name: `Actualización: ${nuevo.nombre || ""} ${nuevo.apellido || ""}`,
                   detalles: detallesFormateados,
                   date: `📅 (${new Date().toLocaleDateString()}, ${new Date().toLocaleTimeString([], {
@@ -94,6 +114,7 @@ const OrdersList = () => {
                     minute: "2-digit",
                   })})`,
                   timestamp: new Date().toISOString(),
+                  usuario_master_id: nuevo.usuario_master_id,
                 });
               }
             }
@@ -105,7 +126,7 @@ const OrdersList = () => {
             if (!nuevosIds.includes(anterior.id)) {
               nuevosEventos.push({
                 id: anterior.id + "-delete-" + Date.now(),
-                icon: "delete", 
+                icon: "delete",
                 name: `Eliminado: ${anterior.nombre || ""} ${anterior.apellido || ""}`,
                 detalles: "El prospecto fue eliminado.",
                 date: `📅 (${new Date().toLocaleDateString()}, ${new Date().toLocaleTimeString([], {
@@ -113,13 +134,17 @@ const OrdersList = () => {
                   minute: "2-digit",
                 })})`,
                 timestamp: new Date().toISOString(),
+                usuario_master_id: anterior.usuario_master_id,
               });
             }
           });
         }
 
+        console.log("Nuevos eventos generados:", nuevosEventos);
+
         dataAnteriorRef.current = nuevosDatos;
-        localStorage.setItem("dataAnterior", JSON.stringify(nuevosDatos)); 
+        localStorage.setItem("dataAnterior", JSON.stringify(nuevosDatos));
+        console.log("Guardando datos anteriores en localStorage:", nuevosDatos);
 
         if (nuevosEventos.length > 0) {
           setOrders((prev) => {
@@ -127,16 +152,18 @@ const OrdersList = () => {
             const unicos = Array.from(
               new Map(nuevos.map((item) => [item.id, item])).values()
             );
-            return unicos.slice(0, 50); 
+            console.log("Estado de 'orders' actualizado:", unicos.slice(0, 50));
+            return unicos.slice(0, 50);
           });
         }
       } catch (error) {
+        console.error("Error al obtener los prospectos:", error);
       }
     };
 
     fetchData();
     const interval = setInterval(fetchData, 10000);
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, [user]);
 
   const getIcon = (iconType) => {
@@ -160,7 +187,7 @@ const OrdersList = () => {
           {orders.map((order) => (
             <ListItem key={order.id} alignItems="flex-start">
               <ListItemIcon>
-                {getIcon(order.icon)} 
+                {getIcon(order.icon)}
               </ListItemIcon>
               <ListItemText
                 primary={order.name}

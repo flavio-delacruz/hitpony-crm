@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { TextField, Select, MenuItem, FormControl, InputLabel, Box, Stack } from '@mui/material';
 
 const ProspectFilter = ({ columns, filterModel, setFilterModel, rows }) => {
   const [nombreFilter, setNombreFilter] = useState('');
@@ -9,7 +9,6 @@ const ProspectFilter = ({ columns, filterModel, setFilterModel, rows }) => {
     const newFilterModel = { items: [] };
 
     if (nombreFilter) {
-      // 🆕 Cambiamos el operador a 'startsWith' para buscar desde el inicio
       newFilterModel.items.push({
         field: 'nombre',
         operator: 'startsWith',
@@ -31,17 +30,17 @@ const ProspectFilter = ({ columns, filterModel, setFilterModel, rows }) => {
   const estadoOptions = [...new Set(rows.map(row => row.estado_contacto))];
 
   return (
-    <div style={{ display: 'flex', gap: '16px', padding: '16px' }}>
+    <Stack direction="row" spacing={2} sx={{ width: {xs: "100%", md: "50%",}, mr: {xs: "0", md: 2}}}>
       <TextField
         label="Filtrar por Nombre"
         value={nombreFilter}
         onChange={(e) => setNombreFilter(e.target.value)}
-        size="small" 
-        sx={{ minWidth: 200 }} 
+        size="small"
+        sx={{ flexGrow: 1 }}
       />
       <FormControl
-        size="small" 
-        sx={{ minWidth: 200 }} 
+        size="small"
+        sx={{ flexGrow: 1 }} 
       >
         <InputLabel id="estado-select-label">Filtrar por Estado</InputLabel>
         <Select
@@ -57,7 +56,7 @@ const ProspectFilter = ({ columns, filterModel, setFilterModel, rows }) => {
           ))}
         </Select>
       </FormControl>
-    </div>
+    </Stack>
   );
 };
 

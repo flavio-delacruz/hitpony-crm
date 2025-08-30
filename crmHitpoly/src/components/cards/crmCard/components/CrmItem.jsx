@@ -79,7 +79,7 @@ const CrmItem = ({ item, index }) => {
             >
               <EmailIcon sx={{ mr: 1, color: "black" }} />
               <Typography variant="body2">
-                {item.email || "Sin correo"}
+                {item.correo || "Sin correo"}
               </Typography>
             </Box>
           </Box>

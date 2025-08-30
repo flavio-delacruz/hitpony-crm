@@ -8,53 +8,21 @@ import {
   Typography,
   Box,
 } from "@mui/material";
-import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom"; // 👈 Importa useNavigate
-import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+import { useProspectos } from "../../context/ProspectosContext"; // ⭐ Importamos el hook del contexto
 
 function Search() {
-  const { user } = useAuth();
-  const navigate = useNavigate(); // 👈 Hook de navegación
-  const [prospectos, setProspectos] = useState([]);
+  // ⭐ Ahora obtenemos los prospectos directamente del contexto
+  const { prospectos, loadingProspectos } = useProspectos();
+
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [inputFocused, setInputFocused] = useState(false);
   const containerRef = useRef(null);
 
-  useEffect(() => {
-    const fetchProspects = async () => {
-      try {
-        const response = await fetch(
-          "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              funcion: "getProspectos",
-              id: user?.id || 0,
-            }),
-          }
-        );
-
-        const data = await response.json();
-
-        if (data.success && Array.isArray(data.resultado)) {
-          setProspectos(data.resultado);
-        } else {
-          throw new Error("Formato de datos incorrecto");
-        }
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Error al cargar datos",
-          text: "No se pudo obtener la lista de prospectos.",
-        });
-      }
-    };
-
-    if (user?.id) {
-      fetchProspects();
-    }
-  }, [user]);
+  // ⭐ Eliminamos el useEffect que hacía la llamada a la API, ya no es necesario.
+  // La lista de prospectos ahora se gestiona globalmente en el contexto.
+  // Puedes usar el estado `loadingProspectos` si necesitas mostrar un indicador de carga.
 
   const resultadosFiltrados = searchTerm
     ? prospectos.filter((prospecto) =>
@@ -64,11 +32,14 @@ function Search() {
       )
     : [];
 
-  // 👇 Navegación al hacer clic en un contacto
-  const handleSelectProspecto = (id) => {
-    if (id) {
-      navigate(`/pagina-de-contacto/${id}`);
+  const handleSelectProspecto = (prospecto) => {
+    // 💡 Usa la lógica de navegación para pasar el nombre y apellido si los necesitas
+    // Esto es una mejora sobre la simple navegación por ID
+    if (prospecto && prospecto.id) {
+        const slug = `${prospecto.nombre?.toLowerCase().replace(/\s+/g, '-')}-${prospecto.apellido?.toLowerCase().replace(/\s+/g, '-')}`;
+        navigate(`/pagina-de-contacto/${slug}-${prospecto.id}`);
     } else {
+        console.error("No se pudo obtener el ID del prospecto.");
     }
   };
 
@@ -108,47 +79,53 @@ function Search() {
           }}
           elevation={4}
         >
-          <List>
-            {resultadosFiltrados.length > 0 ? (
-              resultadosFiltrados.map((prospecto, index) => (
-                <ListItem
-                  key={index}
-                  divider
-                  button // 👈 Hace el item clickable
-                  onClick={() => handleSelectProspecto(prospecto.id)} // 👈 Navega al contacto
-                >
+          {loadingProspectos ? (
+             <ListItem>
+                <ListItemText primary={<Typography variant="body2">Cargando contactos...</Typography>} />
+             </ListItem>
+          ) : (
+            <List>
+              {resultadosFiltrados.length > 0 ? (
+                resultadosFiltrados.map((prospecto, index) => (
+                  <ListItem
+                    key={index}
+                    divider
+                    button
+                    onClick={() => handleSelectProspecto(prospecto)}
+                  >
+                    <ListItemText
+                      primary={`${prospecto.nombre} ${prospecto.apellido}`}
+                      secondary={`Correo: ${prospecto.correo}`}
+                      primaryTypographyProps={{
+                        sx: {
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        },
+                      }}
+                      secondaryTypographyProps={{
+                        sx: {
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        },
+                      }}
+                    />
+                  </ListItem>
+                ))
+              ) : (
+                <ListItem>
                   <ListItemText
-                    primary={`${prospecto.nombre} ${prospecto.apellido}`}
-                    secondary={`Correo: ${prospecto.correo}`}
-                    primaryTypographyProps={{
-                      sx: {
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      },
-                    }}
-                    secondaryTypographyProps={{
-                      sx: {
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      },
-                    }}
+                    primary={
+                      <Typography variant="body2">
+                        No se encontraron contactos.
+                      </Typography>
+                    }
                   />
                 </ListItem>
-              ))
-            ) : (
-              <ListItem>
-                <ListItemText
-                  primary={
-                    <Typography variant="body2">
-                      No se encontraron contactos.
-                    </Typography>
-                  }
-                />
-              </ListItem>
-            )}
-          </List>
+              )}
+            </List>
+          )}
         </Paper>
       )}
     </Box>

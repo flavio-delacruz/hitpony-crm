@@ -1,26 +1,26 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Stack from "@mui/material/Stack";
-import { Button, Typography } from "@mui/material";
+import { Button, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useAuth } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { columns } from "./components/columns";
+import { columns as defaultColumns } from "./components/columns";
 import CreateList from "./components/CreateList";
 import Swal from "sweetalert2";
 import ProspectFilter from "./components/Filter";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
-// Importamos los componentes del modal y los iconos
 import AddModal from "../../modals/addModal/addModal";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ShareIcon from '@mui/icons-material/Share';
-// 🆕 Importamos el modal de compartir
-import ShareLinkModal from "../../forms/clientesPotenciales/ShareLinkModal"; 
+import ShareLinkModal from "../../forms/clientesPotenciales/ShareLinkModal";
 
 const googleBlue = "#4285F4";
 
 function DataTable() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [prospectos, setProspectos] = useState(() => {
     try {
@@ -48,9 +48,19 @@ function DataTable() {
     page: 0,
   });
 
-  // 🆕 Estados para los modales
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false); // 🆕 Nuevo estado para el modal de compartir
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  const mobileColumns = [
+    {
+      field: 'nombreCompleto',
+      headerName: 'Prospecto',
+      flex: 1,
+      valueGetter: (value, row) => `${row.nombreProspecto || ''} ${row.apellido || ''}`,
+    },
+  ];
+
+  const columnsToShow = isMobile ? mobileColumns : defaultColumns;
 
   const fetchAllProspects = useCallback(async () => {
     if (!user || !user.id || isCheckingForChanges.current) {
@@ -64,6 +74,20 @@ function DataTable() {
     try {
       let allProspects = [];
       const { id, id_tipo } = user;
+
+      const usersResponse = await fetch("https://apiweb.hitpoly.com/ajax/traerUsuariosController.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accion: "getDataUsuarios" }),
+      });
+      const usersData = await usersResponse.json();
+
+      const usersMap = {};
+      if (usersData.data) {
+        usersData.data.forEach(u => {
+          usersMap[u.id] = u;
+        });
+      }
 
       if (id_tipo === "3" || id_tipo === 3) {
         const asignacionesResponse = await fetch(
@@ -124,10 +148,17 @@ function DataTable() {
           ? [...allProspects, ...prospectsFromUser]
           : prospectsFromUser;
 
-      const nuevosProspectosFormatted = finalProspects.map((item) => ({
-        id: item.id,
-        ...item,
-      }));
+      const nuevosProspectosFormatted = finalProspects.map((item) => {
+        const propietario = usersMap[item.usuario_master_id];
+        const nombreCompletoPropietario = propietario ? `${propietario.nombre} ${propietario.apellido}` : 'Desconocido';
+
+        return {
+          id: item.id,
+          nombreProspecto: item.nombre,
+          ...item,
+          nombrePropietario: nombreCompletoPropietario,
+        };
+      });
 
       setProspectos(nuevosProspectosFormatted);
     } catch (error) {
@@ -139,7 +170,7 @@ function DataTable() {
   }, [user]);
 
   const deleteProspectsFromList = useCallback(
-    async (prospectIds) => { 
+    async (prospectIds) => {
       const previousProspects = [...prospectos];
 
       const updatedProspects = previousProspects.filter(
@@ -150,7 +181,7 @@ function DataTable() {
       try {
         const deletePromises = prospectIds.map((prospectId) => {
           const bodyData = JSON.stringify({
-            funcion: "delete", 
+            funcion: "delete",
             id: prospectId,
           });
           return fetch(
@@ -279,7 +310,6 @@ function DataTable() {
     setIsAddModalOpen(true);
   };
 
-  // 🆕 La nueva función que abre el modal de compartir
   const handleShareForm = () => {
     setIsShareModalOpen(true);
   };
@@ -294,33 +324,62 @@ function DataTable() {
 
   return (
     <Stack spacing={2}>
-      <Stack 
-        direction="row" 
-        alignItems="center" 
+      {/* Botones para la vista de teléfono */}
+      {isMobile && (
+        <Stack direction="row" spacing={2} sx={{ mb: 2, width: '100%' }}>
+          <Button
+            variant="outlined"
+            startIcon={<ShareIcon />}
+            onClick={handleShareForm}
+            sx={{ flexGrow: 1 }}
+          >
+            Formularios
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<PersonAddIcon />}
+            onClick={handleAddNew}
+            sx={{ flexGrow: 1 }}
+          >
+            Añadir
+          </Button>
+        </Stack>
+      )}
+
+      {/* Fila del filtro y los botones de escritorio */}
+      <Stack
+        direction="row"
+        alignItems="center"
         justifyContent="space-between"
+        sx={{ width: '100%', }}
       >
+        {/* ⭐ El filtro ahora se renderiza siempre */}
         <ProspectFilter
-          columns={columns}
+          columns={columnsToShow}
           filterModel={filterModel}
           setFilterModel={setFilterModel}
           rows={prospectos}
+          sx={{ flexGrow: 1 }}
         />
-        <Stack direction="row" spacing={2}>
-          <Button 
-            variant="outlined" 
-            startIcon={<ShareIcon />} 
-            onClick={handleShareForm}
-          >
-            Compartir Formulario
-          </Button>
-          <Button 
-            variant="contained" 
-            startIcon={<PersonAddIcon />} 
-            onClick={handleAddNew}
-          >
-            Añadir Nuevo Prospecto
-          </Button>
-        </Stack> 
+        {/* Los botones de escritorio se mantienen visibles solo en escritorio */}
+        {!isMobile && (
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="outlined"
+              startIcon={<ShareIcon />}
+              onClick={handleShareForm}
+            >
+              Formularios
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<PersonAddIcon />}
+              onClick={handleAddNew}
+            >
+              Añadir
+            </Button>
+          </Stack>
+        )}
       </Stack>
       {selectedRows.length > 0 && (
         <Stack direction="row" spacing={1} justifyContent="flex-end">
@@ -361,7 +420,7 @@ function DataTable() {
       >
         <DataGrid
           rows={prospectos}
-          columns={columns}
+          columns={columnsToShow}
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
           pageSizeOptions={[5, 10, 50, 100]}
@@ -396,7 +455,6 @@ function DataTable() {
           onListCreated={handleListCreated}
         />
       )}
-      {/* Agregamos el AddModal aquí */}
       <AddModal
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
@@ -405,7 +463,6 @@ function DataTable() {
           setIsAddModalOpen(false);
         }}
       />
-      {/* 🆕 Renderizamos el nuevo modal de compartir aquí */}
       <ShareLinkModal
         open={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
