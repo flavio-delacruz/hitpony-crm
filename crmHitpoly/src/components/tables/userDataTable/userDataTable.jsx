@@ -1,3 +1,4 @@
+// DataTable.jsx
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Stack from "@mui/material/Stack";
 import { Button, Typography, useMediaQuery, useTheme } from "@mui/material";
@@ -27,7 +28,6 @@ function DataTable() {
       const localData = localStorage.getItem("prospectos");
       return localData ? JSON.parse(localData) : [];
     } catch (error) {
-      console.error("Error al cargar prospectos desde localStorage", error);
       return [];
     }
   });
@@ -50,6 +50,9 @@ function DataTable() {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    estado_contacto: !isMobile,
+  });
 
   const mobileColumns = [
     {
@@ -57,6 +60,11 @@ function DataTable() {
       headerName: 'Prospecto',
       flex: 1,
       valueGetter: (value, row) => `${row.nombreProspecto || ''} ${row.apellido || ''}`,
+    },
+    {
+      field: 'estado_contacto',
+      headerName: 'Estado',
+      width: 150,
     },
   ];
 
@@ -112,7 +120,6 @@ function DataTable() {
                 setterIds = parsedSetters;
               }
             } catch (e) {
-              console.error("Error parsing setters_ids:", e);
             }
           }
         }
@@ -157,6 +164,7 @@ function DataTable() {
           nombreProspecto: item.nombre,
           ...item,
           nombrePropietario: nombreCompletoPropietario,
+          estado: item.estado_contacto || 'Sin estado',
         };
       });
 
@@ -219,7 +227,6 @@ function DataTable() {
           });
         }
       } catch (error) {
-        console.error("Error de conexión al eliminar los prospectos:", error);
         setProspectos(previousProspects);
         Swal.fire({
           icon: "error",
@@ -243,7 +250,6 @@ function DataTable() {
         localStorage.setItem("prospectos", JSON.stringify(prospectos));
       }
     } catch (error) {
-      console.error("Error al guardar prospectos en localStorage", error);
     }
   }, [prospectos]);
 
@@ -324,14 +330,13 @@ function DataTable() {
 
   return (
     <Stack spacing={2}>
-      {/* Botones para la vista de teléfono */}
       {isMobile && (
         <Stack direction="row" spacing={2} sx={{ mb: 2, width: '100%' }}>
           <Button
             variant="outlined"
             startIcon={<ShareIcon />}
             onClick={handleShareForm}
-            sx={{ flexGrow: 1 }}
+            sx={{ flex: 1 }}
           >
             Formularios
           </Button>
@@ -339,21 +344,19 @@ function DataTable() {
             variant="contained"
             startIcon={<PersonAddIcon />}
             onClick={handleAddNew}
-            sx={{ flexGrow: 1 }}
+            sx={{ flex: 1 }}
           >
             Añadir
           </Button>
         </Stack>
       )}
 
-      {/* Fila del filtro y los botones de escritorio */}
       <Stack
         direction="row"
         alignItems="center"
         justifyContent="space-between"
         sx={{ width: '100%', }}
       >
-        {/* ⭐ El filtro ahora se renderiza siempre */}
         <ProspectFilter
           columns={columnsToShow}
           filterModel={filterModel}
@@ -361,7 +364,6 @@ function DataTable() {
           rows={prospectos}
           sx={{ flexGrow: 1 }}
         />
-        {/* Los botones de escritorio se mantienen visibles solo en escritorio */}
         {!isMobile && (
           <Stack direction="row" spacing={2}>
             <Button
@@ -431,6 +433,7 @@ function DataTable() {
           filterModel={filterModel}
           onFilterModelChange={handleFilterModelChange}
           onRowClick={handleRowClick}
+          columnVisibilityModel={columnVisibilityModel}
           sx={{
             fontWeight: "bold",
             "& .MuiDataGrid-cell": {
@@ -459,7 +462,6 @@ function DataTable() {
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSave={(newUser) => {
-          console.log("Nuevo usuario guardado:", newUser);
           setIsAddModalOpen(false);
         }}
       />

@@ -99,9 +99,9 @@ function App() {
             <Route
               path="/gestor-de-asignaciones"
               element={
-                <ProtectedRoute requiredRoles={["admin",]}>
+                <ProtectedRouteWithRole requiredRoles={["admin"]}>
                   <GestorDeAsignaciones />
-                </ProtectedRoute>
+                </ProtectedRouteWithRole>
               }
             />
 

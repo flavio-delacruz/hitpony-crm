@@ -1,4 +1,3 @@
-// src/pages/AdminDashboard.jsx
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Typography,
@@ -10,7 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import LayoutAdmin from "../../components/layout/layoutAdmin";
 import ProspectsTable from "./components/ProspectsTable";
-import SearchSetterControl from "./components/SearchSetterControl";
+import SearchProspectControl from "./components/SearchSetterControl";
 import EstadoFilterControl from "./components/EstadoFilterControl";
 import Swal from "sweetalert2";
 import useAdminDashboardData from "./components/useAdminDashboardData";
@@ -44,26 +43,18 @@ const AdminDashboard = () => {
 
   const filteredData = useMemo(() => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    const matchingSetterIds = new Set();
-
-    data.forEach((item) => {
-      if (
-        (item.setterNombre || "").toLowerCase().includes(lowerCaseSearchTerm) ||
-        (item.setterApellido || "").toLowerCase().includes(lowerCaseSearchTerm) ||
-        (item.correoSetter || "").toLowerCase().includes(lowerCaseSearchTerm) ||
-        (item.telefonoSetter || "").includes(lowerCaseSearchTerm)
-      ) {
-        matchingSetterIds.add(item.setterId);
-      }
-    });
 
     return data.filter((item) => {
-      const belongsToMatchedSetter = searchTerm
-        ? matchingSetterIds.has(item.setterId)
-        : true;
+      const matchesSearch =
+        (item.nombre || "").toLowerCase().includes(lowerCaseSearchTerm) ||
+        (item.apellido || "").toLowerCase().includes(lowerCaseSearchTerm) ||
+        (item.correo || "").toLowerCase().includes(lowerCaseSearchTerm) ||
+        (item.telefono || "").includes(lowerCaseSearchTerm);
+      
       const matchesEstado =
         filtroEstado === "all" || item.estado_contacto === filtroEstado;
-      return belongsToMatchedSetter && matchesEstado;
+      
+      return matchesSearch && matchesEstado;
     });
   }, [data, searchTerm, filtroEstado]);
 
@@ -116,7 +107,7 @@ const AdminDashboard = () => {
             flexWrap: "wrap",
           }}
         >
-          <SearchSetterControl
+          <SearchProspectControl
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
           />

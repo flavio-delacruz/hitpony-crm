@@ -1,12 +1,11 @@
-// src/components/SearchSetterControl.jsx
 import React from "react";
 import { TextField, Box } from "@mui/material";
 
-const SearchSetterControl = ({ searchTerm, onSearchChange }) => {
+const SearchProspectControl = ({ searchTerm, onSearchChange }) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <TextField
-        label="Buscar Setter"
+        label="Buscar Prospecto"
         variant="outlined"
         fullWidth
         value={searchTerm}
@@ -16,4 +15,4 @@ const SearchSetterControl = ({ searchTerm, onSearchChange }) => {
   );
 };
 
-export default SearchSetterControl;
+export default SearchProspectControl;

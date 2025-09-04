@@ -14,6 +14,8 @@ import {
   MenuItem,
   OutlinedInput,
   IconButton,
+  Stack,
+  Chip,
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import LayoutAdmin from "../../../components/layout/layoutAdmin";
@@ -29,11 +31,16 @@ const GestorDeAsignaciones = () => {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
 
-  const ENDPOINT_GET_USERS = "https://apiweb.hitpoly.com/ajax/traerUsuariosController.php";
-  const ENDPOINT_TRAER_ASIGNACIONES = "https://apiweb.hitpoly.com/ajax/traerAsignacionesController.php";
-  const ENDPOINT_ASIGNAR = "https://apiweb.hitpoly.com/ajax/asignarSetterCloserController.php";
-  const ENDPOINT_ELIMINAR = "https://apiweb.hitpoly.com/ajax/deleteSetterListController.php";
-  const ENDPOINT_AGREGAR = "https://apiweb.hitpoly.com/ajax/cargarSetterAListController.php";
+  const ENDPOINT_GET_USERS =
+    "https://apiweb.hitpoly.com/ajax/traerUsuariosController.php";
+  const ENDPOINT_TRAER_ASIGNACIONES =
+    "https://apiweb.hitpoly.com/ajax/traerAsignacionesController.php";
+  const ENDPOINT_ASIGNAR =
+    "https://apiweb.hitpoly.com/ajax/asignarSetterCloserController.php";
+  const ENDPOINT_ELIMINAR =
+    "https://apiweb.hitpoly.com/ajax/deleteSetterListController.php";
+  const ENDPOINT_AGREGAR =
+    "https://apiweb.hitpoly.com/ajax/cargarSetterAListController.php";
 
   const obtenerUsuarios = async () => {
     setCargando(true);
@@ -48,8 +55,12 @@ const GestorDeAsignaciones = () => {
 
       if (datos.data && Array.isArray(datos.data)) {
         setAllUsers(datos.data);
-        const closersFiltrados = datos.data.filter((user) => user.id_tipo === 3);
-        const settersFiltrados = datos.data.filter((user) => user.id_tipo === 2);
+        const closersFiltrados = datos.data.filter(
+          (user) => user.id_tipo === 3
+        );
+        const settersFiltrados = datos.data.filter(
+          (user) => user.id_tipo === 2
+        );
         setClosers(closersFiltrados);
         setSetters(settersFiltrados);
       }
@@ -84,6 +95,7 @@ const GestorDeAsignaciones = () => {
         setAsignaciones([]);
       }
     } catch (err) {
+      setError("No se pudieron cargar las asignaciones.");
     }
   };
 
@@ -103,6 +115,7 @@ const GestorDeAsignaciones = () => {
       setSelectedCloserId("");
       setSettersToAssign([]);
     } catch (err) {
+      setError("No se pudieron asignar los setters.");
     }
   };
 
@@ -122,6 +135,7 @@ const GestorDeAsignaciones = () => {
       setSelectedCloserId("");
       setSettersToAssign([]);
     } catch (err) {
+      setError("No se pudo agregar el setter.");
     }
   };
 
@@ -139,6 +153,7 @@ const GestorDeAsignaciones = () => {
       await respuesta.json();
       obtenerAsignaciones();
     } catch (err) {
+      setError("No se pudo eliminar el setter.");
     }
   };
 
@@ -151,18 +166,23 @@ const GestorDeAsignaciones = () => {
     const {
       target: { value },
     } = event;
-    setSettersToAssign(typeof value === "string" ? value.split(",").map(Number) : value);
+    setSettersToAssign(
+      typeof value === "string" ? value.split(",").map(Number) : value
+    );
   };
-  
+
   const handleCloserToViewChange = (event) => {
     setCloserToViewId(event.target.value);
   };
 
-
   const handleAsignar = () => {
     if (selectedCloserId && settersToAssign.length > 0) {
-      const asignacionExistente = asignaciones.find((a) => a.id_closer === selectedCloserId);
-      const settersYaAsignadosACloser = asignacionExistente ? asignacionExistente.setters_ids : [];
+      const asignacionExistente = asignaciones.find(
+        (a) => a.id_closer === selectedCloserId
+      );
+      const settersYaAsignadosACloser = asignacionExistente
+        ? asignacionExistente.setters_ids
+        : [];
 
       const nuevosSetters = settersToAssign.filter(
         (setterId) => !settersYaAsignadosACloser.includes(setterId)
@@ -194,7 +214,9 @@ const GestorDeAsignaciones = () => {
     (setter) => !todosLosSettersAsignados.includes(setter.id)
   );
 
-  const displayedAsignacion = asignaciones.find((a) => a.id_closer === closerToViewId);
+  const displayedAsignacion = asignaciones.find(
+    (a) => a.id_closer === closerToViewId
+  );
 
   const getCloserName = (id) => {
     const closer = closers.find((c) => c.id === id);
@@ -208,20 +230,24 @@ const GestorDeAsignaciones = () => {
 
   return (
     <LayoutAdmin title={"Gestor de Asignaciones"}>
-      <Box sx={{ 
-        p: 4, 
-        display: 'flex', 
-        gap: 4, 
-        width: '100%',
-        flexDirection: { xs: 'column', md: 'row' }
-      }}>
-        <Box sx={{ 
-            flex: { xs: 1, md: '0 0 300px' },
-            p: 2, 
-            border: '1px solid #ddd', 
-            borderRadius: 2, 
-            height: 'fit-content' 
-        }}>
+      <Box
+        sx={{
+          p: 4,
+          display: "flex",
+          gap: 4,
+          width: "100%",
+          flexDirection: { xs: "column", md: "row" },
+        }}
+      >
+        <Box
+          sx={{
+            flex: { xs: 1, md: "0 0 300px" },
+            p: 2,
+            border: "1px solid #ddd",
+            borderRadius: 2,
+            height: "fit-content",
+          }}
+        >
           <Typography variant="h6" component="h2" gutterBottom>
             Asignar Setters
           </Typography>
@@ -233,7 +259,7 @@ const GestorDeAsignaciones = () => {
               label="Seleccionar Closer"
               onChange={handleCloserChange}
             >
-              {closers.map(closer => (
+              {closers.map((closer) => (
                 <MenuItem key={closer.id} value={closer.id}>
                   {closer.nombre} {closer.apellido}
                 </MenuItem>
@@ -243,7 +269,9 @@ const GestorDeAsignaciones = () => {
 
           {selectedCloserId && (
             <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel id="setters-select-label">Seleccionar Setters</InputLabel>
+              <InputLabel id="setters-select-label">
+                Seleccionar Setters
+              </InputLabel>
               <Select
                 labelId="setters-select-label"
                 multiple
@@ -251,12 +279,30 @@ const GestorDeAsignaciones = () => {
                 onChange={handleSettersChange}
                 input={<OutlinedInput label="Seleccionar Setters" />}
                 renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map((value) => getSetterName(value))}
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip key={value} label={getSetterName(value)} />
+                    ))}
                   </Box>
                 )}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      width: { xs: "80%", sm: "25%" },
+                      ml: { xs: 0, sm: 35 }, // 👈 en móviles 0, desde sm hacia arriba 35
+                    },
+                  },
+                  anchorOrigin: {
+                    vertical: "bottom",
+                    horizontal: "left",
+                  },
+                  transformOrigin: {
+                    vertical: "top",
+                    horizontal: "left",
+                  },
+                }}
               >
-                {settersDisponibles.map(setter => (
+                {settersDisponibles.map((setter) => (
                   <MenuItem key={setter.id} value={setter.id}>
                     {setter.nombre} {setter.apellido}
                   </MenuItem>
@@ -265,8 +311,8 @@ const GestorDeAsignaciones = () => {
             </FormControl>
           )}
 
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             fullWidth
             disabled={!selectedCloserId || settersToAssign.length === 0}
             onClick={handleAsignar}
@@ -276,7 +322,14 @@ const GestorDeAsignaciones = () => {
         </Box>
 
         {/* Panel Derecho: Vista de Asignaciones */}
-        <Box sx={{ flex: 1, p: 2, border: '1px solid #ddd', borderRadius: 2 }}>
+        <Box
+          sx={{
+            flex: 1,
+            p: 2,
+            border: "1px solid #ddd",
+            borderRadius: 2,
+          }}
+        >
           <Typography variant="h6" component="h2" gutterBottom>
             Asignaciones Actuales
           </Typography>
@@ -294,121 +347,136 @@ const GestorDeAsignaciones = () => {
           )}
 
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="closer-view-select-label">Ver Asignaciones de Closer</InputLabel>
+            <InputLabel id="closer-view-select-label">
+              Ver Asignaciones de Closer
+            </InputLabel>
             <Select
-                labelId="closer-view-select-label"
-                value={closerToViewId}
-                label="Ver Asignaciones de Closer"
-                onChange={handleCloserToViewChange}
+              labelId="closer-view-select-label"
+              value={closerToViewId}
+              label="Ver Asignaciones de Closer"
+              onChange={handleCloserToViewChange}
             >
-                <MenuItem value="">
-                    <em>Todos los closers</em>
+              <MenuItem value="">
+                <em>Todos los closers</em>
+              </MenuItem>
+              {closers.map((closer) => (
+                <MenuItem key={closer.id} value={closer.id}>
+                  {closer.nombre} {closer.apellido}
                 </MenuItem>
-                {closers.map(closer => (
-                    <MenuItem key={closer.id} value={closer.id}>
-                        {closer.nombre} {closer.apellido}
-                    </MenuItem>
-                ))}
+              ))}
             </Select>
           </FormControl>
-          
-          <Box sx={{ maxHeight: 450, overflowY: 'auto' }}>
+
+          <Box sx={{ maxHeight: 450, overflowY: "auto" }}>
             <List>
-                {closerToViewId ? (
-                    displayedAsignacion ? (
-                      <>
-                        <ListItem>
-                            <ListItemText 
-                                primary={
-                                    <Typography variant="h6">
-                                        {getCloserName(displayedAsignacion.id_closer)}
-                                    </Typography>
-                                }
-                                secondary="Setters Asignados:"
-                            />
-                        </ListItem>
-                        <List sx={{ width: '100%' }}>
-                            {displayedAsignacion.setters_ids.length > 0 ? (
-                                displayedAsignacion.setters_ids.map((setterId, setterIndex) => (
-                                    <ListItem
-                                        key={setterIndex}
-                                        secondaryAction={
-                                            <IconButton
-                                                edge="end"
-                                                aria-label="eliminar"
-                                                onClick={() => eliminarSetter(displayedAsignacion.id_closer, setterId)}
-                                            >
-                                                <DeleteIcon color="error" />
-                                            </IconButton>
-                                        }
-                                    >
-                                        <ListItemText primary={getSetterName(setterId)} />
-                                    </ListItem>
-                                ))
-                            ) : (
-                                <ListItem>
-                                    <ListItemText primary="Ninguno" sx={{ fontStyle: 'italic' }} />
-                                </ListItem>
-                            )}
-                        </List>
-                      </>
-                    ) : (
-                      <ListItem>
-                        <ListItemText primary="Este closer no tiene asignaciones." />
-                      </ListItem>
-                    )
-                ) : (
-                    asignaciones.length > 0 ? (
-                      asignaciones.map((asignacion, index) => (
-                        <ListItem 
-                          key={index} 
-                          sx={{ 
-                            flexDirection: 'column', 
-                            alignItems: 'flex-start',
-                            borderBottom: '1px solid #ddd',
-                            mb: 2
-                          }}
-                        >
-                          <ListItemText
-                            primary={
-                              <Typography variant="h6">
-                                {getCloserName(asignacion.id_closer)}
-                              </Typography>
-                            }
-                            secondary="Setters Asignados:"
-                          />
-                          <List sx={{ width: '100%' }}>
-                            {asignacion.setters_ids.length > 0 ? (
-                              asignacion.setters_ids.map((setterId, setterIndex) => (
-                                <ListItem
-                                  key={setterIndex}
-                                  secondaryAction={
-                                    <IconButton
-                                      edge="end"
-                                      aria-label="eliminar"
-                                      onClick={() => eliminarSetter(asignacion.id_closer, setterId)}
-                                    >
-                                      <DeleteIcon color="error" />
-                                    </IconButton>
+              {closerToViewId ? (
+                displayedAsignacion ? (
+                  <>
+                    <ListItem>
+                      <ListItemText
+                        primary={
+                          <Typography variant="h6">
+                            {getCloserName(displayedAsignacion.id_closer)}
+                          </Typography>
+                        }
+                        secondary="Setters Asignados:"
+                      />
+                    </ListItem>
+                    <List sx={{ width: "100%" }}>
+                      {displayedAsignacion.setters_ids.length > 0 ? (
+                        displayedAsignacion.setters_ids.map(
+                          (setterId, setterIndex) => (
+                            <ListItem
+                              key={setterIndex}
+                              secondaryAction={
+                                <IconButton
+                                  edge="end"
+                                  aria-label="eliminar"
+                                  onClick={() =>
+                                    eliminarSetter(
+                                      displayedAsignacion.id_closer,
+                                      setterId
+                                    )
                                   }
                                 >
-                                  <ListItemText primary={getSetterName(setterId)} />
-                                </ListItem>
-                              ))
-                            ) : (
-                              <ListItem>
-                                <ListItemText primary="Ninguno" sx={{ fontStyle: 'italic' }} />
-                              </ListItem>
-                            )}
-                          </List>
+                                  <DeleteIcon color="error" />
+                                </IconButton>
+                              }
+                            >
+                              <ListItemText primary={getSetterName(setterId)} />
+                            </ListItem>
+                          )
+                        )
+                      ) : (
+                        <ListItem>
+                          <ListItemText
+                            primary="Ninguno"
+                            sx={{ fontStyle: "italic" }}
+                          />
                         </ListItem>
-                      ))
-                    ) : (
-                      <ListItem>
-                        <ListItemText primary="No hay asignaciones actuales." />
-                      </ListItem>
-                    )
-                )}
+                      )}
+                    </List>
+                  </>
+                ) : (
+                  <ListItem>
+                    <ListItemText primary="Este closer no tiene asignaciones." />
+                  </ListItem>
+                )
+              ) : asignaciones.length > 0 ? (
+                asignaciones.map((asignacion, index) => (
+                  <ListItem
+                    key={index}
+                    sx={{
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      borderBottom: "1px solid #ddd",
+                      mb: 2,
+                    }}
+                  >
+                    <ListItemText
+                      primary={
+                        <Typography variant="h6">
+                          {getCloserName(asignacion.id_closer)}
+                        </Typography>
+                      }
+                      secondary="Setters Asignados:"
+                    />
+                    <List sx={{ width: "100%" }}>
+                      {asignacion.setters_ids.length > 0 ? (
+                        asignacion.setters_ids.map((setterId, setterIndex) => (
+                          <ListItem
+                            key={setterIndex}
+                            secondaryAction={
+                              <IconButton
+                                edge="end"
+                                aria-label="eliminar"
+                                onClick={() =>
+                                  eliminarSetter(asignacion.id_closer, setterId)
+                                }
+                              >
+                                <DeleteIcon color="error" />
+                              </IconButton>
+                            }
+                          >
+                            <ListItemText primary={getSetterName(setterId)} />
+                          </ListItem>
+                        ))
+                      ) : (
+                        <ListItem>
+                          <ListItemText
+                            primary="Ninguno"
+                            sx={{ fontStyle: "italic" }}
+                          />
+                        </ListItem>
+                      )}
+                    </List>
+                  </ListItem>
+                ))
+              ) : (
+                <ListItem>
+                  <ListItemText primary="No hay asignaciones actuales." />
+                </ListItem>
+              )}
             </List>
           </Box>
         </Box>
