@@ -98,6 +98,8 @@ const EditableField = ({ label, value, onChange }) => (
       onChange={(e) => onChange(e.target.value)}
       fullWidth
       margin="normal"
+      multiline={label === "Descripción" || label === "Productos de Interés"}
+      minRows={label === "Descripción" || label === "Productos de Interés" ? 2 : 1}
     />
   </Grid>
 );
@@ -123,6 +125,7 @@ export default function ContactInformation({ prospectId }) {
           const normalizedProspect = {
             ...prospect,
             email: prospect.email || prospect.correo,
+            productos_interes: prospect.productos_interes || "",
           };
           setContactData(normalizedProspect);
           setInitialData(normalizedProspect);
@@ -171,6 +174,7 @@ export default function ContactInformation({ prospectId }) {
       direccion: contactData.direccion,
       ciudad: contactData.ciudad,
       pais: contactData.pais,
+      productos_interes: contactData.productos_interes, // Se añade el campo aquí
     };
 
     setContactData((prev) => ({ ...prev, ...updatedData }));
@@ -278,6 +282,11 @@ export default function ContactInformation({ prospectId }) {
               enableSearch
             />
           </Grid>
+          <EditableField
+            label="Producto de Interés"
+            value={contactData.productos_interes}
+            onChange={updateField("productos_interes")}
+          />
           <EditableField
             label="Descripción"
             value={contactData.descripcion}

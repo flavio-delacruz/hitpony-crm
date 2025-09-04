@@ -56,6 +56,9 @@ const CrmItem = ({ item, index }) => {
             <Typography variant="body2" color="textSecondary">
               {item.descripcion || "Sin descripción"}
             </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {item.productos_interes || "Sin descripción"}
+            </Typography>
 
             <Box
               sx={{
