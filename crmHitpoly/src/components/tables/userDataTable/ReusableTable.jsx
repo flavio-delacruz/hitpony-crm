@@ -46,6 +46,7 @@ function ReusableTable({
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={pageSizeOptions}
         checkboxSelection
+        disableRowSelectionOnClick
         onRowSelectionModelChange={handleRowSelectionChange}
         rowSelectionModel={rowSelectionModel}
         onCellClick={onCellClick}
@@ -66,6 +67,19 @@ function ReusableTable({
             outline: "none",
           },
           border: "none",
+          "& .MuiDataGrid-menu": {
+            zIndex: 1500,
+          },
+          "& .MuiDataGrid-panel": {
+            zIndex: 1500,
+          },
+        }}
+        slotProps={{
+          basePopper: {
+            sx: {
+              zIndex: 1500,
+            },
+          },
         }}
       />
     </Paper>

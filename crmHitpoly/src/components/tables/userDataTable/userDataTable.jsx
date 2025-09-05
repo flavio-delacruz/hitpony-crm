@@ -11,8 +11,8 @@ import ProspectFilter from "./components/Filter";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import AddModal from "../../modals/addModal/addModal";
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import ShareIcon from '@mui/icons-material/Share';
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import ShareIcon from "@mui/icons-material/Share";
 import ShareLinkModal from "../../forms/clientesPotenciales/ShareLinkModal";
 
 const googleBlue = "#4285F4";
@@ -21,7 +21,7 @@ function DataTable() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [prospectos, setProspectos] = useState(() => {
     try {
@@ -31,6 +31,7 @@ function DataTable() {
       return [];
     }
   });
+
   const [loadingProspectos, setLoadingProspectos] = useState(false);
   const [errorProspectos, setErrorProspectos] = useState(null);
   const isCheckingForChanges = useRef(false);
@@ -47,7 +48,6 @@ function DataTable() {
     pageSize: 10,
     page: 0,
   });
-
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
@@ -56,14 +56,15 @@ function DataTable() {
 
   const mobileColumns = [
     {
-      field: 'nombreCompleto',
-      headerName: 'Prospecto',
+      field: "nombreCompleto",
+      headerName: "Prospecto",
       flex: 1,
-      valueGetter: (value, row) => `${row.nombreProspecto || ''} ${row.apellido || ''}`,
+      valueGetter: (value, row) =>
+        `${row.nombreProspecto || ""} ${row.apellido || ""}`,
     },
     {
-      field: 'estado_contacto',
-      headerName: 'Estado',
+      field: "estado_contacto",
+      headerName: "Estado",
       width: 150,
     },
   ];
@@ -74,7 +75,6 @@ function DataTable() {
     if (!user || !user.id || isCheckingForChanges.current) {
       return;
     }
-
     isCheckingForChanges.current = true;
     setLoadingProspectos(true);
     setErrorProspectos(null);
@@ -83,16 +83,18 @@ function DataTable() {
       let allProspects = [];
       const { id, id_tipo } = user;
 
-      const usersResponse = await fetch("https://apiweb.hitpoly.com/ajax/traerUsuariosController.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accion: "getDataUsuarios" }),
-      });
+      const usersResponse = await fetch(
+        "https://apiweb.hitpoly.com/ajax/traerUsuariosController.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ accion: "getDataUsuarios" }),
+        }
+      );
       const usersData = await usersResponse.json();
-
       const usersMap = {};
       if (usersData.data) {
-        usersData.data.forEach(u => {
+        usersData.data.forEach((u) => {
           usersMap[u.id] = u;
         });
       }
@@ -107,7 +109,6 @@ function DataTable() {
           }
         );
         const asignacionesData = await asignacionesResponse.json();
-
         let setterIds = [];
         if (asignacionesData.data && asignacionesData.data.length > 0) {
           const asignacionDelCloser = asignacionesData.data.find(
@@ -119,10 +120,10 @@ function DataTable() {
               if (Array.isArray(parsedSetters)) {
                 setterIds = parsedSetters;
               }
-            } catch (e) {
-            }
+            } catch (e) {}
           }
         }
+
         const promises = setterIds.map((setterId) =>
           fetch(
             "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
@@ -133,6 +134,7 @@ function DataTable() {
             }
           ).then((res) => res.json())
         );
+
         const allProspectsFromSetters = await Promise.all(promises);
         allProspects = allProspectsFromSetters.flatMap(
           (data) => data.resultado || []
@@ -157,14 +159,16 @@ function DataTable() {
 
       const nuevosProspectosFormatted = finalProspects.map((item) => {
         const propietario = usersMap[item.usuario_master_id];
-        const nombreCompletoPropietario = propietario ? `${propietario.nombre} ${propietario.apellido}` : 'Desconocido';
+        const nombreCompletoPropietario = propietario
+          ? `${propietario.nombre} ${propietario.apellido}`
+          : "Desconocido";
 
         return {
           id: item.id,
           nombreProspecto: item.nombre,
           ...item,
           nombrePropietario: nombreCompletoPropietario,
-          estado: item.estado_contacto || 'Sin estado',
+          estado: item.estado_contacto || "Sin estado",
         };
       });
 
@@ -180,7 +184,6 @@ function DataTable() {
   const deleteProspectsFromList = useCallback(
     async (prospectIds) => {
       const previousProspects = [...prospectos];
-
       const updatedProspects = previousProspects.filter(
         (p) => !prospectIds.includes(p.id)
       );
@@ -203,7 +206,6 @@ function DataTable() {
         });
 
         const results = await Promise.all(deletePromises);
-
         let allSucceeded = true;
         for (const response of results) {
           const responseBody = await response.json().catch(() => ({}));
@@ -249,8 +251,7 @@ function DataTable() {
       if (prospectos.length > 0) {
         localStorage.setItem("prospectos", JSON.stringify(prospectos));
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   }, [prospectos]);
 
   const handleRowSelectionChange = (newSelectionModel) => {
@@ -258,11 +259,11 @@ function DataTable() {
     setSelectedRows(newSelectionModel);
   };
 
-  const handleCellClick = (params, event) => {};
-
   const handleSendMessage = () => {
     if (selectedRows.length > 0) {
-      navigate("/enviar-correo", { state: { selectedProspectIds: selectedRows } });
+      navigate("/enviar-correo", {
+        state: { selectedProspectIds: selectedRows },
+      });
     } else {
       Swal.fire({
         icon: "warning",
@@ -279,11 +280,9 @@ function DataTable() {
   const handleOpenCreateList = () => {
     setIsCreateListOpen(true);
   };
-
   const handleCloseCreateList = () => {
     setIsCreateListOpen(false);
   };
-
   const handleListCreated = () => {};
 
   const handleDeleteSelected = async () => {
@@ -331,7 +330,7 @@ function DataTable() {
   return (
     <Stack spacing={2}>
       {isMobile && (
-        <Stack direction="row" spacing={2} sx={{ mb: 2, width: '100%' }}>
+        <Stack direction="row" spacing={2} sx={{ mb: 2, width: "100%" }}>
           <Button
             variant="outlined"
             startIcon={<ShareIcon />}
@@ -355,7 +354,7 @@ function DataTable() {
         direction="row"
         alignItems="center"
         justifyContent="space-between"
-        sx={{ width: '100%', }}
+        sx={{ width: "100%" }}
       >
         <ProspectFilter
           columns={columnsToShow}
@@ -364,6 +363,7 @@ function DataTable() {
           rows={prospectos}
           sx={{ flexGrow: 1 }}
         />
+
         {!isMobile && (
           <Stack direction="row" spacing={2}>
             <Button
@@ -383,6 +383,7 @@ function DataTable() {
           </Stack>
         )}
       </Stack>
+
       {selectedRows.length > 0 && (
         <Stack direction="row" spacing={1} justifyContent="flex-end">
           <Button
@@ -411,6 +412,7 @@ function DataTable() {
           </Button>
         </Stack>
       )}
+
       <Paper
         sx={{
           height: "80vh",
@@ -427,9 +429,9 @@ function DataTable() {
           onPaginationModelChange={setPaginationModel}
           pageSizeOptions={[5, 10, 50, 100]}
           checkboxSelection
+          disableRowSelectionOnClick
           onRowSelectionModelChange={handleRowSelectionChange}
           rowSelectionModel={rowSelectionModel}
-          onCellClick={handleCellClick}
           filterModel={filterModel}
           onFilterModelChange={handleFilterModelChange}
           onRowClick={handleRowClick}
@@ -450,6 +452,7 @@ function DataTable() {
           }}
         />
       </Paper>
+
       {isCreateListOpen && (
         <CreateList
           open={isCreateListOpen}
@@ -458,6 +461,7 @@ function DataTable() {
           onListCreated={handleListCreated}
         />
       )}
+
       <AddModal
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
@@ -465,6 +469,7 @@ function DataTable() {
           setIsAddModalOpen(false);
         }}
       />
+
       <ShareLinkModal
         open={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}

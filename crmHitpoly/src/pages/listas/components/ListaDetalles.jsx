@@ -27,7 +27,6 @@ function ListaDetalles() {
       const localData = localStorage.getItem("prospectos");
       return localData ? JSON.parse(localData) : [];
     } catch (error) {
-      console.error("Error al cargar prospectos desde localStorage", error);
       return [];
     }
   });
@@ -73,11 +72,9 @@ function ListaDetalles() {
       if (data.success) {
         setListProspectsIds(data.data);
       } else {
-        console.error("Error al obtener IDs de prospectos:", data.message);
         setListProspectsIds([]);
       }
     } catch (error) {
-      console.error("Error de conexión al obtener IDs de prospectos:", error);
       setListProspectsIds([]);
       setErrorProspectos("Error al obtener los prospectos de la lista.");
     } finally {
@@ -151,7 +148,6 @@ function ListaDetalles() {
           );
         }
       } catch (error) {
-        console.error("Error de conexión al eliminar los prospectos:", error);
         setListProspectsIds(prevListProspectsIds);
         alert("Hubo un error de conexión, la lista se ha restaurado.");
       }

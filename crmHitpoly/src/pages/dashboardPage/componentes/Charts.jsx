@@ -11,6 +11,13 @@ const DashboardCharts = () => {
     ganadosPorMes: [],
     perdidosPorMes: [],
   });
+  
+  // Nuevo estado para los porcentajes
+  const [porcentajes, setPorcentajes] = useState({
+    total: "Cargando...",
+    ganados: "Cargando...",
+    perdidos: "Cargando...",
+  });
 
   useEffect(() => {
     const fetchAllProspectsAndProcess = async () => {
@@ -100,7 +107,9 @@ const DashboardCharts = () => {
           if (mesDiferencia >= 0 && mesDiferencia < 4) {
             const index = 3 - mesDiferencia;
             totalPorMes[index]++;
-            if (estado === "ganado") ganadosPorMes[index]++;
+            if (estado === "ganado") {
+              ganadosPorMes[index]++;
+            }
             if (estado === "perdido") perdidosPorMes[index]++;
           }
         });
@@ -111,7 +120,26 @@ const DashboardCharts = () => {
           ganadosPorMes,
           perdidosPorMes,
         });
+
+        // Función para calcular el porcentaje
+        const calculatePercentageChange = (current, previous) => {
+            if (previous === 0) {
+                return current > 0 ? "+100% respecto al mes pasado" : "0% respecto al mes pasado";
+            }
+            const percentage = ((current - previous) / previous) * 100;
+            const sign = percentage >= 0 ? "+" : "";
+            return `${sign}${percentage.toFixed(1)}% respecto al mes pasado`;
+        };
+
+        // Calcula y actualiza los porcentajes
+        setPorcentajes({
+            total: calculatePercentageChange(totalPorMes[3], totalPorMes[2]),
+            ganados: calculatePercentageChange(ganadosPorMes[3], ganadosPorMes[2]),
+            perdidos: calculatePercentageChange(perdidosPorMes[3], perdidosPorMes[2]),
+        });
+
       } catch (error) {
+        console.error("Error al obtener o procesar los prospectos:", error);
         setProspectosPorMes({
           meses: [],
           totalPorMes: [],
@@ -144,7 +172,7 @@ const DashboardCharts = () => {
         xAxis={[{ data: meses, scaleType: "band" }]}
         titleChart="Todos los prospectos"
         title="Desde los últimos 4 meses"
-        subtitle="%+ respecto al mes pasado"
+        subtitle={porcentajes.total}
       />
 
       {/* Ganados por mes */}
@@ -153,7 +181,7 @@ const DashboardCharts = () => {
         xAxis={[{ data: meses, scaleType: "band" }]}
         titleChart="Prospectos Ganados"
         title="Desde los últimos 4 meses"
-        subtitle="%+ respecto al mes pasado"
+        subtitle={porcentajes.ganados}
       />
 
       {/* Perdidos por mes */}
@@ -162,7 +190,7 @@ const DashboardCharts = () => {
         xAxis={[{ data: meses, scaleType: "band" }]}
         titleChart="Prospectos Perdidos"
         title="Desde los últimos 4 meses"
-        subtitle="%+ respecto al mes pasado"
+        subtitle={porcentajes.perdidos}
       />
     </Box>
   );

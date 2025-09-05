@@ -28,8 +28,6 @@ const SummaryCardsRow = ({
             ? totalProspectos.toLocaleString()
             : "Cargando..."
         }
-        percentage="+55% respecto a la semana pasada"
-        percentageColor="textSecondary"
       />
 
       <InfoCard
@@ -39,8 +37,6 @@ const SummaryCardsRow = ({
             ? totalInteresados.toLocaleString()
             : "Cargando..."
         }
-        percentage="+8% esta semana"
-        percentageColor="textSecondary"
       />
 
       <InfoCard
@@ -50,8 +46,6 @@ const SummaryCardsRow = ({
             ? totalAgendados.toLocaleString()
             : "Cargando..."
         }
-        percentage="+5% respecto a ayer"
-        percentageColor="textSecondary"
       />
 
       <InfoCard
@@ -61,7 +55,6 @@ const SummaryCardsRow = ({
             ? totalGanados.toLocaleString()
             : "Cargando..."
         }
-        percentage="+12% respecto al mes pasado"
       />
     </Box>
   );
