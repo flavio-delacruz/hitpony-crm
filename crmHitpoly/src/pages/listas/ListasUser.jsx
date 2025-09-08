@@ -42,7 +42,6 @@ function Listas() {
     const cachedProspectsString = localStorage.getItem('allUserProspects');
     
     if (cachedProspectsString && cachedCount) {
-        console.log("✅ Datos del caché encontrados. Mostrando prospectos de forma instantánea.");
         setAllUserProspects(JSON.parse(cachedProspectsString));
     }
     
@@ -97,16 +96,13 @@ function Listas() {
         const newCount = formattedProspects.length;
 
         if (parseInt(cachedCount) === newCount) {
-            console.log("No hay cambios en los prospectos. El caché está al día.");
-        } else {
-            console.log("🔄 Se detectó un cambio o el caché no existía. Actualizando y guardando nuevos datos.");
+            } else {
             setAllUserProspects(formattedProspects); // Actualizamos el estado con los nuevos datos
             localStorage.setItem('prospectosCount', newCount);
             localStorage.setItem('allUserProspects', JSON.stringify(formattedProspects));
         }
 
     } catch (error) {
-        console.error("Error al cargar prospectos:", error);
         Swal.fire({
             icon: 'error',
             title: 'Error de Sincronización',

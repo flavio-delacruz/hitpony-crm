@@ -1,4 +1,3 @@
-// src/components/EnviarCorreo.js
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
@@ -7,6 +6,8 @@ import Stack from "@mui/material/Stack";
 import Swal from "sweetalert2";
 import Layout from "../../layout/layout";
 import { useAuth } from "../../../context/AuthContext";
+
+const API_BASE_URL = "https://apiweb.hitpoly.com/ajax/";
 
 function EnviarCorreo() {
   const location = useLocation();
@@ -21,36 +22,28 @@ function EnviarCorreo() {
   useEffect(() => {
     const fetchSelectedProspects = async () => {
       if (user?.id && selectedProspectIds.length > 0) {
+        console.log("IDs de prospectos seleccionados:", selectedProspectIds);
+
         try {
-          const response = await fetch(
-            "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
-            {
+          const promises = selectedProspectIds.map((prospectoId) =>
+            fetch("https://apiweb.hitpoly.com/ajax/traerProsxIdController.php", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                funcion: "getProspectos",
-                id: user.id,
+                accion: "getProspecto",
+                id: prospectoId,
               }),
-            }
+            }).then((res) => res.json())
           );
-          const data = await response.json();
 
-          if (data.success && Array.isArray(data.resultado)) {
-            const selectedProspectData = data.resultado.filter((prospecto) =>
-              selectedProspectIds.includes(prospecto.id)
-            );
+          const allProspectsData = await Promise.all(promises);
 
-            const emails = selectedProspectData
-              .map((prospecto) => prospecto.correo)
-              .filter((email) => email);
-            setRecipientEmails(emails);
-          } else {
-            Swal.fire(
-              "Error",
-              "No se pudieron obtener los prospectos.",
-              "error"
-            );
-          }
+          const emails = allProspectsData
+            .map((data) => data.resultado?.correo)
+            .filter((email) => email);
+            
+          setRecipientEmails(emails);
+          console.log("Correos obtenidos:", emails);
         } catch (error) {
           Swal.fire("Error", "Error al obtener los prospectos.", "error");
         }
@@ -103,12 +96,38 @@ function EnviarCorreo() {
 
       const data = await response.json();
 
-
-
       if (data.status === "success" || data.status === "completed") {
+        // ✅ REGISTRO DE ACTIVIDAD: se ejecuta después de que el correo se envió con éxito.
+        const registroPromises = selectedProspectIds.map((prospectoId, index) => {
+            const actividadData = {
+                funcion: "registrarActividad",
+                prospecto_id: prospectoId,
+                tipo_actividad: "Correo Saliente",
+                detalle_actividad: `Correo enviado a ${recipientEmails[index]} con el asunto: ${subject}`,
+                fecha_hora: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                estado_anterior: "Sin estado", // Puedes obtener el estado real si lo necesitas
+                estado_nuevo: "Contacto iniciado", // Puedes cambiar este estado según tu lógica de negocio
+                canal: "Email"
+            };
+
+            return fetch('https://apiweb.hitpoly.com/ajax/registerActividadController.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(actividadData),
+            }).then(res => res.json());
+        });
+
+        await Promise.all(registroPromises)
+            .then(() => {
+                console.log("Actividades registradas con éxito.");
+            })
+            .catch(error => {
+                console.error("Error al registrar una o más actividades:", error);
+            });
+
         Swal.fire(
           "Éxito",
-          "Los correos han sido enviados correctamente.",
+          "Los correos han sido enviados correctamente y la actividad registrada.",
           "success"
         ).then(() => {
           navigate(-1);
