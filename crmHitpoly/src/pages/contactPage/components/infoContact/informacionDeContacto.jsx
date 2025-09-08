@@ -10,12 +10,14 @@ import {
   Button,
   Snackbar,
   Alert,
+  IconButton, // Importar IconButton
 } from "@mui/material";
-import { Email, Phone, MoreVert } from "@mui/icons-material";
+import { Email, Phone, WhatsApp } from "@mui/icons-material"; // Importar WhatsApp
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/material.css";
 import { useAuth } from "../../../../context/AuthContext";
 import EditableAvatar from "./editInformation/EditableAvatar";
+import CorreoFlotante from "../../../../components/correos/enviados/CorreoFlotante"; // Importar CorreoFlotante
 
 const fetchProspectsAndFindById = async (user, prospectId) => {
   if (!user || !user.id) return null;
@@ -111,6 +113,8 @@ export default function ContactInformation({ prospectId }) {
   const [hasChanges, setHasChanges] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  // Estado para controlar el CorreoFlotante
+  const [openEmail, setOpenEmail] = useState(false);
 
   useEffect(() => {
     setHasChanges(false);
@@ -174,7 +178,7 @@ export default function ContactInformation({ prospectId }) {
       direccion: contactData.direccion,
       ciudad: contactData.ciudad,
       pais: contactData.pais,
-      productos_interes: contactData.productos_interes, // Se añade el campo aquí
+      productos_interes: contactData.productos_interes,
     };
 
     setContactData((prev) => ({ ...prev, ...updatedData }));
@@ -202,6 +206,21 @@ export default function ContactInformation({ prospectId }) {
         setSnackbarMessage("Hubo un error al realizar la solicitud.");
         setOpenSnackbar(true);
       });
+  };
+
+  // Función para abrir el CorreoFlotante
+  const handleOpenEmail = () => {
+    setOpenEmail(true);
+  };
+
+  // Función para cerrar el CorreoFlotante
+  const handleCloseEmail = () => {
+    setOpenEmail(false);
+  };
+
+  const handleOpenWhatsApp = () => {
+    const message = encodeURIComponent(`Hola ${contactData.nombre}, `);
+    window.open(`https://wa.me/${contactData.celular}?text=${message}`, '_blank');
   };
 
   return (
@@ -238,6 +257,22 @@ export default function ContactInformation({ prospectId }) {
           <Typography variant="body2" color="text.secondary">
             {contactData.email || "Correo no disponible"}
           </Typography>
+
+          {/* Iconos de correo, WhatsApp y teléfono */}
+          <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
+            {/* 1. Icono de Correo (llama a CorreoFlotante) */}
+            <IconButton onClick={handleOpenEmail}>
+              <Email />
+            </IconButton>
+            {/* 2. Icono de WhatsApp */}
+            <IconButton onClick={handleOpenWhatsApp} disabled={!contactData.celular}>
+              <WhatsApp />
+            </IconButton>
+            {/* 3. Icono de Teléfono */}
+            <IconButton href={`tel:${contactData.celular}`} disabled={!contactData.celular}>
+              <Phone />
+            </IconButton>
+          </Box>
         </Box>
       </Paper>
 
@@ -359,6 +394,13 @@ export default function ContactInformation({ prospectId }) {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      {/* Correo Flotante */}
+      <CorreoFlotante
+        open={openEmail}
+        onClose={handleCloseEmail}
+        prospectoId={prospectId}
+      />
     </Box>
   );
 }

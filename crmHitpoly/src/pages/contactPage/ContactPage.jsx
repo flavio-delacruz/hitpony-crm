@@ -14,7 +14,8 @@ export default function ContactPage() {
     if (prospectId) {
       const parts = prospectId.split("-");
       const idPart = parts[parts.length - 1];
-      setExtractedProspectId(parseInt(idPart));
+      const numericId = parseInt(idPart);
+      setExtractedProspectId(numericId);
     }
   }, [prospectId]);
 
