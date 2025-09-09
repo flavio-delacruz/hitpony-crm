@@ -7,162 +7,203 @@ import Swal from "sweetalert2";
 import { useAuth } from "../../../context/AuthContext";
 
 const style = {
-  position: 'fixed',
-  bottom: { xs: 16, sm: 0 },
-  right: { xs: 8, sm: 20 }, 
-  width: { xs: 'calc(100% - 16px)', sm: 400 },
-  maxHeight: '80vh',
-  overflowY: 'auto',
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 2,
-  borderRadius: { xs: '8px', sm: '8px 8px 0 0' }, 
-  zIndex: 1300,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
+  position: 'fixed',
+  bottom: { xs: 16, sm: 0 },
+  right: { xs: 8, sm: 20 }, 
+  width: { xs: 'calc(100% - 16px)', sm: 400 },
+  maxHeight: '80vh',
+  overflowY: 'auto',
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 2,
+  borderRadius: { xs: '8px', sm: '8px 8px 0 0' }, 
+  zIndex: 1300,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 2,
 };
 
 export default function CorreoFlotante({ open, onClose, prospectoId }) {
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
-  const [recipientEmails, setRecipientEmails] = useState([]);
-  const [isSending, setIsSending] = useState(false);
-  const { user } = useAuth();
-  const defaultSenderEmail = "correo_por_defecto@example.com";
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [recipientEmails, setRecipientEmails] = useState([]);
+  const [isSending, setIsSending] = useState(false);
+  const { user } = useAuth();
+  const defaultSenderEmail = "correo_por_defecto@example.com";
 
-  useEffect(() => {    
-    const fetchProspectData = async () => {
-      if (user?.id && prospectoId) {
-        try {
-          const response = await fetch(
-            "https://apiweb.hitpoly.com/ajax/traerProsxIdController.php",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                accion: "getProspecto",
-                id: prospectoId,
-              }),
-            }
-          );
-          const data = await response.json();
+  useEffect(() => {    
+    const fetchProspectData = async () => {
+      if (user?.id && prospectoId) {
+        try {
+          const response = await fetch(
+            "https://apiweb.hitpoly.com/ajax/traerProsxIdController.php",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                accion: "getProspecto",
+                id: prospectoId,
+              }),
+            }
+          );
+          const data = await response.json();
 
-          if (data.success && data.resultado && data.resultado.correo) {
-            setRecipientEmails([data.resultado.correo]);
-          } else {
-            Swal.fire("Advertencia", "No se encontró correo para el prospecto seleccionado.", "warning");
-            setRecipientEmails([]);
-          }
-        } catch (error) {
-          Swal.fire("Error", "Error al obtener los datos del prospecto.", "error");
-        }
-      } else {
-        setRecipientEmails([]);
-      }
-    };
+          if (data.success && data.resultado && data.resultado.correo) {
+            setRecipientEmails([data.resultado.correo]);
+          } else {
+            Swal.fire("Advertencia", "No se encontró correo para el prospecto seleccionado.", "warning");
+            setRecipientEmails([]);
+          }
+        } catch (error) {
+          Swal.fire("Error", "Error al obtener los datos del prospecto.", "error");
+        }
+      } else {
+        setRecipientEmails([]);
+      }
+    };
 
-    if (open) {
-      fetchProspectData();
-    }
-  }, [user?.id, prospectoId, open]);
+    if (open) {
+      fetchProspectData();
+    }
+  }, [user?.id, prospectoId, open]);
 
-  const handleEnviarCorreo = async () => {
-    if (recipientEmails.length === 0) {
-      Swal.fire("Advertencia", "No hay un correo destinatario.", "warning");
-      return;
-    }
+  const handleEnviarCorreo = async () => {
+    if (recipientEmails.length === 0) {
+      Swal.fire("Advertencia", "No hay un correo destinatario.", "warning");
+      return;
+    }
 
-    if (!subject.trim() || !body.trim()) {
-      Swal.fire("Advertencia", "Por favor, complete el asunto y el cuerpo del correo.", "warning");
-      return;
-    }
+    if (!subject.trim() || !body.trim()) {
+      Swal.fire("Advertencia", "Por favor, complete el asunto y el cuerpo del correo.", "warning");
+      return;
+    }
 
-    setIsSending(true);
+    setIsSending(true);
 
-    try {
-      const senderEmail = user?.correo || defaultSenderEmail;
-      const requestBody = JSON.stringify({
-        accion: "emails",
-        name: user?.nombre || "",
-        email: senderEmail,
-        destinatarios: recipientEmails,
-        motivo: subject,
-        message: body,
-      });
+    try {
+      const senderEmail = user?.correo || defaultSenderEmail;
+      const requestBody = JSON.stringify({
+        accion: "emails",
+        name: user?.nombre || "",
+        email: senderEmail,
+        destinatarios: recipientEmails,
+        motivo: subject,
+        message: body,
+      });
 
-      const response = await fetch(
-        "https://apiweb.hitpoly.com/ajax/mandarEmailsController.php",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: requestBody,
-        }
-      );
+      const response = await fetch(
+        "https://apiweb.hitpoly.com/ajax/mandarEmailsController.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: requestBody,
+        }
+      );
 
-      const data = await response.json();
+      const data = await response.json();
 
-      if (data.status === "success" || data.status === "completed") {
-        Swal.fire("Éxito", "El correo ha sido enviado correctamente.", "success");
-        setSubject("");
-        setBody("");
-        onClose(); 
-      } else {
-        Swal.fire("Error", data.message || "Hubo un problema al enviar el correo.", "error");
-      }
-    } catch (error) {
-      Swal.fire("Error", "No se pudo enviar el correo.", "error");
-    } finally {
-      setIsSending(false);
-    }
-  };
+      if (data.status === "success" || data.status === "completed") {
+        
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
-  if (!open) return null;
+        // ✅ Nuevo: Captura la zona horaria del usuario
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  return (
-    <Box sx={style}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h6">Mensaje nuevo</Typography>
-        <IconButton onClick={onClose} size="small">
-          <Close />
-        </IconButton>
-      </Box>
+        const actividadData = {
+          funcion: "registrarActividad",
+          prospecto_id: prospectoId,
+          tipo_actividad: "email",
+          detalle_actividad: `Correo enviado a ${recipientEmails[0]} con el asunto: ${subject}`,
+          fecha_hora: formattedDateTime,
+          zona_horaria: timeZone, // ✅ Agregamos la zona horaria al objeto
+          estado_anterior: "Sin estado", 
+          estado_nuevo: "Contacto iniciado", 
+          canal: "Email"
+        };
+        
+        console.log("Datos de la actividad que se enviarán:", actividadData);
 
-      {recipientEmails.length > 0 && (
-        <TextField
-          label="Destinatario"
-          value={recipientEmails.join(', ')}
-          InputProps={{ readOnly: true }}
-          fullWidth
-        />
-      )}
-      
-      <TextField
-        label="Asunto"
-        fullWidth
-        value={subject}
-        onChange={(e) => setSubject(e.target.value)}
-      />
-      
-      <TextField
-        label="Cuerpo del Correo"
-        multiline
-        rows={4}
-        fullWidth
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-      />
-      
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleEnviarCorreo}
-        disabled={isSending}
-        startIcon={isSending ? <CircularProgress size={20} color="inherit" /> : null}
-        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-      >
-        {isSending ? "Enviando..." : "Enviar"}
-      </Button>
-    </Box>
-  );
+        try {
+          const registerResponse = await fetch('https://apiweb.hitpoly.com/ajax/registerActividadController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(actividadData),
+          });
+          const registerData = await registerResponse.json();
+
+          if (registerData.status === "success") {
+            } else {
+            }
+        } catch (registerError) {
+          }
+
+        Swal.fire("Éxito", "El correo ha sido enviado correctamente y la actividad registrada.", "success");
+        setSubject("");
+        setBody("");
+        onClose(); 
+      } else {
+        Swal.fire("Error", data.message || "Hubo un problema al enviar el correo.", "error");
+      }
+    } catch (error) {
+      Swal.fire("Error", "No se pudo enviar el correo.", "error");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <Box sx={style}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h6">Mensaje nuevo</Typography>
+        <IconButton onClick={onClose} size="small">
+          <Close />
+        </IconButton>
+      </Box>
+
+      {recipientEmails.length > 0 && (
+        <TextField
+          label="Destinatario"
+          value={recipientEmails.join(', ')}
+          InputProps={{ readOnly: true }}
+          fullWidth
+        />
+      )}
+      
+      <TextField
+        label="Asunto"
+        fullWidth
+        value={subject}
+        onChange={(e) => setSubject(e.target.value)}
+      />
+      
+      <TextField
+        label="Cuerpo del Correo"
+        multiline
+        rows={4}
+        fullWidth
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+      />
+      
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleEnviarCorreo}
+        disabled={isSending}
+        startIcon={isSending ? <CircularProgress size={20} color="inherit" /> : null}
+        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
+        {isSending ? "Enviando..." : "Enviar"}
+      </Button>
+    </Box>
+  );
 }

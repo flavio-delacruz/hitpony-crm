@@ -10,14 +10,30 @@ import {
   Button,
   Snackbar,
   Alert,
-  IconButton, // Importar IconButton
+  IconButton,
+  Modal,
 } from "@mui/material";
-import { Email, Phone, WhatsApp } from "@mui/icons-material"; // Importar WhatsApp
+import { Email, Phone, WhatsApp } from "@mui/icons-material"; 
+import NoteAddIcon from "@mui/icons-material/NoteAdd"; 
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/material.css";
 import { useAuth } from "../../../../context/AuthContext";
 import EditableAvatar from "./editInformation/EditableAvatar";
-import CorreoFlotante from "../../../../components/correos/enviados/CorreoFlotante"; // Importar CorreoFlotante
+import CorreoFlotante from "../../../../components/correos/enviados/CorreoFlotante";
+import NotaCard from "../../components/actividades/Notas/NotaCard";
+
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: "8px",
+};
 
 const fetchProspectsAndFindById = async (user, prospectId) => {
   if (!user || !user.id) return null;
@@ -113,8 +129,8 @@ export default function ContactInformation({ prospectId }) {
   const [hasChanges, setHasChanges] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  // Estado para controlar el CorreoFlotante
   const [openEmail, setOpenEmail] = useState(false);
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
 
   useEffect(() => {
     setHasChanges(false);
@@ -208,19 +224,25 @@ export default function ContactInformation({ prospectId }) {
       });
   };
 
-  // Función para abrir el CorreoFlotante
   const handleOpenEmail = () => {
     setOpenEmail(true);
   };
 
-  // Función para cerrar el CorreoFlotante
   const handleCloseEmail = () => {
     setOpenEmail(false);
   };
 
   const handleOpenWhatsApp = () => {
     const message = encodeURIComponent(`Hola ${contactData.nombre}, `);
-    window.open(`https://wa.me/${contactData.celular}?text=${message}`, '_blank');
+    window.open(`https://wa.me/${contactData.celular}?text=${message}`, "_blank");
+  };
+
+  const handleOpenNoteModal = () => {
+    setIsNoteModalOpen(true);
+  };
+
+  const handleCloseNoteModal = () => {
+    setIsNoteModalOpen(false);
   };
 
   return (
@@ -258,19 +280,18 @@ export default function ContactInformation({ prospectId }) {
             {contactData.email || "Correo no disponible"}
           </Typography>
 
-          {/* Iconos de correo, WhatsApp y teléfono */}
           <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
-            {/* 1. Icono de Correo (llama a CorreoFlotante) */}
             <IconButton onClick={handleOpenEmail}>
               <Email />
             </IconButton>
-            {/* 2. Icono de WhatsApp */}
             <IconButton onClick={handleOpenWhatsApp} disabled={!contactData.celular}>
               <WhatsApp />
             </IconButton>
-            {/* 3. Icono de Teléfono */}
             <IconButton href={`tel:${contactData.celular}`} disabled={!contactData.celular}>
               <Phone />
+            </IconButton>
+            <IconButton onClick={handleOpenNoteModal}>
+              <NoteAddIcon />
             </IconButton>
           </Box>
         </Box>
@@ -395,12 +416,23 @@ export default function ContactInformation({ prospectId }) {
         </Alert>
       </Snackbar>
 
-      {/* Correo Flotante */}
       <CorreoFlotante
         open={openEmail}
         onClose={handleCloseEmail}
         prospectoId={prospectId}
       />
+
+      <Modal open={isNoteModalOpen} onClose={handleCloseNoteModal}>
+        <Box sx={style}>
+          <NotaCard
+            initialNote={{ id: null, titulo: "", contenido: "" }}
+            prospectoId={prospectId}
+            onNoteCreated={handleCloseNoteModal} 
+            onCancel={handleCloseNoteModal}
+            isNew={true}
+          />
+        </Box>
+      </Modal>
     </Box>
   );
 }

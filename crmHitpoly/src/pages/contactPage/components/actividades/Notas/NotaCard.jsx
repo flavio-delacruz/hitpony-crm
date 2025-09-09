@@ -1,3 +1,5 @@
+// src/components/NotaCard.js
+
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -129,6 +131,51 @@ export default function NotaCard({
       const data = await response.json();
 
       if (data.success === true) {
+        // ✅ REGISTRO DE ACTIVIDAD: se ejecuta después de que la nota se guardó con éxito.
+
+        // ✅ Nuevo: Obtener la zona horaria del usuario y la hora local
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const localDateTime = new Date();
+        
+        // CORRECCIÓN: Formateamos la fecha y hora manualmente para evitar el desfase de UTC
+        const year = localDateTime.getFullYear();
+        const month = String(localDateTime.getMonth() + 1).padStart(2, '0');
+        const day = String(localDateTime.getDate()).padStart(2, '0');
+        const hours = String(localDateTime.getHours()).padStart(2, '0');
+        const minutes = String(localDateTime.getMinutes()).padStart(2, '0');
+        const seconds = String(localDateTime.getSeconds()).padStart(2, '0');
+
+        const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+        const actividadData = {
+          funcion: "registrarActividad",
+          prospecto_id: prospectoId,
+          tipo_actividad: "nota",
+          detalle_actividad: `Se creó una nota: "${note.titulo}"`,
+          fecha_hora: formattedDateTime, // ✅ Usamos la hora local formateada
+          zona_horaria: timeZone, // ✅ Agregamos la zona horaria
+          estado_anterior: "Sin estado", 
+          estado_nuevo: "Nota registrada",
+          canal: "Notas",
+        };
+
+        try {
+          const registerResponse = await fetch('https://apiweb.hitpoly.com/ajax/registerActividadController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(actividadData),
+          });
+          const registerData = await registerResponse.json();
+
+          if (registerData.status === "success") {
+            console.log("Actividad de nota registrada con éxito.");
+          } else {
+            console.error("Error al registrar la actividad de nota:", registerData);
+          }
+        } catch (registerError) {
+          console.error("Error en la petición para registrar la actividad de nota:", registerError);
+        }
+
         onNoteCreated();
       }
     } catch (error) {
@@ -179,7 +226,7 @@ export default function NotaCard({
     setNote((prevNote) => ({ ...prevNote, [name]: value }));
   };
 
-  // --- NUEVA FUNCIÓN DE CONVERSIÓN ---
+  // --- FUNCIÓN DE CONVERSIÓN ---
   const getDisplayDateTime = (serverDateString) => {
     if (!serverDateString) {
       return "";

@@ -101,12 +101,6 @@ export default function NotasContainer({ prospectoId }) {
 
   return (
     <Box sx={{}}>
-      {/* Posicionamos el botón a la derecha */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Button variant="contained" onClick={handleAddNote}>
-          Crear nota
-        </Button>
-      </Box>
 
       {isLoading ? (
         <Box display="flex" justifyContent="center" mt={4}>
