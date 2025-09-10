@@ -1,11 +1,11 @@
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
+import React from "react";
 import Swal from "sweetalert2";
+import MenuItem from "@mui/material/MenuItem";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { grey } from "@mui/material/colors";
 
-const EliminarLista = ({ listaId, onListaEliminada }) => {
-  const handleEliminarLista = async (event) => {
-    event.stopPropagation();
+const EliminarLista = ({ listaId, onListaEliminada, onCloseMenu }) => {
+  const handleEliminarLista = async () => {
     Swal.fire({
       title: "¿Eliminar lista?",
       text: "¿Estás seguro de que quieres eliminar esta lista?",
@@ -36,6 +36,9 @@ const EliminarLista = ({ listaId, onListaEliminada }) => {
           }
 
           onListaEliminada(listaId);
+          if (onCloseMenu) {
+            onCloseMenu();
+          }
 
           let listasGuardadas =
             JSON.parse(localStorage.getItem("listas")) || [];
@@ -59,13 +62,10 @@ const EliminarLista = ({ listaId, onListaEliminada }) => {
   };
 
   return (
-    <IconButton
-      onClick={handleEliminarLista}
-      aria-label="eliminar"
-      sx={{ color: grey[600], mx: 0.5 }}
-    >
-      <DeleteIcon />
-    </IconButton>
+    <MenuItem onClick={handleEliminarLista}>
+      <DeleteIcon sx={{ mr: 1, color: grey[600] }} />
+      Eliminar
+    </MenuItem>
   );
 };
 

@@ -12,71 +12,73 @@ const EditarLista = ({ lista, onNombreGuardado, onCancelEdit }) => {
   const [editedName, setEditedName] = useState(lista.nombre_lista);
 
   const handleGuardarNombre = async () => {
-    if (editedName.trim()) {
-      if (user?.id) {
-        const updateData = {
-          funcion: "actualizarLista",
-          id: lista.id,
-          nombre_lista: editedName,
-          link: "",
-          idSetter: user.id,
-        };
+    // Si el campo está vacío, muestra un error y no continúa
+    if (!editedName.trim()) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "El nombre de la lista no puede estar vacío.",
+      });
+      return;
+    }
 
-        Swal.fire(
-          "Guardando...",
-          "Actualizando el nombre de la lista.",
-          "info",
-          { timer: 1500, showConfirmButton: false }
-        );
+    if (!user?.id) {
+      // Si no hay usuario, no se puede guardar
+      return;
+    }
 
-        try {
-          const response = await fetch(
-            "https://apiweb.hitpoly.com/ajax/UpdateListaController.php",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(updateData),
-            }
-          );
+    try {
+      const updateData = {
+        funcion: "actualizarLista",
+        id: lista.id,
+        nombre_lista: editedName,
+        link: "",
+        idSetter: user.id,
+      };
 
-          if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`HTTP error! status: ${response.status}, mensaje: ${errorText}`);
-          }
-
-          const data = await response.json();
-          if (data.status === "success") {
-            Swal.fire(
-              "Guardado",
-              "El nombre de la lista ha sido actualizado.",
-              "success"
-            );
-            onNombreGuardado(lista.id, editedName);
-          } else {
-            Swal.fire(
-              "Error",
-              "No se pudo actualizar el nombre de la lista.",
-              "error"
-            );
-          }
-        } catch (error) {
-          Swal.fire(
-            "Error",
-            "Hubo un problema al actualizar el nombre.",
-            "error"
-          );
-        } finally {
-          onCancelEdit();
+      const response = await fetch(
+        "https://apiweb.hitpoly.com/ajax/UpdateListaController.php",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updateData),
         }
-      }
-    } else {
-      Swal.fire(
-        "Error",
-        "El nombre de la lista no puede estar vacío.",
-        "error"
       );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, mensaje: ${errorText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.status === "success") {
+        // Muestra solo la alerta de éxito final
+        Swal.fire({
+          title: "Guardado",
+          text: "El nombre de la lista ha sido actualizado.",
+          icon: "success",
+          timer: 1500, // Cierra automáticamente después de 1.5 segundos
+          showConfirmButton: false,
+        });
+        onNombreGuardado(lista.id, editedName);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudo actualizar el nombre de la lista.",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Hubo un problema al actualizar el nombre.",
+      });
+    } finally {
+      onCancelEdit();
     }
   };
 

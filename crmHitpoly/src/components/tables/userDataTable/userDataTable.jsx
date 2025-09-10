@@ -1,4 +1,5 @@
-// DataTable.jsx
+// src/components/tables/userDataTable/DataTable.jsx
+
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Stack from "@mui/material/Stack";
 import { Button, Typography, useMediaQuery, useTheme } from "@mui/material";
@@ -283,7 +284,17 @@ function DataTable() {
   const handleCloseCreateList = () => {
     setIsCreateListOpen(false);
   };
-  const handleListCreated = () => {};
+  
+  // ✅ Función para manejar la notificación de éxito
+  const handleListCreated = async () => {
+    try {
+        await Swal.fire("Éxito", "Operación completada con éxito.", "success");
+    } catch (error) {
+        console.error("Error al mostrar la alerta:", error);
+    }
+    // Opcional: recargar los prospectos para reflejar cualquier cambio
+    fetchAllProspects(); 
+  };
 
   const handleDeleteSelected = async () => {
     if (selectedRows.length > 0) {

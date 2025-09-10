@@ -132,19 +132,14 @@ export default function NotaCard({
 
       if (data.success === true) {
         // ✅ REGISTRO DE ACTIVIDAD: se ejecuta después de que la nota se guardó con éxito.
-
-        // ✅ Nuevo: Obtener la zona horaria del usuario y la hora local
         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const localDateTime = new Date();
-        
-        // CORRECCIÓN: Formateamos la fecha y hora manualmente para evitar el desfase de UTC
         const year = localDateTime.getFullYear();
         const month = String(localDateTime.getMonth() + 1).padStart(2, '0');
         const day = String(localDateTime.getDate()).padStart(2, '0');
         const hours = String(localDateTime.getHours()).padStart(2, '0');
         const minutes = String(localDateTime.getMinutes()).padStart(2, '0');
         const seconds = String(localDateTime.getSeconds()).padStart(2, '0');
-
         const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
         const actividadData = {
@@ -152,9 +147,9 @@ export default function NotaCard({
           prospecto_id: prospectoId,
           tipo_actividad: "nota",
           detalle_actividad: `Se creó una nota: "${note.titulo}"`,
-          fecha_hora: formattedDateTime, // ✅ Usamos la hora local formateada
-          zona_horaria: timeZone, // ✅ Agregamos la zona horaria
-          estado_anterior: "Sin estado", 
+          fecha_hora: formattedDateTime,
+          zona_horaria: timeZone,
+          estado_anterior: "Sin estado",  
           estado_nuevo: "Nota registrada",
           canal: "Notas",
         };
@@ -166,7 +161,6 @@ export default function NotaCard({
             body: JSON.stringify(actividadData),
           });
           const registerData = await registerResponse.json();
-
           if (registerData.status === "success") {
             console.log("Actividad de nota registrada con éxito.");
           } else {
@@ -175,7 +169,6 @@ export default function NotaCard({
         } catch (registerError) {
           console.error("Error en la petición para registrar la actividad de nota:", registerError);
         }
-
         onNoteCreated();
       }
     } catch (error) {
@@ -200,7 +193,6 @@ export default function NotaCard({
         }
       );
       const data = await response.json();
-
       if (data.status === "success" || data.success === true) {
         onNoteDeleted(note.id);
       }
@@ -226,23 +218,14 @@ export default function NotaCard({
     setNote((prevNote) => ({ ...prevNote, [name]: value }));
   };
 
-  // --- FUNCIÓN DE CONVERSIÓN ---
   const getDisplayDateTime = (serverDateString) => {
     if (!serverDateString) {
       return "";
     }
-    
-    // 1. Convertir el string del servidor a un objeto Date (esto lo interpreta como una fecha UTC)
     const serverDate = new Date(serverDateString);
-
-    // 2. Obtener la hora del servidor en milisegundos y sumarle 1 hora para llegar a la hora de Perú
     const peruTimeInMillis = serverDate.getTime() + 60 * 60 * 1000;
     const peruDate = new Date(peruTimeInMillis);
-
-    // 3. Obtener la zona horaria del navegador del usuario
     const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    // 4. Opciones para el formato de fecha y hora
     const options = {
       year: "numeric",
       month: "long",
@@ -253,8 +236,6 @@ export default function NotaCard({
       timeZone: userTimeZone,
       timeZoneName: 'short'
     };
-
-    // 5. Devolver la fecha y hora formateada en la zona horaria del usuario
     return peruDate.toLocaleString(navigator.language, options);
   };
 
@@ -262,6 +243,9 @@ export default function NotaCard({
   if (onCancel) {
     return (
       <Card variant="outlined" sx={{ p: 2 }}>
+        <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+          {isExistingNote ? "Editando nota" : "Creando nota"}
+        </Typography>
         <TextField
           fullWidth
           label="Título"

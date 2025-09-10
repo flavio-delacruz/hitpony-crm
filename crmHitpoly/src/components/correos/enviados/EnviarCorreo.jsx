@@ -96,9 +96,15 @@ function EnviarCorreo() {
 
       if (data.status === "success" || data.status === "completed") {
 
-            // ✅ Nuevo: Obtener la zona horaria del usuario
-            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const formattedDateTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            // ✅ CAMBIO: Obtener y formatear la fecha y hora de manera local
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
         const registroPromises = selectedProspectIds.map((prospectoId, index) => {
             const actividadData = {
@@ -107,7 +113,7 @@ function EnviarCorreo() {
                 tipo_actividad: "email",
                 detalle_actividad: `Correo enviado a ${recipientEmails[index]} con el asunto: ${subject}`,
                 fecha_hora: formattedDateTime,
-                zona_horaria: timeZone, // ✅ Agregamos la zona horaria
+                zona_horaria: Intl.DateTimeFormat().resolvedOptions().timeZone, // Mantenemos la zona horaria
                 estado_anterior: "Sin estado", 
                 estado_nuevo: "Contacto iniciado",
                 canal: "Email"
