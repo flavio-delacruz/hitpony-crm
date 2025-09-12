@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Layout from "../../../components/layout/layout";
-import { Typography, Button } from "@mui/material";
+import { Typography, Button, Box } from "@mui/material";
+import GetAppIcon from "@mui/icons-material/GetApp"; // Importar el icono de descarga
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import ReusableTable from "../../../components/tables/userDataTable/ReusableTable";
 import CreateList from "../../../components/tables/userDataTable/components/CreateList";
+import DownloadOptions from "../../../components/tables/userDataTable/components/DownloadOptions"; // Importar el componente de descarga
 import Swal from "sweetalert2";
 
 const columns = [
@@ -44,6 +46,15 @@ function ListaDetalles() {
   const [selectedProspectIds, setSelectedProspectIds] = useState([]);
   const [isCreateListModalOpen, setIsCreateListModalOpen] = useState(false);
   const isFetchingUsers = useRef(false);
+
+  // Estado y manejadores para el menú de descarga
+  const [anchorElDownload, setAnchorElDownload] = useState(null);
+  const handleOpenDownloadMenu = (event) => {
+    setAnchorElDownload(event.currentTarget);
+  };
+  const handleCloseDownloadMenu = () => {
+    setAnchorElDownload(null);
+  };
 
   // Formato del nombre de la lista para la visualización
   const formattedName = nombreLista.replace(/-(\d+)$/, "").replace(/-/g, " ");
@@ -123,9 +134,12 @@ function ListaDetalles() {
   });
 
   // Filtra y enriquece los datos de los prospectos para la tabla
-  const filteredProspectos = listProspectsIds.length > 0
-    ? prospectos.filter((prospecto) => listProspectsIds.includes(Number(prospecto.id)))
-    : [];
+  const filteredProspectos =
+    listProspectsIds.length > 0
+      ? prospectos.filter((prospecto) =>
+          listProspectsIds.includes(Number(prospecto.id))
+        )
+      : [];
 
   const finalProspectos = filteredProspectos.map((item) => {
     const propietario = usersMap[item.usuario_master_id];
@@ -139,7 +153,6 @@ function ListaDetalles() {
     };
   });
 
-
   // Manejadores de eventos de la tabla
   const handleRowSelectionChange = (newSelectionModel) => {
     setSelectedProspectIds(newSelectionModel);
@@ -149,13 +162,21 @@ function ListaDetalles() {
     if (selectedProspectIds.length > 0) {
       navigate("/enviar-correo", { state: { selectedProspectIds } });
     } else {
-      Swal.fire("Advertencia", "Por favor, selecciona al menos un prospecto.", "warning");
+      Swal.fire(
+        "Advertencia",
+        "Por favor, selecciona al menos un prospecto.",
+        "warning"
+      );
     }
   };
 
   const handleDeleteProspectsClick = async () => {
     if (selectedProspectIds.length === 0) {
-      Swal.fire("Advertencia", "Por favor, selecciona al menos un prospecto para eliminar.", "warning");
+      Swal.fire(
+        "Advertencia",
+        "Por favor, selecciona al menos un prospecto para eliminar.",
+        "warning"
+      );
       return;
     }
     if (!listaSeleccionada || !listaSeleccionada.id) {
@@ -163,16 +184,18 @@ function ListaDetalles() {
       return;
     }
     if (
-      (await Swal.fire({
-        title: "¿Estás seguro?",
-        text: `¿Quieres eliminar ${selectedProspectIds.length} prospectos de esta lista?`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar",
-      })).isConfirmed
+      (
+        await Swal.fire({
+          title: "¿Estás seguro?",
+          text: `¿Quieres eliminar ${selectedProspectIds.length} prospectos de esta lista?`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sí, eliminar",
+          cancelButtonText: "Cancelar",
+        })
+      ).isConfirmed
     ) {
       const prevListProspectsIds = [...listProspectsIds];
       setListProspectsIds((currentIds) =>
@@ -195,13 +218,25 @@ function ListaDetalles() {
         const allSucceeded = results.every((response) => response.ok);
         if (!allSucceeded) {
           setListProspectsIds(prevListProspectsIds);
-          Swal.fire("Error", "Hubo un error al eliminar uno o más prospectos. La lista se ha restaurado.", "error");
+          Swal.fire(
+            "Error",
+            "Hubo un error al eliminar uno o más prospectos. La lista se ha restaurado.",
+            "error"
+          );
         } else {
-          Swal.fire("Eliminados", "Los prospectos se han eliminado con éxito.", "success");
+          Swal.fire(
+            "Eliminados",
+            "Los prospectos se han eliminado con éxito.",
+            "success"
+          );
         }
       } catch (error) {
         setListProspectsIds(prevListProspectsIds);
-        Swal.fire("Error de conexión", "Hubo un error de conexión, la lista se ha restaurado.", "error");
+        Swal.fire(
+          "Error de conexión",
+          "Hubo un error de conexión, la lista se ha restaurado.",
+          "error"
+        );
       }
     }
   };
@@ -239,12 +274,24 @@ function ListaDetalles() {
       const results = await Promise.all(deletePromises);
       const allDeletionsSucceeded = results.every((response) => response.ok);
       if (!allDeletionsSucceeded) {
-        Swal.fire("Error", "Los prospectos se agregaron a la nueva lista pero no se pudieron eliminar de la lista original.", "error");
+        Swal.fire(
+          "Error",
+          "Los prospectos se agregaron a la nueva lista pero no se pudieron eliminar de la lista original.",
+          "error"
+        );
       } else {
-        Swal.fire("¡Movido!", "Los prospectos se han movido con éxito a la nueva lista.", "success");
+        Swal.fire(
+          "¡Movido!",
+          "Los prospectos se han movido con éxito a la nueva lista.",
+          "success"
+        );
       }
     } catch (error) {
-      Swal.fire("Error", "Hubo un problema de conexión al intentar eliminar los prospectos de la lista original.", "error");
+      Swal.fire(
+        "Error",
+        "Hubo un problema de conexión al intentar eliminar los prospectos de la lista original.",
+        "error"
+      );
     } finally {
       setSelectedProspectIds([]);
       fetchProspectIdsFromList();
@@ -253,48 +300,74 @@ function ListaDetalles() {
 
   return (
     <Layout title={`${displayNombreLista}`}>
-      <div style={{ width: "100%" }}>
-        <ReusableTable
-          rows={finalProspectos}
-          columns={columns}
-          getRowId={(row) => row.id}
-          onRowSelectionChange={handleRowSelectionChange}
-          onRowClick={handleRowClick}
-        />
-        <div style={{ marginTop: "16px", display: "flex", gap: "8px" }}>
-          {selectedProspectIds.length > 0 && (
-            <>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleEnviarCorreoClick}
-              >
-                Enviar Correo a Seleccionados
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleMoveToListClick}
-              >
-                Mover a Otra Lista
-              </Button>
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={handleDeleteProspectsClick}
-              >
-                Eliminar Seleccionados
-              </Button>
-            </>
-          )}
+      <Box sx={{ p: 2 }}>
+        <Box sx={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center", 
+          marginBottom: "16px" 
+        }}>
+          <Typography variant="h6" gutterBottom sx={{ marginRight: "auto" }}>
+            Lista: {displayNombreLista}
+          </Typography>
+          <Box sx={{ display: "flex", gap: "8px" }}>
+            {selectedProspectIds.length > 0 && (
+              <>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleEnviarCorreoClick}
+                >
+                  Enviar Correos
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleMoveToListClick}
+                >
+                  Mover a Otra Lista
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={handleDeleteProspectsClick}
+                >
+                  Eliminar Seleccionados
+                </Button>
+              </>
+            )}
+            <Button
+              variant="outlined"
+              startIcon={<GetAppIcon />}
+              onClick={handleOpenDownloadMenu}
+            >
+              Descargar
+            </Button>
+          </Box>
+        </Box>
+
+        <div style={{ width: "100%" }}>
+          <ReusableTable
+            rows={finalProspectos}
+            columns={columns}
+            getRowId={(row) => row.id}
+            onRowSelectionChange={handleRowSelectionChange}
+            onRowClick={handleRowClick}
+          />
         </div>
-      </div>
+      </Box>
       <CreateList
         open={isCreateListModalOpen}
         onClose={() => setIsCreateListModalOpen(false)}
         prospectosSeleccionados={selectedProspectIds}
         onListCreated={handleMoveSuccess}
-        excludeListId={listaSeleccionada?.id} // ✅ Agregando la prop aquí
+        excludeListId={listaSeleccionada?.id}
+      />
+      {/* Componente de opciones de descarga */}
+      <DownloadOptions
+        anchorEl={anchorElDownload}
+        handleClose={handleCloseDownloadMenu}
+        prospectsToDownload={finalProspectos}
       />
     </Layout>
   );

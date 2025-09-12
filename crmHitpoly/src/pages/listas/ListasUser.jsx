@@ -232,7 +232,7 @@ function Listas() {
               <TableHead>
                 <TableRow>
                   <TableCell>Nombre</TableCell>
-                  <TableCell align="center">Tamaño de la lista</TableCell>
+                  <TableCell align="center">Tamaño</TableCell>
                   <TableCell align="right">Acciones</TableCell>
                 </TableRow>
               </TableHead>

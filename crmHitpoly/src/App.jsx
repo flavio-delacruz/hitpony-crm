@@ -99,7 +99,7 @@ function App() {
             <Route
               path="/gestor-de-asignaciones"
               element={
-                <ProtectedRouteWithRole requiredRoles={["admin"]}>
+                <ProtectedRouteWithRole requiredRoles={["admin", "cliente"]}>
                   <GestorDeAsignaciones />
                 </ProtectedRouteWithRole>
               }
@@ -155,7 +155,7 @@ function App() {
             />
 
             <Route
-              path="/usuarios"
+              path="/contactos"
               element={
                 <ProtectedRoute>
                   <UserListPage />

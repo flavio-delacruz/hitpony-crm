@@ -5,12 +5,15 @@ import HeaderComponent from "../headers/headerComponet/usuarios/headerComponent"
 import { useMediaQuery } from "@mui/material";
 import HeaderComponentMovile from "../headers/headerComponet/usuarios/headerComponentMovile";
 
-const MainContent = styled(Box)({
+const MainContent = styled(Box)(({ theme }) => ({
   flex: 1,
   padding: "20px",
   height: "100vh",
   overflow: "auto",
-});
+  [theme.breakpoints.down("sm")]: {
+    padding: "10px",
+  },
+}));
 
 const Layout = ({ children, title }) => {
   const isMobile = useMediaQuery("(max-width:600px)");
@@ -24,12 +27,7 @@ const Layout = ({ children, title }) => {
     >
       <SideBar />
       <MainContent>
-        {isMobile ? (
-          <HeaderComponentMovile title={title} />
-        ) : (
-          <HeaderComponent title={title} />
-        )}
-
+        {isMobile ? <HeaderComponentMovile /> : <HeaderComponent />}
         {children}
       </MainContent>
     </Box>

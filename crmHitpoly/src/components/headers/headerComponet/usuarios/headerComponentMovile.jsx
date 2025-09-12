@@ -1,8 +1,8 @@
 // HeaderComponentMovile.js
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Typography, IconButton, Drawer, useMediaQuery, Avatar } from "@mui/material";
 import { styled } from "@mui/system";
-import SettingsIcon from "@mui/icons-material/Settings";
+import PeopleIcon from "@mui/icons-material/People"; // Nuevo ícono para colaboradores
 import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
 
@@ -23,8 +23,16 @@ const HeaderComponentMovile = ({ title }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Condición para mostrar el botón de colaboradores
+  const isCollaboratorButtonVisible = Number(user?.id_tipo) === 4;
+
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
   const handleAccountClick = () => navigate("/perfil");
+
+  // Nuevo manejador para el botón de colaboradores
+  const handleCollabClick = () => {
+    navigate("/gestor-de-asignaciones");
+  };
 
   return (
     <Header>
@@ -40,12 +48,7 @@ const HeaderComponentMovile = ({ title }) => {
       >
         <SideBarContent />
       </Drawer>
-
-      <Typography sx={{ fontWeight: "bold", color: "#000", flex: 1, ml: 2 }} variant="h6">
-        Página / {title}
-      </Typography>
-
-      <Box sx={{ display: { xs: "none", sm: "block" }, mr: 2 }}>
+      <Box sx={{ display: "flex", mr: 2 }}>
         <Search />
       </Box>
 
@@ -53,9 +56,11 @@ const HeaderComponentMovile = ({ title }) => {
         <IconButton>
           <NotificationComponent />
         </IconButton>
-        <IconButton>
-          <SettingsIcon />
-        </IconButton>
+        {isCollaboratorButtonVisible && (
+          <IconButton onClick={handleCollabClick}>
+            <PeopleIcon />
+          </IconButton>
+        )}
         <IconButton onClick={handleAccountClick}>
           <Avatar
             alt={user?.name || "Usuario"}

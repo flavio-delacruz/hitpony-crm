@@ -18,7 +18,7 @@ import {
   Chip,
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
-import LayoutAdmin from "../../../components/layout/layoutAdmin";
+import Layout from "../../../components/layout/layout";
 
 const GestorDeAsignaciones = () => {
   const [allUsers, setAllUsers] = useState([]);
@@ -227,9 +227,14 @@ const GestorDeAsignaciones = () => {
     const setter = setters.find((s) => s.id === id);
     return setter ? `${setter.nombre} ${setter.apellido}` : `Setter ID: ${id}`;
   };
+  
+  // Nuevo filtro para solo mostrar closers con setters asignados
+  const asignacionesConSetters = asignaciones.filter(
+    (a) => a.setters_ids && a.setters_ids.length > 0
+  );
 
   return (
-    <LayoutAdmin title={"Gestor de Asignaciones"}>
+    <Layout>
       <Box
         sx={{
           p: 4,
@@ -289,7 +294,7 @@ const GestorDeAsignaciones = () => {
                   PaperProps: {
                     sx: {
                       width: { xs: "80%", sm: "25%" },
-                      ml: { xs: 0, sm: 35 }, // 👈 en móviles 0, desde sm hacia arriba 35
+                      ml: { xs: 0, sm: 35 },
                     },
                   },
                   anchorOrigin: {
@@ -422,8 +427,8 @@ const GestorDeAsignaciones = () => {
                     <ListItemText primary="Este closer no tiene asignaciones." />
                   </ListItem>
                 )
-              ) : asignaciones.length > 0 ? (
-                asignaciones.map((asignacion, index) => (
+              ) : asignacionesConSetters.length > 0 ? (
+                asignacionesConSetters.map((asignacion, index) => (
                   <ListItem
                     key={index}
                     sx={{
@@ -481,7 +486,7 @@ const GestorDeAsignaciones = () => {
           </Box>
         </Box>
       </Box>
-    </LayoutAdmin>
+    </Layout>
   );
 };
 

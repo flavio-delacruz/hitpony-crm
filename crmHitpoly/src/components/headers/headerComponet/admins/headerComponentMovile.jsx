@@ -40,10 +40,6 @@ const HeaderComponentMovile = ({ title }) => {
       >
         <SideBarContent />
       </Drawer>
-
-      <Typography sx={{ fontWeight: "bold", color: "#000", flex: 1, ml: 2 }} variant="h6">
-        {title}
-      </Typography>
       <Box display="flex" alignItems="center">
         <IconButton>
           <NotificationComponent />

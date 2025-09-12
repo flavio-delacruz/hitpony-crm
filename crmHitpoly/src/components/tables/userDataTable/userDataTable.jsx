@@ -1,9 +1,8 @@
-// src/components/tables/userDataTable/DataTable.jsx
-
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import Stack from "@mui/material/Stack";
 import { Button, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useAuth } from "../../../context/AuthContext";
+import { useProspectos } from "../../../context/ProspectosContext"; // Importa el hook del contexto
 import { useNavigate } from "react-router-dom";
 import { columns as defaultColumns } from "./components/columns";
 import CreateList from "./components/CreateList";
@@ -15,27 +14,23 @@ import AddModal from "../../modals/addModal/addModal";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import ShareIcon from "@mui/icons-material/Share";
 import ShareLinkModal from "../../forms/clientesPotenciales/ShareLinkModal";
+import DownloadIcon from "@mui/icons-material/Download";
+import DownloadOptions from "./components/DownloadOptions";
 
 const googleBlue = "#4285F4";
 
 function DataTable() {
   const { user } = useAuth();
+  const {
+    prospectos, // 🎉 Los datos vienen de aquí ahora
+    loadingProspectos,
+    errorProspectos,
+    deleteProspectsFromList,
+    fetchProspectos,
+  } = useProspectos();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
-  const [prospectos, setProspectos] = useState(() => {
-    try {
-      const localData = localStorage.getItem("prospectos");
-      return localData ? JSON.parse(localData) : [];
-    } catch (error) {
-      return [];
-    }
-  });
-
-  const [loadingProspectos, setLoadingProspectos] = useState(false);
-  const [errorProspectos, setErrorProspectos] = useState(null);
-  const isCheckingForChanges = useRef(false);
 
   const [selectedRows, setSelectedRows] = useState([]);
   const [filterModel, setFilterModel] = useState({
@@ -54,6 +49,7 @@ function DataTable() {
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     estado_contacto: !isMobile,
   });
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const mobileColumns = [
     {
@@ -72,188 +68,8 @@ function DataTable() {
 
   const columnsToShow = isMobile ? mobileColumns : defaultColumns;
 
-  const fetchAllProspects = useCallback(async () => {
-    if (!user || !user.id || isCheckingForChanges.current) {
-      return;
-    }
-    isCheckingForChanges.current = true;
-    setLoadingProspectos(true);
-    setErrorProspectos(null);
-
-    try {
-      let allProspects = [];
-      const { id, id_tipo } = user;
-
-      const usersResponse = await fetch(
-        "https://apiweb.hitpoly.com/ajax/traerUsuariosController.php",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ accion: "getDataUsuarios" }),
-        }
-      );
-      const usersData = await usersResponse.json();
-      const usersMap = {};
-      if (usersData.data) {
-        usersData.data.forEach((u) => {
-          usersMap[u.id] = u;
-        });
-      }
-
-      if (id_tipo === "3" || id_tipo === 3) {
-        const asignacionesResponse = await fetch(
-          "https://apiweb.hitpoly.com/ajax/traerAsignacionesController.php",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ accion: "get" }),
-          }
-        );
-        const asignacionesData = await asignacionesResponse.json();
-        let setterIds = [];
-        if (asignacionesData.data && asignacionesData.data.length > 0) {
-          const asignacionDelCloser = asignacionesData.data.find(
-            (asignacion) => Number(asignacion.id_closer) === Number(id)
-          );
-          if (asignacionDelCloser && asignacionDelCloser.setters_ids) {
-            try {
-              const parsedSetters = JSON.parse(asignacionDelCloser.setters_ids);
-              if (Array.isArray(parsedSetters)) {
-                setterIds = parsedSetters;
-              }
-            } catch (e) {}
-          }
-        }
-
-        const promises = setterIds.map((setterId) =>
-          fetch(
-            "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ funcion: "getProspectos", id: setterId }),
-            }
-          ).then((res) => res.json())
-        );
-
-        const allProspectsFromSetters = await Promise.all(promises);
-        allProspects = allProspectsFromSetters.flatMap(
-          (data) => data.resultado || []
-        );
-      }
-
-      const userProspectsResponse = await fetch(
-        "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ funcion: "getProspectos", id: id }),
-        }
-      );
-      const userProspectsData = await userProspectsResponse.json();
-      const prospectsFromUser = userProspectsData.resultado || [];
-
-      const finalProspects =
-        user.id_tipo === "3" || user.id_tipo === 3
-          ? [...allProspects, ...prospectsFromUser]
-          : prospectsFromUser;
-
-      const nuevosProspectosFormatted = finalProspects.map((item) => {
-        const propietario = usersMap[item.usuario_master_id];
-        const nombreCompletoPropietario = propietario
-          ? `${propietario.nombre} ${propietario.apellido}`
-          : "Desconocido";
-
-        return {
-          id: item.id,
-          nombreProspecto: item.nombre,
-          ...item,
-          nombrePropietario: nombreCompletoPropietario,
-          estado: item.estado_contacto || "Sin estado",
-        };
-      });
-
-      setProspectos(nuevosProspectosFormatted);
-    } catch (error) {
-      setErrorProspectos("Error al cargar prospectos: " + error.message);
-    } finally {
-      setLoadingProspectos(false);
-      isCheckingForChanges.current = false;
-    }
-  }, [user]);
-
-  const deleteProspectsFromList = useCallback(
-    async (prospectIds) => {
-      const previousProspects = [...prospectos];
-      const updatedProspects = previousProspects.filter(
-        (p) => !prospectIds.includes(p.id)
-      );
-      setProspectos(updatedProspects);
-
-      try {
-        const deletePromises = prospectIds.map((prospectId) => {
-          const bodyData = JSON.stringify({
-            funcion: "delete",
-            id: prospectId,
-          });
-          return fetch(
-            "https://apiweb.hitpoly.com/ajax/eliminarProspectoTempController.php",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: bodyData,
-            }
-          );
-        });
-
-        const results = await Promise.all(deletePromises);
-        let allSucceeded = true;
-        for (const response of results) {
-          const responseBody = await response.json().catch(() => ({}));
-          if (!response.ok || responseBody.status === "error") {
-            allSucceeded = false;
-          }
-        }
-
-        if (!allSucceeded) {
-          setProspectos(previousProspects);
-          Swal.fire({
-            icon: "error",
-            title: "Error de servidor",
-            text: "Hubo un error al eliminar los prospectos. La lista se ha restaurado.",
-          });
-        } else {
-          Swal.fire({
-            icon: "success",
-            title: "¡Eliminado!",
-            text: "Los prospectos seleccionados han sido eliminados correctamente.",
-          });
-        }
-      } catch (error) {
-        setProspectos(previousProspects);
-        Swal.fire({
-          icon: "error",
-          title: "Error de conexión",
-          text: "Hubo un error de conexión, la lista se ha restaurado.",
-        });
-      }
-    },
-    [prospectos]
-  );
-
-  useEffect(() => {
-    if (user?.id) {
-      fetchAllProspects();
-    }
-  }, [user, fetchAllProspects]);
-
-  useEffect(() => {
-    try {
-      if (prospectos.length > 0) {
-        localStorage.setItem("prospectos", JSON.stringify(prospectos));
-      }
-    } catch (error) {}
-  }, [prospectos]);
+  // La lógica de fetchAllProspects y el useEffect se han eliminado.
+  // Ahora el contexto se encarga de cargar los datos.
 
   const handleRowSelectionChange = (newSelectionModel) => {
     setRowSelectionModel(newSelectionModel);
@@ -284,16 +100,14 @@ function DataTable() {
   const handleCloseCreateList = () => {
     setIsCreateListOpen(false);
   };
-  
-  // ✅ Función para manejar la notificación de éxito
+
   const handleListCreated = async () => {
     try {
-        await Swal.fire("Éxito", "Operación completada con éxito.", "success");
+      await Swal.fire("Éxito", "Operación completada con éxito.", "success");
     } catch (error) {
-        console.error("Error al mostrar la alerta:", error);
+      console.error("Error al mostrar la alerta:", error);
     }
-    // Opcional: recargar los prospectos para reflejar cualquier cambio
-    fetchAllProspects(); 
+    fetchProspectos(); // Llama a la función del contexto para refrescar la tabla
   };
 
   const handleDeleteSelected = async () => {
@@ -303,7 +117,8 @@ function DataTable() {
           `¿Estás seguro de que quieres eliminar ${selectedRows.length} prospectos?`
         )
       ) {
-        await deleteProspectsFromList(selectedRows);
+        // Usa la función del contexto para eliminar prospectos
+        await deleteProspectsFromList(selectedRows); 
         setSelectedRows([]);
         setRowSelectionModel([]);
       }
@@ -329,6 +144,19 @@ function DataTable() {
   const handleShareForm = () => {
     setIsShareModalOpen(true);
   };
+
+  const handleOpenDownloadMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseDownloadMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const prospectsToDownload =
+    selectedRows.length > 0
+      ? prospectos.filter((p) => selectedRows.includes(p.id))
+      : prospectos;
 
   if (loadingProspectos) {
     return <Typography>Cargando prospectos...</Typography>;
@@ -379,6 +207,13 @@ function DataTable() {
           <Stack direction="row" spacing={2}>
             <Button
               variant="outlined"
+              startIcon={<DownloadIcon />}
+              onClick={handleOpenDownloadMenu}
+            >
+              Descargar
+            </Button>
+            <Button
+              variant="outlined"
               startIcon={<ShareIcon />}
               onClick={handleShareForm}
             >
@@ -403,15 +238,7 @@ function DataTable() {
             onClick={handleOpenCreateList}
             sx={{ width: "fit-content", mt: 1 }}
           >
-            Crear Lista
-          </Button>
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={handleDeleteSelected}
-            sx={{ width: "fit-content", mt: 1 }}
-          >
-            Eliminar Seleccionados
+            Enviar a lista
           </Button>
           <Button
             variant="contained"
@@ -419,7 +246,15 @@ function DataTable() {
             onClick={handleSendMessage}
             sx={{ width: "fit-content", mt: 1 }}
           >
-            Enviar Correo
+            Enviar Correos
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={handleDeleteSelected}
+            sx={{ width: "fit-content", mt: 1 }}
+          >
+            Eliminar
           </Button>
         </Stack>
       )}
@@ -434,7 +269,7 @@ function DataTable() {
         }}
       >
         <DataGrid
-          rows={prospectos}
+          rows={prospectos} // Usa los datos del contexto
           columns={columnsToShow}
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
@@ -484,6 +319,12 @@ function DataTable() {
       <ShareLinkModal
         open={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
+      />
+
+      <DownloadOptions
+        anchorEl={anchorEl}
+        handleClose={handleCloseDownloadMenu}
+        prospectsToDownload={prospectsToDownload}
       />
     </Stack>
   );

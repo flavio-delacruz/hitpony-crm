@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { DragDropContext } from "@hello-pangea/dnd";
-import useProspectos from "./components/prospectosService";
+import { useProspectos } from "../../../context/ProspectosContext"; // Importa desde el nuevo contexto
 import useUpdateProspecto from "./components/updateProspectoService";
 import CrmColumn from "./components/CrmColumn";
 
@@ -24,7 +24,7 @@ const move = (source, destination, droppableSource, droppableDestination) => {
 };
 
 const CrmCard = () => {
-  const { fetchProspectos } = useProspectos();
+  const { prospectos } = useProspectos(); // Consume los datos directamente del contexto
   const { updateProspectoEstado } = useUpdateProspecto();
   const [columns, setColumns] = useState({
     leads: [],
@@ -37,10 +37,9 @@ const CrmCard = () => {
   });
   const containerRef = useRef(null);
 
-  const loadProspectos = async () => {
-    const prospectosData = await fetchProspectos();
-
-    if (prospectosData) {
+  useEffect(() => {
+    // Esta lógica ahora se activa cada vez que 'prospectos' del contexto cambia
+    if (prospectos && prospectos.length > 0) {
       const organizedColumns = {
         leads: [],
         nutricion: [],
@@ -51,7 +50,7 @@ const CrmCard = () => {
         perdido: [],
       };
 
-      prospectosData.forEach((p) => {
+      prospectos.forEach((p) => {
         const estado = p.estado_contacto?.toLowerCase() || "leads";
         if (organizedColumns[estado]) {
           organizedColumns[estado].push(p);
@@ -60,13 +59,8 @@ const CrmCard = () => {
         }
       });
       setColumns(organizedColumns);
-    } else {
     }
-  };
-
-  useEffect(() => {
-    loadProspectos();
-  }, [fetchProspectos]);
+  }, [prospectos]); // Dependencia del efecto
 
   const onDragEnd = async (result) => {
     const { source, destination } = result;

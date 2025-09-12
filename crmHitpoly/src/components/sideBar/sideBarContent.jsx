@@ -25,7 +25,7 @@ const SidebarContainer = styled(Box)({
 
 const buttons = [
   { text: "Inicio", icon: HomeIcon, path: "/dashboard" },
-  { text: "Usuarios", icon: PeopleIcon, path: "/usuarios" },
+  { text: "Contactos", icon: PeopleIcon, path: "/contactos" },
   { text: "Listas", icon: ListAltIcon, path: "/todas-las-listas" },
   { text: "Crm", icon: ContactPageIcon, path: "/crm" },
   { text: "Metricas", icon: AssessmentIcon, path: "/metricas" },
