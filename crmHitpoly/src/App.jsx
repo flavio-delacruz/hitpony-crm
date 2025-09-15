@@ -23,7 +23,9 @@ import ListaDetalles from "./pages/listas/components/ListaDetalles";
 import EnviarCorreo from "./components/correos/enviados/EnviarCorreo";
 import EnviarCorreoAdmin from "./components/correos/enviados/EnviarCorreoAdmin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import GestorDeAsignaciones from "./pages/admin/pages/GestorDeAsignaciones";
+import GestorDeAsignaciones from "./pages/cliente/GestorDeAsignaciones";
+import MisAsignacionesCards from "./pages/cliente/AsignacionesCards";
+import GestorClientes from "./pages/admin/pages/GestorClientes";
 
 // Función auxiliar para mapear id_tipo a un rol legible
 const getRoleFromIdTipo = (id_tipo) => {
@@ -101,6 +103,22 @@ function App() {
               element={
                 <ProtectedRouteWithRole requiredRoles={["admin", "cliente"]}>
                   <GestorDeAsignaciones />
+                </ProtectedRouteWithRole>
+              }
+            />
+            <Route
+              path="/gestor-de-clientes"
+              element={
+                <ProtectedRouteWithRole requiredRoles={["admin", "cliente"]}>
+                  <GestorClientes />
+                </ProtectedRouteWithRole>
+              }
+            />
+            <Route
+              path="/asignaciones-card"
+              element={
+                <ProtectedRouteWithRole requiredRoles={["admin", "cliente"]}>
+                  <MisAsignacionesCards />
                 </ProtectedRouteWithRole>
               }
             />

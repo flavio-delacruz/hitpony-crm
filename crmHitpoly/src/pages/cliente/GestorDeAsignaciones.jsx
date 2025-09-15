@@ -18,7 +18,7 @@ import {
   Chip,
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
-import Layout from "../../../components/layout/layout";
+import Layout from "../../components/layout/layout";
 
 const GestorDeAsignaciones = () => {
   const [allUsers, setAllUsers] = useState([]);
