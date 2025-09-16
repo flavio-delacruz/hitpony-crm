@@ -24,9 +24,7 @@ const OrdersList = () => {
       // Solo carga las órdenes si pertenecen al usuario actual
       if (parsedOrdersData.userId === user?.id) {
         setOrders(parsedOrdersData.list);
-        console.log("Órdenes cargadas de localStorage para el usuario actual:", parsedOrdersData.list);
-      } else {
-        console.log("Ignorando órdenes de localStorage, no coinciden con el usuario actual.");
+        } else {
         setOrders([]);
       }
     }
@@ -45,7 +43,6 @@ const OrdersList = () => {
         list: orders
       };
       localStorage.setItem("orders", JSON.stringify(ordersToSave));
-      console.log("Órdenes guardadas en localStorage:", ordersToSave);
     }
   }, [orders, user]);
 
@@ -67,15 +64,9 @@ const OrdersList = () => {
           }
         );
 
-        console.log("Respuesta completa de la API:", response.data);
-
         const nuevosDatos = Array.isArray(response.data.resultado)
           ? response.data.resultado
           : [];
-
-        console.log("Comparando...");
-        console.log("Datos anteriores (dataAnteriorRef):", dataAnteriorRef.current);
-        console.log("Nuevos datos de la API:", nuevosDatos);
 
         const nuevosEventos = [];
 
@@ -140,11 +131,9 @@ const OrdersList = () => {
           });
         }
 
-        console.log("Nuevos eventos generados:", nuevosEventos);
 
         dataAnteriorRef.current = nuevosDatos;
         localStorage.setItem("dataAnterior", JSON.stringify(nuevosDatos));
-        console.log("Guardando datos anteriores en localStorage:", nuevosDatos);
 
         if (nuevosEventos.length > 0) {
           setOrders((prev) => {
@@ -152,12 +141,12 @@ const OrdersList = () => {
             const unicos = Array.from(
               new Map(nuevos.map((item) => [item.id, item])).values()
             );
-            console.log("Estado de 'orders' actualizado:", unicos.slice(0, 50));
+            
             return unicos.slice(0, 50);
           });
         }
       } catch (error) {
-        console.error("Error al obtener los prospectos:", error);
+        
       }
     };
 

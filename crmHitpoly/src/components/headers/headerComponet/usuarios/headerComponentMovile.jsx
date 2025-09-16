@@ -31,7 +31,7 @@ const HeaderComponentMovile = ({ title }) => {
 
   // Nuevo manejador para el botón de colaboradores
   const handleCollabClick = () => {
-    navigate("/gestor-de-asignaciones");
+    navigate("/asignaciones");
   };
 
   return (

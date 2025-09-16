@@ -115,9 +115,9 @@ function App() {
               }
             />
             <Route
-              path="/asignaciones-card"
+              path="/equipo"
               element={
-                <ProtectedRouteWithRole requiredRoles={["admin", "cliente"]}>
+                <ProtectedRouteWithRole requiredRoles={["admin", "cliente", "closer", "setter"]}>
                   <MisAsignacionesCards />
                 </ProtectedRouteWithRole>
               }

@@ -1,10 +1,10 @@
 import React, {
-    createContext,
-    useState,
-    useEffect,
-    useContext,
-    useCallback,
-    useRef,
+    createContext,
+    useState,
+    useEffect,
+    useContext,
+    useCallback,
+    useRef,
 } from "react";
 import { useAuth } from "./AuthContext";
 
@@ -13,19 +13,19 @@ const ProspectosContext = createContext();
 export const useProspectos = () => useContext(ProspectosContext);
 
 export const ProspectosProvider = ({ children }) => {
-    const { user } = useAuth();
-    const [prospectos, setProspectos] = useState(() => {
-        try {
-            const localData = localStorage.getItem("prospectos");
-            return localData ? JSON.parse(localData) : [];
-        } catch (error) {
-            console.error("Error al cargar prospectos desde localStorage", error);
-            return [];
-        }
-    });
-    const [loadingProspectos, setLoadingProspectos] = useState(false);
-    const [errorProspectos, setErrorProspectos] = useState(null);
-    const isCheckingForChanges = useRef(false);
+    const { user } = useAuth();
+    const [prospectos, setProspectos] = useState(() => {
+        try {
+            const localData = localStorage.getItem("prospectos");
+            return localData ? JSON.parse(localData) : [];
+        } catch (error) {
+            console.error("Error al cargar prospectos desde localStorage", error);
+            return [];
+        }
+    });
+    const [loadingProspectos, setLoadingProspectos] = useState(false);
+    const [errorProspectos, setErrorProspectos] = useState(null);
+    const isCheckingForChanges = useRef(false);
 
     useEffect(() => {
         try {
@@ -47,6 +47,20 @@ export const ProspectosProvider = ({ children }) => {
         setErrorProspectos(null);
 
         try {
+            // Paso 1: Obtener todos los usuarios y crear un mapa para un acceso rápido.
+            const usersResponse = await fetch("https://apiweb.hitpoly.com/ajax/traerUsuariosController.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ accion: "getDataUsuarios" }),
+            });
+            const usersData = await usersResponse.json();
+            const usersMap = {};
+            if (usersData.data) {
+                usersData.data.forEach((u) => {
+                    usersMap[u.id] = u;
+                });
+            }
+
             let allProspects = [];
             const { id, id_tipo } = user;
 
@@ -84,6 +98,36 @@ export const ProspectosProvider = ({ children }) => {
                 );
                 const allProspectsFromSetters = await Promise.all(promises);
                 allProspects = allProspectsFromSetters.flatMap(data => data.resultado || []);
+            } else if (id_tipo === "4" || id_tipo === 4) {
+                const asignacionesResponse = await fetch(
+                    "https://apiweb.hitpoly.com/ajax/getCloserClientesController.php",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ accion: "get", cliente_id: id }),
+                    }
+                );
+                const asignacionesData = await asignacionesResponse.json();
+
+                let setterIds = [];
+                if (asignacionesData.success && asignacionesData["Clientes-closers-setters"] && asignacionesData["Clientes-closers-setters"].length > 0) {
+                    const asignacionDelCliente = asignacionesData["Clientes-closers-setters"].find(asignacion => Number(asignacion.cliente_id) === Number(id));
+                    if (asignacionDelCliente && asignacionDelCliente.setters_ids) {
+                        setterIds = asignacionDelCliente.setters_ids;
+                    }
+                }
+
+                if (setterIds.length > 0) {
+                    const promises = setterIds.map(setterId =>
+                        fetch("https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ funcion: "getProspectos", id: setterId }),
+                        }).then(res => res.json())
+                    );
+                    const allProspectsFromSetters = await Promise.all(promises);
+                    allProspects = allProspectsFromSetters.flatMap(data => data.resultado || []);
+                }
             }
 
             const userProspectsResponse = await fetch(
@@ -97,14 +141,21 @@ export const ProspectosProvider = ({ children }) => {
             const userProspectsData = await userProspectsResponse.json();
             const prospectsFromUser = userProspectsData.resultado || [];
             
-            const finalProspects = (user.id_tipo === "3" || user.id_tipo === 3)
-                ? [...allProspects, ...prospectsFromUser]
-                : prospectsFromUser;
+            const finalProspects = [...allProspects, ...prospectsFromUser];
 
-            const nuevosProspectosFormatted = finalProspects.map((item) => ({
-                id: item.id,
-                ...item,
-            }));
+            // Paso 2: Enriquecer los prospectos con el nombre del propietario
+            const nuevosProspectosFormatted = finalProspects.map((item) => {
+                const propietario = usersMap[item.usuario_master_id];
+                const nombreCompletoPropietario = propietario
+                    ? `${propietario.nombre} ${propietario.apellido}`
+                    : "Desconocido";
+
+                return {
+                    id: item.id,
+                    ...item,
+                    nombrePropietario: nombreCompletoPropietario,
+                };
+            });
             
             setProspectos(nuevosProspectosFormatted);
             
@@ -138,12 +189,12 @@ export const ProspectosProvider = ({ children }) => {
             const results = await Promise.all(deletePromises);
             
             let allSucceeded = true;
-            results.forEach(response => {
+            for (const response of results) {
                 if (!response.ok) {
                     allSucceeded = false;
                     console.error('Error del servidor al eliminar un prospecto.');
                 }
-            });
+            }
 
             if (!allSucceeded) {
                 setProspectos(previousProspects);

@@ -28,7 +28,7 @@ const HeaderComponent = ({ title }) => {
   };
 
   const handleCollabClick = () => {
-    navigate("/gestor-de-asignaciones");
+    navigate("/asignaciones");
   };
 
   return (

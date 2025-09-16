@@ -34,7 +34,7 @@ const GestorClientes = () => {
 
   const ENDPOINT_GET_USERS = "https://apiweb.hitpoly.com/ajax/traerUsuariosController.php";
   const ENDPOINT_TRAER_ASIGNACIONES = "https://apiweb.hitpoly.com/ajax/getCloserClientesController.php";
-  const ENDPOINT_ASIGNAR = "https://apiweb.hitpoly.com/ajax/relacionCloserClienteController.php";
+  const ENDPOINT_ASIGNAR_NUEVO = "https://apiweb.hitpoly.com/ajax/insertarCloserClienteController.php"; // Nuevo Endpoint
   const ENDPOINT_ELIMINAR = "https://apiweb.hitpoly.com/ajax/eliminarCloserClienteController.php";
 
   const fetchAllData = async () => {
@@ -85,19 +85,15 @@ const GestorClientes = () => {
     fetchAllData();
   }, []);
 
-  const asignarCloserSetter = async (payload) => {
+  const insertarUsuarios = async (payload) => {
     try {
-      await fetch(ENDPOINT_ASIGNAR, {
+      await fetch(ENDPOINT_ASIGNAR_NUEVO, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      fetchAllData();
-      setSelectedClienteId("");
-      setClosersToAssign([]);
-      setSettersToAssign([]);
     } catch (err) {
-      setError("No se pudo asignar a los usuarios.");
+      throw new Error("No se pudo asignar al usuario.");
     }
   };
 
@@ -140,19 +136,25 @@ const GestorClientes = () => {
     setClienteToView(event.target.value);
   };
 
-  const handleAsignar = () => {
-    if (selectedClienteId) {
-      const payload = {
-        accion: "asignarClosers",
-        cliente_id: selectedClienteId,
-      };
-      if (closersToAssign.length > 0) {
-        payload.closers_ids = closersToAssign.map(Number);
-      }
-      if (settersToAssign.length > 0) {
-        payload.setters_ids = settersToAssign.map(Number);
-      }
-      asignarCloserSetter(payload);
+  const handleAsignar = async () => {
+    if (!selectedClienteId) return;
+
+    const closerPromises = closersToAssign.map((closerId) =>
+      insertarUsuarios({ cliente_id: selectedClienteId, closer_id: Number(closerId) })
+    );
+
+    const setterPromises = settersToAssign.map((setterId) =>
+      insertarUsuarios({ cliente_id: selectedClienteId, setter_id: Number(setterId) })
+    );
+
+    try {
+      await Promise.all([...closerPromises, ...setterPromises]);
+      fetchAllData(); // Refrescar los datos para mostrar las nuevas asignaciones
+      setSelectedClienteId("");
+      setClosersToAssign([]);
+      setSettersToAssign([]);
+    } catch (err) {
+      setError("No se pudo asignar a los usuarios.");
     }
   };
 
