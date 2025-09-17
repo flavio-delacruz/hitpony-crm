@@ -48,6 +48,7 @@ function DataTable() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     estado_contacto: !isMobile,
+    // nombrePropietario: !isMobile,
   });
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -57,13 +58,19 @@ function DataTable() {
       headerName: "Prospecto",
       flex: 1,
       valueGetter: (value, row) =>
-        `${row.nombreProspecto || ""} ${row.apellido || ""}`,
+        `${row.nombre || ""} ${row.apellido || ""}`,
     },
     {
       field: "estado_contacto",
       headerName: "Estado",
       width: 150,
     },
+
+    {
+    field: "nombrePropietario", // <-- El campo ya tiene el nombre, no necesita valueGetter
+    headerName: "Propietario",
+    flex: 1,
+  },
   ];
 
   const columnsToShow = isMobile ? mobileColumns : defaultColumns;

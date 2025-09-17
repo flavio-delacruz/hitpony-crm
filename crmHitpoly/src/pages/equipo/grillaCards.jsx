@@ -50,15 +50,25 @@ const MisAsignacionesCards = () => {
   const ENDPOINT_TRAER_ASIGNACIONES =
     "https://apiweb.hitpoly.com/ajax/traerAsignacionesController.php";
 
+  // Agrega el mapeo de tipos de usuario a roles
+  const userTypesMap = {
+    1: "Administrador",
+    2: "Setter",
+    3: "Closer",
+    4: "Cliente",
+  };
+
   useEffect(() => {
     const fetchDatos = async () => {
+      console.log("🟡 Iniciando fetch de datos...");
+
       if (
         !user ||
         !user.id ||
-        (user.id_tipo !== 4 && user.id_tipo !== 3 && user.id_tipo !== 2)
+        (user.id_tipo !== 4 && user.id_tipo !== 3 && user.id_tipo !== 2 && user.id_tipo !== 1)
       ) {
         setError(
-          "Acceso denegado: Este componente es solo para clientes, closers o setters."
+          "Acceso denegado: Este componente es solo para clientes, closers, setters o administradores."
         );
         setCargando(false);
         return;
@@ -68,20 +78,23 @@ const MisAsignacionesCards = () => {
       setError(null);
 
       try {
-        let asignacionesCloserSetterData;
-        let foundAsignacion = null;
-        let usuariosData;
-        let clienteAsignacionData;
-
         const usuariosRes = await fetch(ENDPOINT_GET_USERS, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ accion: "getDataUsuarios" }),
         });
-        usuariosData = await usuariosRes.json();
-        setContactos(usuariosData.data);
+        const usuariosData = await usuariosRes.json();
+        const allUsers = usuariosData.data;
+        console.log("🟢 Usuarios obtenidos:", allUsers);
+        setContactos(allUsers);
 
-        if (user.id_tipo === 4) {
+        if (user.id_tipo === 1) {
+          console.log("🟢 Usuario tipo 1 (Administrador) detectado.");
+          setAsignacionesCliente({ closers_ids: [], setters_ids: [] });
+          setCloserAsignado(null);
+          setClienteAsignado(null);
+        } else if (user.id_tipo === 4) {
+          // ... (lógica existente para Clientes)
           const [asignacionesRes, asignacionesCloserSetterRes] =
             await Promise.all([
               fetch(ENDPOINT_CLIENTE_ASIGNACIONES, {
@@ -97,63 +110,64 @@ const MisAsignacionesCards = () => {
             ]);
 
           const asignacionesData = await asignacionesRes.json();
-          asignacionesCloserSetterData = await asignacionesCloserSetterRes.json();
+          const asignacionesCloserSetterData = await asignacionesCloserSetterRes.json();
 
           if (
             asignacionesData.success &&
             Array.isArray(asignacionesData["Clientes-closers-setters"])
           ) {
-            foundAsignacion = asignacionesData["Clientes-closers-setters"].find(
+            const foundAsignacion = asignacionesData["Clientes-closers-setters"].find(
               (asignacion) =>
                 asignacion.cliente_id.toString() === user.id.toString()
             );
-          }
 
-          if (foundAsignacion) {
-            const closersIdsAsStrings = foundAsignacion.closers_ids.map((id) =>
-              id.toString()
-            );
-            const settersIdsAsStrings = foundAsignacion.setters_ids.map((id) =>
-              id.toString()
-            );
+            if (foundAsignacion) {
+              const closersIdsAsStrings = foundAsignacion.closers_ids.map((id) =>
+                id.toString()
+              );
+              const settersIdsAsStrings = foundAsignacion.setters_ids.map((id) =>
+                id.toString()
+              );
 
-            setAsignacionesCliente({
-              closers_ids: closersIdsAsStrings,
-              setters_ids: settersIdsAsStrings,
-            });
-
-            const newSelectedClosers = {};
-            settersIdsAsStrings.forEach((setterId) => {
-              newSelectedClosers[setterId] = [];
-            });
-
-            if (
-              asignacionesCloserSetterData.success &&
-              Array.isArray(asignacionesCloserSetterData.data)
-            ) {
-              asignacionesCloserSetterData.data.forEach((asignacion) => {
-                if (asignacion.id_closer && asignacion.setters_ids) {
-                  try {
-                    const setterIdsFromApi = JSON.parse(asignacion.setters_ids);
-                    setterIdsFromApi.forEach((setterId) => {
-                      const setterIdStr = setterId.toString();
-                      const closerIdStr = asignacion.id_closer.toString();
-                      if (newSelectedClosers[setterIdStr]) {
-                        newSelectedClosers[setterIdStr].push(closerIdStr);
-                      }
-                    });
-                  } catch (e) {
-                    console.error("Error al parsear setters_ids:", e);
-                  }
-                }
+              setAsignacionesCliente({
+                closers_ids: closersIdsAsStrings,
+                setters_ids: settersIdsAsStrings,
               });
+
+              const newSelectedClosers = {};
+              settersIdsAsStrings.forEach((setterId) => {
+                newSelectedClosers[setterId] = [];
+              });
+
+              if (
+                asignacionesCloserSetterData.success &&
+                Array.isArray(asignacionesCloserSetterData.data)
+              ) {
+                asignacionesCloserSetterData.data.forEach((asignacion) => {
+                  if (asignacion.id_closer && asignacion.setters_ids) {
+                    try {
+                      const setterIdsFromApi = JSON.parse(asignacion.setters_ids);
+                      setterIdsFromApi.forEach((setterId) => {
+                        const setterIdStr = setterId.toString();
+                        const closerIdStr = asignacion.id_closer.toString();
+                        if (newSelectedClosers[setterIdStr]) {
+                          newSelectedClosers[setterIdStr].push(closerIdStr);
+                        }
+                      });
+                    } catch (e) {
+                      console.error("Error al parsear setters_ids:", e);
+                    }
+                  }
+                });
+              }
+              setSelectedClosers(newSelectedClosers);
+            } else {
+              setAsignacionesCliente({ closers_ids: [], setters_ids: [] });
+              setSelectedClosers({});
             }
-            setSelectedClosers(newSelectedClosers);
-          } else {
-            setAsignacionesCliente({ closers_ids: [], setters_ids: [] });
-            setSelectedClosers({});
           }
         } else if (user.id_tipo === 3) {
+          // ... (lógica existente para Closers)
           const [asignacionesCloserSetterRes, clienteAsignacionRes] =
             await Promise.all([
               fetch(ENDPOINT_TRAER_ASIGNACIONES, {
@@ -168,22 +182,20 @@ const MisAsignacionesCards = () => {
               }),
             ]);
 
-          asignacionesCloserSetterData = await asignacionesCloserSetterRes.json();
-          clienteAsignacionData = await clienteAsignacionRes.json();
+          const asignacionesCloserSetterData = await asignacionesCloserSetterRes.json();
+          const clienteAsignacionData = await clienteAsignacionRes.json();
 
           if (
             clienteAsignacionData.success &&
             Array.isArray(clienteAsignacionData["Clientes-closers-setters"])
           ) {
-            const clienteFound = clienteAsignacionData[
-              "Clientes-closers-setters"
-            ].find((asignacion) => {
+            const clienteFound = clienteAsignacionData["Clientes-closers-setters"].find((asignacion) => {
               return asignacion.closers_ids.some(
                 (closerId) => closerId.toString() === user.id.toString()
               );
             });
             if (clienteFound) {
-              const clienteInfo = usuariosData.data.find(
+              const clienteInfo = allUsers.find(
                 (u) => u.id.toString() === clienteFound.cliente_id.toString()
               );
               setClienteAsignado(clienteInfo);
@@ -215,6 +227,7 @@ const MisAsignacionesCards = () => {
           });
           setSelectedClosers({});
         } else if (user.id_tipo === 2) {
+          // ... (lógica existente para Setters)
           const [asignacionesCloserSetterRes, clienteAsignacionRes] =
             await Promise.all([
               fetch(ENDPOINT_TRAER_ASIGNACIONES, {
@@ -228,8 +241,8 @@ const MisAsignacionesCards = () => {
                 body: JSON.stringify({ accion: "get" }),
               }),
             ]);
-          asignacionesCloserSetterData = await asignacionesCloserSetterRes.json();
-          clienteAsignacionData = await clienteAsignacionRes.json();
+          const asignacionesCloserSetterData = await asignacionesCloserSetterRes.json();
+          const clienteAsignacionData = await clienteAsignacionRes.json();
 
           let foundCloser = null;
           if (
@@ -245,23 +258,20 @@ const MisAsignacionesCards = () => {
                       .map((id) => id.toString())
                       .includes(user.id.toString())
                   ) {
-                    foundCloser = usuariosData.data.find(
+                    foundCloser = allUsers.find(
                       (u) => u.id.toString() === asignacion.id_closer.toString()
                     );
                     if (foundCloser) {
-                      const clienteFound = clienteAsignacionData[
-                        "Clientes-closers-setters"
-                      ].find((cliAsig) => {
+                      const clienteFound = clienteAsignacionData["Clientes-closers-setters"].find((cliAsig) => {
                         return cliAsig.closers_ids.some(
                           (closerId) =>
                             closerId.toString() === foundCloser.id.toString()
                         );
                       });
                       if (clienteFound) {
-                        const clienteInfo = usuariosData.data.find(
+                        const clienteInfo = allUsers.find(
                           (u) =>
-                            u.id.toString() ===
-                            clienteFound.cliente_id.toString()
+                            u.id.toString() === clienteFound.cliente_id.toString()
                         );
                         setClienteAsignado(clienteInfo);
                       }
@@ -310,6 +320,8 @@ const MisAsignacionesCards = () => {
   const settersAsignados = asignacionesCliente.setters_ids
     .map(getContacto)
     .filter(Boolean);
+
+  const contactosParaMostrar = user.id_tipo === 1 ? filterContactos(contactos, searchInput) : [];
 
   const closersFiltrados = filterContactos(closersAsignados, searchInput);
   const settersFiltrados = filterContactos(settersAsignados, searchInput);
@@ -434,19 +446,19 @@ const MisAsignacionesCards = () => {
               {contacto.nombre} {contacto.apellido}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Typography color="text.secondary" sx={{ mr: 1 }}>
-                    {tipo}
-                </Typography>
-                <IconButton
-                    aria-label="contactar por correo"
-                    onClick={() => handleOpenCorreo(contacto.id)}
-                    sx={{
-                        color: "primary.main",
-                        p: 0.5,
-                    }}
-                >
-                    <MailOutlineIcon />
-                </IconButton>
+              <Typography color="text.secondary" sx={{ mr: 1 }}>
+                {tipo}
+              </Typography>
+              <IconButton
+                aria-label="contactar por correo"
+                onClick={() => handleOpenCorreo(contacto.id)}
+                sx={{
+                  color: "primary.main",
+                  p: 0.5,
+                }}
+              >
+                <MailOutlineIcon />
+              </IconButton>
             </Box>
             <Typography variant="body2" sx={{ mt: 1, overflowWrap: "break-word" }}>
               Correo: {contacto.correo}
@@ -501,6 +513,26 @@ const MisAsignacionesCards = () => {
 
         {!cargando && !error && (
           <Box>
+            {user.id_tipo === 1 && (
+              <>
+                <Typography variant="h5" component="h2" sx={{ mt: 4, mb: 2 }}>
+                  Todos los Usuarios
+                </Typography>
+                <Grid container spacing={3}>
+                  {contactosParaMostrar.length > 0 ? (
+                    contactosParaMostrar.map((contacto) =>
+                      // Solución: Pasar el nombre del rol desde el mapeo
+                      renderContactoCard(contacto, userTypesMap[contacto.id_tipo] || "Desconocido")
+                    )
+                  ) : (
+                    <Grid item xs={12}>
+                      <Typography>No se encontraron usuarios.</Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              </>
+            )}
+
             {(user.id_tipo === 3 || user.id_tipo === 2) && (
               <>
                 <Typography variant="h5" component="h2" sx={{ mt: 4, mb: 2 }}>
@@ -605,17 +637,17 @@ const MisAsignacionesCards = () => {
                               </Typography>
                               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <Typography color="text.secondary" sx={{ mr: 1 }}>
-                                    Setter
+                                  Setter
                                 </Typography>
                                 <IconButton
-                                    aria-label="contactar por correo"
-                                    onClick={() => handleOpenCorreo(setter.id)}
-                                    sx={{
-                                        color: "primary.main",
-                                        p: 0.5,
-                                    }}
+                                  aria-label="contactar por correo"
+                                  onClick={() => handleOpenCorreo(setter.id)}
+                                  sx={{
+                                    color: "primary.main",
+                                    p: 0.5,
+                                  }}
                                 >
-                                    <MailOutlineIcon />
+                                  <MailOutlineIcon />
                                 </IconButton>
                               </Box>
                               <Typography
@@ -634,7 +666,7 @@ const MisAsignacionesCards = () => {
                                     Closers asignados:
                                   </Typography>
                                   {selectedClosers[setter.id] &&
-                                  selectedClosers[setter.id].length > 0 ? (
+                                    selectedClosers[setter.id].length > 0 ? (
                                     selectedClosers[setter.id].map(
                                       (closerId) => {
                                         const closer = getContacto(closerId);
