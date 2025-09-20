@@ -2,9 +2,9 @@ import React, { useState, useMemo, useRef } from "react";
 import Stack from "@mui/material/Stack";
 import { Button, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useAuth } from "../../../context/AuthContext";
-import { useProspectos } from "../../../context/ProspectosContext"; // Importa el hook del contexto
+import { useProspectos } from "../../../context/ProspectosContext";
 import { useNavigate } from "react-router-dom";
-import { columns as defaultColumns } from "./components/columns";
+import { columns as defaultColumns } from "./components/columns"; // <-- Las columnas importadas
 import CreateList from "./components/CreateList";
 import Swal from "sweetalert2";
 import ProspectFilter from "./components/Filter";
@@ -22,7 +22,7 @@ const googleBlue = "#4285F4";
 function DataTable() {
   const { user } = useAuth();
   const {
-    prospectos, // 🎉 Los datos vienen de aquí ahora
+    prospectos,
     loadingProspectos,
     errorProspectos,
     deleteProspectsFromList,
@@ -48,7 +48,6 @@ function DataTable() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     estado_contacto: !isMobile,
-    // nombrePropietario: !isMobile,
   });
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -65,18 +64,28 @@ function DataTable() {
       headerName: "Estado",
       width: 150,
     },
-
     {
-    field: "nombrePropietario", // <-- El campo ya tiene el nombre, no necesita valueGetter
-    headerName: "Propietario",
-    flex: 1,
-  },
+      field: "nombrePropietario",
+      headerName: "Propietario",
+      flex: 1,
+    },
   ];
 
-  const columnsToShow = isMobile ? mobileColumns : defaultColumns;
+  // Agrega la nueva columna oculta a las columnas de escritorio.
+  const desktopColumns = useMemo(() => {
+    // Definimos la columna de "nombreCompleto"
+    const nombreCompletoColumn = {
+      field: "nombreCompleto",
+      headerName: "Nombre Completo",
+      // Escondemos esta columna para que no se duplique la información
+      hide: true,
+      valueGetter: (value, row) => `${row.nombre || ""} ${row.apellido || ""}`,
+    };
+    // Devolvemos un nuevo array que incluye la nueva columna y las originales
+    return [nombreCompletoColumn, ...defaultColumns];
+  }, [defaultColumns]);
 
-  // La lógica de fetchAllProspects y el useEffect se han eliminado.
-  // Ahora el contexto se encarga de cargar los datos.
+  const columnsToShow = isMobile ? mobileColumns : desktopColumns;
 
   const handleRowSelectionChange = (newSelectionModel) => {
     setRowSelectionModel(newSelectionModel);
@@ -114,7 +123,7 @@ function DataTable() {
     } catch (error) {
       console.error("Error al mostrar la alerta:", error);
     }
-    fetchProspectos(); // Llama a la función del contexto para refrescar la tabla
+    fetchProspectos();
   };
 
   const handleDeleteSelected = async () => {
@@ -124,8 +133,7 @@ function DataTable() {
           `¿Estás seguro de que quieres eliminar ${selectedRows.length} prospectos?`
         )
       ) {
-        // Usa la función del contexto para eliminar prospectos
-        await deleteProspectsFromList(selectedRows); 
+        await deleteProspectsFromList(selectedRows);
         setSelectedRows([]);
         setRowSelectionModel([]);
       }
@@ -276,7 +284,7 @@ function DataTable() {
         }}
       >
         <DataGrid
-          rows={prospectos} // Usa los datos del contexto
+          rows={prospectos}
           columns={columnsToShow}
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}

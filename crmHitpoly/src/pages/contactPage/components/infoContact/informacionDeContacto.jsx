@@ -10,13 +10,18 @@ import {
   Alert,
   IconButton,
   Modal,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Tooltip,
 } from "@mui/material";
 import { Email, Phone, WhatsApp } from "@mui/icons-material";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/material.css";
 import { useAuth } from "../../../../context/AuthContext";
-import { useProspectos } from "../../../../context/ProspectosContext"; // Importa el hook del contexto
+import { useProspectos } from "../../../../context/ProspectosContext";
 import EditableAvatar from "./editInformation/EditableAvatar";
 import CorreoFlotante from "../../../../components/correos/enviados/CorreoFlotante";
 import NotaCard from "../../components/actividades/Notas/NotaCard";
@@ -33,7 +38,15 @@ const style = {
   borderRadius: "8px",
 };
 
-// La función 'fetchProspectsAndFindById' ya no es necesaria y se puede eliminar.
+const estados = [
+  "leads",
+  "nutricion",
+  "interesado",
+  "agendado",
+  "ganado",
+  "seguimiento",
+  "perdido",
+];
 
 const EditableField = ({ label, value, onChange }) => (
   <Grid item xs={12}>
@@ -49,10 +62,52 @@ const EditableField = ({ label, value, onChange }) => (
   </Grid>
 );
 
+const CopyableEmail = ({ email }) => {
+  const [copySuccess, setCopySuccess] = useState('');
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(email);
+    setCopySuccess('¡Copiado!');
+  };
+
+  const handleTooltipClose = () => {
+    if (copySuccess) {
+      setTimeout(() => {
+        setCopySuccess('');
+      }, 300);
+    }
+  };
+
+  const truncatedEmail = email && email.length > 20 ? `${email.substring(0, 17)}...` : email;
+  const tooltipTitle = copySuccess || email;
+
+  return (
+    <Tooltip
+      title={tooltipTitle}
+      placement="top"
+      onClose={handleTooltipClose}
+    >
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          cursor: 'pointer',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          maxWidth: '100%',
+        }}
+        onClick={handleCopy}
+      >
+        {truncatedEmail || "Correo no disponible"}
+      </Typography>
+    </Tooltip>
+  );
+};
+
 export default function ContactInformation({ prospectId }) {
   const { user } = useAuth();
-  // Usa el hook del contexto para acceder a los prospectos
-  const { prospectos, loadingProspectos, errorProspectos } = useProspectos(); 
+  const { prospectos, loadingProspectos, errorProspectos } = useProspectos();
 
   const [contactData, setContactData] = useState(null);
   const [initialData, setInitialData] = useState(null);
@@ -63,33 +118,26 @@ export default function ContactInformation({ prospectId }) {
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
 
   useEffect(() => {
-    // Si los prospectos del contexto están cargando, no hagas nada
-    if (loadingProspectos) return; 
-
-    setHasChanges(false);
-    const savedData = localStorage.getItem(`contactData-${prospectId}`);
-    
-    if (savedData) {
-      const data = JSON.parse(savedData);
-      setContactData(data);
-      setInitialData(data);
-    } else {
-      // Busca el prospecto directamente en el array del contexto
-      const prospect = prospectos.find((p) => Number(p.id) === Number(prospectId));
-      
-      if (prospect) {
-        const normalizedProspect = {
-          ...prospect,
-          email: prospect.email || prospect.correo,
-          productos_interes: prospect.productos_interes || "",
-        };
-        setContactData(normalizedProspect);
-        setInitialData(normalizedProspect);
-      } else {
-        setContactData({});
-      }
+    // Si los prospectos están cargando, sal de la función.
+    if (loadingProspectos) {
+      return;
     }
-    // El efecto ahora depende de los datos de 'prospectos' del contexto
+
+    // Busca el prospecto directamente en el array del contexto
+    const prospect = prospectos.find((p) => Number(p.id) === Number(prospectId));
+
+    if (prospect) {
+      const normalizedProspect = {
+        ...prospect,
+        email: prospect.email || prospect.correo,
+        productos_interes: prospect.productos_interes || "",
+      };
+      setContactData(normalizedProspect);
+      setInitialData(normalizedProspect);
+    } else {
+      setContactData({});
+    }
+    // El useEffect se ejecutará cada vez que `prospectos` o `loadingProspectos` cambien.
   }, [prospectId, prospectos, loadingProspectos]);
 
   if (loadingProspectos) return <Typography>Cargando...</Typography>;
@@ -99,10 +147,7 @@ export default function ContactInformation({ prospectId }) {
   const updateField = (field) => (value) => {
     setContactData((prev) => {
       const updatedData = { ...prev, [field]: value };
-      localStorage.setItem(
-        `contactData-${prospectId}`,
-        JSON.stringify(updatedData)
-      );
+      // Ya no se guarda en localStorage aquí
       checkForChanges(updatedData);
       return updatedData;
     });
@@ -133,6 +178,7 @@ export default function ContactInformation({ prospectId }) {
       ciudad: contactData.ciudad,
       pais: contactData.pais,
       productos_interes: contactData.productos_interes,
+      estado_contacto: contactData.estado_contacto,
     };
 
     setContactData((prev) => ({ ...prev, ...updatedData }));
@@ -183,6 +229,10 @@ export default function ContactInformation({ prospectId }) {
     setIsNoteModalOpen(false);
   };
 
+  const handleEstadoChange = (event) => {
+    updateField("estado_contacto")(event.target.value);
+  };
+
   return (
     <Box
       sx={{
@@ -204,21 +254,25 @@ export default function ContactInformation({ prospectId }) {
             onAvatarChange={(newUrl) =>
               setContactData((prev) => {
                 const updatedData = { ...prev, avatar: newUrl };
-                localStorage.setItem(
-                  `contactData-${prospectId}`,
-                  JSON.stringify(updatedData)
-                );
+                // Ya no se guarda en localStorage aquí
                 checkForChanges(updatedData);
                 return updatedData;
               })
             }
           />
           <Typography variant="body1">{contactData.nombre}</Typography>
-          <Typography variant="body2" color="text.secondary">
-            {contactData.email || "Correo no disponible"}
-          </Typography>
+          <CopyableEmail email={contactData.email} />
 
-          <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
+          {/* Código modificado para hacer los íconos responsivos */}
+          <Box
+            sx={{
+              mt: 1,
+              display: "flex",
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: { xs: 1, sm: 1 },
+            }}
+          >
             <IconButton onClick={handleOpenEmail}>
               <Email />
             </IconButton>
@@ -306,6 +360,67 @@ export default function ContactInformation({ prospectId }) {
             value={contactData.pais}
             onChange={updateField("pais")}
           />
+
+          <Grid item xs={12}>
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="estado-label">Estado</InputLabel>
+              <Select
+                labelId="estado-label"
+                id="estado-select"
+                value={contactData.estado_contacto || "leads"}
+                label="Estado"
+                onChange={handleEstadoChange}
+              >
+                {estados.map((estado) => (
+                  <MenuItem key={estado} value={estado}>
+                    {estado.charAt(0).toUpperCase() + estado.slice(1)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          
+          {/* Muestra el nombre del propietario del prospecto (setter) */}
+          <Grid item xs={12}>
+            <TextField
+              label="Propietario del Lead"
+              value={contactData.nombrePropietario || "Desconocido"}
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true,
+              }}
+              sx={{ '& .MuiInputBase-input': { backgroundColor: '#f0f0f0' } }}
+            />
+          </Grid>
+
+          {/* Muestra el nombre del closer asociado */}
+          <Grid item xs={12}>
+            <TextField
+              label="Closer Asociado"
+              value={contactData.nombre_closer || "Desconocido"}
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true,
+              }}
+              sx={{ '& .MuiInputBase-input': { backgroundColor: '#f0f0f0' } }}
+            />
+          </Grid>
+
+          {/* NUEVO CAMPO: Muestra el nombre del cliente asociado */}
+          <Grid item xs={12}>
+            <TextField
+              label="Cliente Asociado"
+              value={contactData.nombre_cliente || "Desconocido"}
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true,
+              }}
+              sx={{ '& .MuiInputBase-input': { backgroundColor: '#f0f0f0' } }}
+            />
+          </Grid>
         </Grid>
       </Paper>
 

@@ -1,4 +1,3 @@
-// CrmItem.js
 import React from "react";
 import { Draggable } from "@hello-pangea/dnd";
 import { Avatar, Typography, Box } from "@mui/material";
@@ -45,10 +44,28 @@ const CrmItem = ({ item, index }) => {
                 alignItems: "center",
               }}
             >
-              <Typography variant="subtitle1" fontWeight="bold">
-                {item.nombre || "Sin nombre"}
-              </Typography>
-              <Avatar src={item.foto_perfil}>
+              {/* Contenedor del nombre con flexbox para que se adapte */}
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  minWidth: 0,
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  noWrap
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {item.nombre || "Sin nombre"}
+                </Typography>
+              </Box>
+
+              <Avatar sx={{ ml: 1 }} src={item.foto_perfil}>
                 {item.nombre?.charAt(0) || "?"}
               </Avatar>
             </Box>
@@ -89,7 +106,7 @@ const CrmItem = ({ item, index }) => {
         </div>
       )}
     </Draggable>
-  ); // <--- Y este paréntesis de cierre también es crucial
+  );
 };
 
 export default CrmItem;

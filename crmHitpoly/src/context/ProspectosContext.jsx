@@ -32,14 +32,13 @@ export const ProspectosProvider = ({ children }) => {
                 localStorage.setItem("prospectos", JSON.stringify(prospectos));
             }
         } catch (error) {
-            }
+        }
     }, [prospectos]);
 
     const fetchAllProspects = useCallback(async () => {
         if (!user || !user.id || isCheckingForChanges.current) {
             return;
         }
-
 
         isCheckingForChanges.current = true;
         setLoadingProspectos(true);
@@ -49,25 +48,56 @@ export const ProspectosProvider = ({ children }) => {
             const { id, id_tipo } = user;
             let finalProspects = [];
 
-            // --- Mueve esta lógica fuera de los if/else if de los roles ---
-            // Esto asegura que el mapa de usuarios se cree para cualquier rol.
+            // --- PASO 1: Obtener todos los usuarios y crear los mapas
             const usersMap = {};
+            const closersMap = {};
+            const clientsMap = {};
+            
             const usersResponse = await fetch("https://apiweb.hitpoly.com/ajax/traerUsuariosController.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ accion: "getDataUsuarios" }),
             });
             const usersData = await usersResponse.json();
-            
+
             if (usersData.data) {
                 usersData.data.forEach((u) => {
                     usersMap[u.id] = u;
+                    if (u.id_tipo === "3" || u.id_tipo === 3) {
+                        closersMap[u.id] = u;
+                    }
+                    if (u.id_tipo === "4" || u.id_tipo === 4) {
+                        clientsMap[u.id] = u;
+                    }
                 });
             }
 
-            // --- La lógica para cada rol permanece igual, solo que ahora usersMap siempre está disponible ---
+            // --- PASO 2: Obtener las asignaciones de clientes a setters
+            const clientAsignacionesResponse = await fetch(
+                "https://apiweb.hitpoly.com/ajax/getCloserClientesController.php",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ accion: "get" }),
+                }
+            );
+            const clientAsignacionesData = await clientAsignacionesResponse.json();
+
+            const setterToClientMap = {};
+            if (clientAsignacionesData.success && clientAsignacionesData['Clientes-closers-setters']) {
+                clientAsignacionesData['Clientes-closers-setters'].forEach(asignacion => {
+                    const settersIds = asignacion.setters_ids;
+                    if (Array.isArray(settersIds)) {
+                        settersIds.forEach(setterId => {
+                            setterToClientMap[setterId] = asignacion.cliente_id;
+                        });
+                    }
+                });
+            }
+            
+            // --- PASO 3: Obtener los prospectos según el rol del usuario ---
             if (id_tipo === "1" || id_tipo === 1) {
-                
+                // Lógica de Admin
                 const setterUsers = usersData.data.filter(u => u.id_tipo === "2" || u.id_tipo === 2);
                 const setterIds = setterUsers.map(u => u.id);
 
@@ -81,9 +111,9 @@ export const ProspectosProvider = ({ children }) => {
                     );
                     const allProspectsFromSetters = await Promise.all(promises);
                     finalProspects = allProspectsFromSetters.flatMap(data => data.resultado || []);
-                    }
-            } 
-            else if (id_tipo === "2" || id_tipo === 2) {
+                }
+            } else if (id_tipo === "2" || id_tipo === 2) {
+                // Lógica de Setter
                 const userProspectsResponse = await fetch(
                     "https://apiweb.hitpoly.com/ajax/traerProspectosDeSetterConctroller.php",
                     {
@@ -94,8 +124,8 @@ export const ProspectosProvider = ({ children }) => {
                 );
                 const userProspectsData = await userProspectsResponse.json();
                 finalProspects = userProspectsData.resultado || [];
-                }
-            else if (id_tipo === "3" || id_tipo === 3) {
+            } else if (id_tipo === "3" || id_tipo === 3) {
+                // Lógica de Closer
                 const asignacionesResponse = await fetch(
                     "https://apiweb.hitpoly.com/ajax/traerAsignacionesController.php",
                     {
@@ -112,7 +142,8 @@ export const ProspectosProvider = ({ children }) => {
                         try {
                             setterIds = JSON.parse(asignacionDelCloser.setters_ids);
                         } catch (e) {
-                            }
+                            console.error("Error al parsear setters_ids en asignaciones:", e);
+                        }
                     }
                 }
                 if (setterIds.length > 0) {
@@ -126,8 +157,8 @@ export const ProspectosProvider = ({ children }) => {
                     const allProspectsFromSetters = await Promise.all(promises);
                     finalProspects = allProspectsFromSetters.flatMap(data => data.resultado || []);
                 }
-                } 
-            else if (id_tipo === "4" || id_tipo === 4) {
+            } else if (id_tipo === "4" || id_tipo === 4) {
+                // Lógica de Cliente
                 const asignacionesResponse = await fetch(
                     "https://apiweb.hitpoly.com/ajax/getCloserClientesController.php",
                     {
@@ -155,23 +186,58 @@ export const ProspectosProvider = ({ children }) => {
                     const allProspectsFromSetters = await Promise.all(promises);
                     finalProspects = allProspectsFromSetters.flatMap(data => data.resultado || []);
                 }
-                }
-            
-            // --- Este paso ahora funciona para todos los roles ---
+            }
+
+            // --- PASO 4: Mapear los datos a los prospectos
+            const asignacionesResponse = await fetch("https://apiweb.hitpoly.com/ajax/traerAsignacionesController.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ accion: "get" }),
+            });
+            const asignacionesData = await asignacionesResponse.json();
+            const asignacionesMap = {};
+            if (asignacionesData.data) {
+                asignacionesData.data.forEach(asignacion => {
+                    try {
+                        const settersIds = JSON.parse(asignacion.setters_ids);
+                        settersIds.forEach(setterId => {
+                            asignacionesMap[setterId] = asignacion.id_closer;
+                        });
+                    } catch (e) {
+                        console.error("Error al parsear setters_ids en asignaciones:", e);
+                    }
+                });
+            }
+
             const nuevosProspectosFormatted = finalProspects.map((item) => {
                 const propietario = usersMap[item.usuario_master_id];
                 const nombreCompletoPropietario = propietario
                     ? `${propietario.nombre} ${propietario.apellido}`
                     : "Desconocido";
+
+                const idCloser = asignacionesMap[item.usuario_master_id];
+                const closer = closersMap[idCloser];
+                const nombreCompletoCloser = closer
+                    ? `${closer.nombre} ${closer.apellido}`
+                    : "No asignado";
+
+                // Lógica de cliente
+                const idCliente = setterToClientMap[item.usuario_master_id];
+                const cliente = clientsMap[idCliente];
+                const nombreCompletoCliente = cliente
+                    ? `${cliente.nombre} ${cliente.apellido}`
+                    : "Desconocido";
+
                 return {
                     id: item.id,
                     ...item,
                     nombrePropietario: nombreCompletoPropietario,
+                    nombre_closer: nombreCompletoCloser,
+                    nombre_cliente: nombreCompletoCliente,
                 };
             });
             
             setProspectos(nuevosProspectosFormatted);
-            
         } catch (error) {
             setErrorProspectos("Error al cargar prospectos: " + error.message);
         } finally {

@@ -20,6 +20,7 @@ const columns = [
   { field: "sector", headerName: "Sector", width: 150 },
   { field: "productos_interes", headerName: "Intereses", width: 200 },
   { field: "nombrePropietario", headerName: "Propietario", width: 200 },
+  { field: "nombre_closer", headerName: "Closer Asociado", width: 200 },
 ];
 
 function ListaDetalles() {
@@ -204,15 +205,18 @@ function ListaDetalles() {
       setSelectedProspectIds([]);
       try {
         const deletePromises = selectedProspectIds.map((prospectId) =>
-          fetch("https://apiweb.hitpoly.com/ajax/borrarSetterListaController.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              accion: "BorrarSetter",
-              id: prospectId,
-              id_lista: listaSeleccionada.id,
-            }),
-          })
+          fetch(
+            "https://apiweb.hitpoly.com/ajax/borrarSetterListaController.php",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                accion: "BorrarSetter",
+                id: prospectId,
+                id_lista: listaSeleccionada.id,
+              }),
+            }
+          )
         );
         const results = await Promise.all(deletePromises);
         const allSucceeded = results.every((response) => response.ok);
@@ -261,15 +265,18 @@ function ListaDetalles() {
     if (!listaSeleccionada || !listaSeleccionada.id) return;
     try {
       const deletePromises = selectedProspectIds.map((prospectId) =>
-        fetch("https://apiweb.hitpoly.com/ajax/borrarSetterListaController.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            accion: "BorrarSetter",
-            id: prospectId,
-            id_lista: listaSeleccionada.id,
-          }),
-        })
+        fetch(
+          "https://apiweb.hitpoly.com/ajax/borrarSetterListaController.php",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              accion: "BorrarSetter",
+              id: prospectId,
+              id_lista: listaSeleccionada.id,
+            }),
+          }
+        )
       );
       const results = await Promise.all(deletePromises);
       const allDeletionsSucceeded = results.every((response) => response.ok);
@@ -301,12 +308,14 @@ function ListaDetalles() {
   return (
     <Layout title={`${displayNombreLista}`}>
       <Box sx={{ p: 2 }}>
-        <Box sx={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center", 
-          marginBottom: "16px" 
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "16px",
+          }}
+        >
           <Typography variant="h6" gutterBottom sx={{ marginRight: "auto" }}>
             Lista: {displayNombreLista}
           </Typography>
