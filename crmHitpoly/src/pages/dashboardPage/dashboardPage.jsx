@@ -1,9 +1,10 @@
 import { Box } from "@mui/material";
+import { useEffect, useState } from "react";
+
 import UserTable from "../../components/tables/userTable/userTable";
 import OrdersList from "../../components/cards/ordersList/ordersList";
 import Layout from "../../components/layout/layout";
 import ContentCard from "../../components/cards/contentCard/contentCard";
-import { useEffect, useState } from "react";
 import SummaryCardsRow from "./componentes/SummaryCardsRow";
 import DashboardCharts from "./componentes/Charts";
 import { useProspectos } from "../../context/ProspectosContext";
