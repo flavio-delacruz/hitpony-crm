@@ -29,7 +29,7 @@ const letter = {
 export default function SplitText({ text, color, fontFamily }) {
   return (
     <motion.span
-      key={text} // 🔥 se re-crea cada vez que cambia el texto
+      key={text} 
       variants={container}
       initial="hidden"
       animate="visible"
@@ -41,7 +41,7 @@ export default function SplitText({ text, color, fontFamily }) {
           variants={letter}
           style={{
             display: "inline-block",
-            fontSize: "25px",
+            fontSize: "35px",
             color,
             fontFamily,
           }}

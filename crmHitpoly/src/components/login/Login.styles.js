@@ -2,7 +2,7 @@
 import { styled } from "@mui/material/styles";
 import { Box, Typography } from "@mui/material";
 import { brand } from "../../theme";
-import { motion } from "framer-motion";
+import { color, motion } from "framer-motion";
 
 export const REST_OFFSET_VH = -8;
 export const EXPANDED_W = 460;
@@ -14,17 +14,11 @@ export const Stage = styled(Box)({
   placeItems: "center",
   position: "relative",
   background: `
-    radial-gradient(ellipse at 80% 80%, rgba(11,141,181,.18), transparent 45%),
-    radial-gradient(ellipse at 0% 0%, rgba(108,77,226,.16), transparent 45%),
-    rgba(15,16,22,.72)
+    radial-gradient(ellipse at 80% 80%, #3B207F, transparent 55%),
+    radial-gradient(ellipse at 0% 0%, rgba(0, 0, 0, 1), transparent 45%),
+    rgba(0, 0, 0, 1)
   `,
-  "::before": {
-    content: '""',
-    position: "absolute",
-    inset: 0,
-    background: `url("/Hitpoly.jpeg") center/cover fixed no-repeat`,
-    zIndex: -1,
-  },
+  overflow: "hidden",
 });
 
 export const NeonWrap = styled(Box)({
@@ -137,6 +131,7 @@ export const NeonDot = styled("span", {
 
 
 
+// Estilos base para GlowTitle
 export const GlowTitle = styled(motion(Typography))({
   fontWeight: 800,
   letterSpacing: ".08em",
@@ -145,28 +140,19 @@ export const GlowTitle = styled(motion(Typography))({
   color: "#ffffff",
   position: "relative",
   overflow: "hidden",
-  textShadow: `
-    0 0 8px rgba(255,255,255,.4),
-    0 0 22px ${brand.blue}55,
-    0 0 22px ${brand.purple}40
-  `,
+  padding: "4px 8px",
 });
 
-GlowTitle.defaultProps = {
-  animate: {
-    textShadow: [
-      `0 0 8px rgba(255,255,255,.4), 0 0 22px ${brand.blue}, 0 0 32px ${brand.purple}`,
-      `0 0 12px rgba(255,255,255,.6), 0 0 32px ${brand.purple}, 0 0 52px ${brand.blue}`,
-      `0 0 6px rgba(255,255,255,.3), 0 0 18px ${brand.blue}55, 0 0 28px ${brand.purple}55`,
-      `0 0 10px rgba(255,255,255,.5), 0 0 42px ${brand.blue}, 0 0 62px ${brand.purple}`
-    ],
+export const fadeInUp = {
+  hidden: { opacity: 0, y: 100 }, // empieza abajo y oculto
+  visible: {
+    opacity: 1,
+    y: 0, // sube a su posición
     transition: {
-      duration: 1.4,
-      repeat: Infinity,
-      repeatType: "mirror",
-      ease: "easeInOut"
-    }
-  }
+      duration: 0.8,
+      ease: "easeOut",
+    },
+  },
 };
 
 

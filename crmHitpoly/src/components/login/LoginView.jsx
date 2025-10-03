@@ -3,6 +3,7 @@ import { Stage, NeonWrap, Pill, NeonDot, GlowTitle, DividerLine } from "./Login.
 import TapHint from "./TapHint";
 import NeonButton from "./NeonButton";
 import SplitText from "./SplitText";
+import { fadeInUp } from "./Login.styles"
 
 import { Box, Typography, TextField } from "@mui/material";
 import { motion } from "framer-motion";
@@ -23,9 +24,49 @@ export default function LoginView({
   error,
 }) { // divide en palabras
 
+const metaBalls = [
+  { size: 250, color: "#6C4DE2" },
+  { size: 200, color: "rgba(108,77,226,.35)" },
+  { size: 180, color: "rgba(255,45,117,.28)" },
+  { size: 220, color: "rgba(0,255,255,.25)" },
+];
+
+
   return (
     <Stage>
-      <GlowTitle variant="h1" sx={{ fontFamily: "'Gravitas One', serif", letterSpacing: ".04em" }}>
+      {/* Fondo MetaBalls animados */}
+      {metaBalls.map((ball, i) => (
+        <motion.div
+          key={i}
+          style={{
+            width: ball.size,
+            height: ball.size,
+            borderRadius: "50%",
+            background: ball.color,
+            position: "absolute",
+            filter: "blur(25px)",
+            mixBlendMode: "screen",
+          }}
+          animate={{
+            x: [0, 150 * (i % 2 ? 1 : -1), -120 * (i % 2 ? 1 : -1), 0],
+            y: [0, -120, 120, 0],
+          }}
+          transition={{
+            duration: 10 + i * 3,
+            repeat: Infinity,
+            repeatType: "mirror",
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      <GlowTitle   
+        variants={ fadeInUp }
+        initial="hidden"
+        animate="visible"
+        variant="h2"
+        sx={{ fontFamily: "'Fredericka the Great', serif", letterSpacing: ".04em" }}
+      >
         Bienvenido a Formark CRM
       </GlowTitle>
 
