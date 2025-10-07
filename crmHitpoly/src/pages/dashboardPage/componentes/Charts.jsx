@@ -1,23 +1,25 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import ChartCard from "../../../components/cards/chartCard/chartCard";
 import { useProspectos } from "../../../context/ProspectosContext";
 
 /* =========================
-   Paleta / helpers
+   Paleta / helpers (modo claro)
 ========================= */
 const getUI = () => ({
-  cyan: "#00EAF0",
-  blue: "#0B8DB5",
-  pink: "#FF2D75",
-  purple: "#6C4DE2",
-  panel: "#0b0f14",
-  text: "#E8ECF1",
+  sky:    "#00C2FF",             // Azul Cielo
+  cyan:   "#0B8DB5",             // Cián Fugaz
+  purple: "#6C4DE2",             // Violeta
+  panel:  "#FFFFFF",             // BLANCO
+  text:   "#211E26",             // Negro Noche
+  border: "rgba(33,30,38,.15)",
+  glowCyan:  "rgba(11,141,181,.35)",
+  glowViolet:"rgba(108,77,226,.25)",
 });
 
 /* =========================
-   Panel neón con borde animado + shimmer + tilt
+   Panel con borde animado + shimmer (claro)
 ========================= */
 const NeonPanel = ({ children, title, subtitle }) => {
   const ui = getUI();
@@ -38,10 +40,11 @@ const NeonPanel = ({ children, title, subtitle }) => {
         overflow: "hidden",
         background: ui.panel,
         p: 2,
-        boxShadow: "0 18px 50px rgba(0,0,0,.55)",
+        border: `1px solid ${ui.border}`,
+        boxShadow: "0 8px 30px rgba(33,30,38,.08)",
       }}
     >
-      {/* Borde en gradiente animado */}
+      {/* Borde en gradiente animado (Azul Cielo → Cián → Violeta) */}
       <Box
         component={motion.div}
         animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
@@ -51,9 +54,9 @@ const NeonPanel = ({ children, title, subtitle }) => {
           inset: 0,
           borderRadius: 14,
           p: "1px",
-          background:
-            "linear-gradient(120deg,#00EAF0,#0B8DB5 40%,#FF2D75 85%,#00EAF0)",
-          backgroundSize: "200% 200%",
+          background: `linear-gradient(120deg, ${ui.sky}, ${ui.cyan} 35%, ${ui.purple} 80%, ${ui.sky})`,
+          backgroundSize: "220% 220%",
+          opacity: 0.65,
           WebkitMask:
             "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
           WebkitMaskComposite: "xor",
@@ -62,13 +65,10 @@ const NeonPanel = ({ children, title, subtitle }) => {
         }}
       />
 
-      {/* Título con glow y letras en stagger */}
+      {/* Título con glow sutil */}
       {title && (
         <Box sx={{ mb: 0.25 }}>
-          <Typography
-            component="div"
-            sx={{ fontWeight: 900, color: ui.text, lineHeight: 1.1 }}
-          >
+          <Typography component="div" sx={{ fontWeight: 900, color: ui.text, lineHeight: 1.1 }}>
             {title.split("").map((ch, i) => (
               <motion.span
                 key={i}
@@ -77,7 +77,7 @@ const NeonPanel = ({ children, title, subtitle }) => {
                 transition={{ delay: 0.02 * i, type: "spring", stiffness: 240, damping: 18 }}
                 style={{
                   textShadow:
-                    "0 1px 0 rgba(0,0,0,.25), 0 0 14px rgba(11,141,181,.45), 0 0 10px rgba(255,45,117,.35)",
+                    `0 1px 0 rgba(255,255,255,.6), 0 0 12px ${ui.glowCyan}, 0 0 8px ${ui.glowViolet}`,
                   display: "inline-block",
                   fontSize: 16,
                 }}
@@ -91,7 +91,7 @@ const NeonPanel = ({ children, title, subtitle }) => {
               variant="caption"
               sx={{
                 color: ui.purple,
-                textShadow: "0 0 8px rgba(108,77,226,.35)",
+                textShadow: "0 0 6px rgba(108,77,226,.2)",
                 display: "block",
                 mt: 0.25,
               }}
@@ -116,7 +116,7 @@ const NeonPanel = ({ children, title, subtitle }) => {
             width: "45%",
             transform: "skewX(-20deg)",
             background:
-              "linear-gradient(120deg, transparent 0, rgba(255,255,255,.08) 20%, transparent 40%)",
+              "linear-gradient(120deg, transparent 0, rgba(0,194,255,.14) 20%, transparent 40%)",
           }}
         />
       </Box>
@@ -131,7 +131,6 @@ const NeonPanel = ({ children, title, subtitle }) => {
 ========================= */
 const DashboardCharts = () => {
   const { prospectos } = useProspectos();
-  const ui = getUI();
 
   const [prospectosPorMes, setProspectosPorMes] = useState({
     meses: [],

@@ -1,40 +1,57 @@
-import { Grid, Typography, Card } from "@mui/material";
-import { styled } from "@mui/system";
+import { Card, CardContent, CardHeader, Typography, Box } from "@mui/material";
+import { motion } from "framer-motion";
+import { PALETA } from "../../../theme/paleta";
 
-const CardStyled = styled(Card)({
-  borderRadius: "15px",
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-});
-
-const ContentCard = ({ title, subtitle, children, gridSize = 8 }) => {
+const ContentCard = ({ title, subtitle, children, gridSize = 12 }) => {
   return (
-    <Grid
-      item
-      xs={gridSize}
+    <Card
+      component={motion.div}
+      initial={{ y: 10, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 180, damping: 20 }}
+      sx={{
+        position: "relative",
+        overflow: "hidden",
+        border: `1px solid ${PALETA.border}`,
+        background: PALETA.white,           // ← BLANCO puro (sin degradados oscuros)
+      }}
     >
-      <CardStyled
+      {/* borde animado (suave para fondo blanco) */}
+      <Box
+        component={motion.div}
+        animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
         sx={{
-          padding: { xs: "10px", sm: "20px" },
-          width: { xs: "90vw", sm: "100%" },
-          height: "100%",
+          position: "absolute",
+          inset: 0,
+          p: "1px",
+          borderRadius: 2,
+          background: PALETA.gradEdgeSoft,
+          backgroundSize: "220% 220%",
+          opacity: .8,
+          WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+          WebkitMaskComposite: "xor",
+          maskComposite: "exclude",
+          pointerEvents: "none",
         }}
-      >
-        <Typography
-          sx={{ fontWeight: "bold" }}
-          variant="h6"
-        >
-          {title}
-        </Typography>
-        <Typography
-          sx={{ fontWeight: "bold" }}
-          variant="body2"
-          color="textSecondary"
-        >
-          {subtitle}
-        </Typography>
-        {children}
-      </CardStyled>
-    </Grid>
+      />
+
+      <CardHeader
+        title={
+          <Typography variant="h6" sx={{ color: PALETA.text, textShadow: `0 0 8px ${PALETA.glowPurple}` }}>
+            {title}
+          </Typography>
+        }
+        subheader={
+          <Typography variant="body2" sx={{ color: PALETA.cyan }}>
+            {subtitle}
+          </Typography>
+        }
+        sx={{ pb: 0.5 }}
+      />
+
+      <CardContent sx={{ pt: 1 }}>{children}</CardContent>
+    </Card>
   );
 };
 

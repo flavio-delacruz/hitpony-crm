@@ -1,49 +1,57 @@
-import { Grid, Typography, Card } from "@mui/material";
-import { styled } from "@mui/system";
-import BarChart from "../../barChart/barChart";
+import { Card, CardContent, Typography, Box } from "@mui/material";
+import { motion } from "framer-motion";
+import { PALETA } from "../../../theme/paleta";
 
-const CardStyled = styled(Card)({
-  borderRadius: "15px",
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-});
-
-const ChartCard = ({
-  series,
-  xAxis,
-  height = 290,
-  title,
-  titleChart,
-  subtitle,
-  margin = { top: 10, bottom: 30, left: 40, right: 10 },
-}) => {
+const ChartCard = ({ title, subtitle, titleChart, series, xAxis }) => {
   return (
-    <Grid
-      item
-      xs={4}
+    <Card
+      component={motion.div}
+      initial={{ scale: 0.98, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 160, damping: 18 }}
+      sx={{
+        background: PALETA.white,            // ← BLANCO, sin degradados grises/negros
+        border: `1px solid ${PALETA.border}`,
+      }}
     >
-      <CardStyled sx={{ padding: { xs: "10px", sm: "20px" } }}>
-        <BarChart
-          titleChart={titleChart}
-          series={series}
-          height={height}
-          xAxis={xAxis}
-          margin={margin}
-        />
-        <Typography
-          sx={{ fontWeight: "bold", fontSize: { xs: "1.1rem" } }}
-          variant="h6"
-        >
-          {title}
-        </Typography>
-        <Typography
-          sx={{ fontWeight: "bold", fontSize: { xs: "14px" } }}
-          variant="body2"
-          color="textSecondary"
-        >
-          {subtitle}
-        </Typography>
-      </CardStyled>
-    </Grid>
+      <Box sx={{ px: 2, pt: 2 }}>
+        {titleChart && (
+          <Typography variant="overline" sx={{ color: PALETA.sky, letterSpacing: ".08em" }}>
+            {titleChart}
+          </Typography>
+        )}
+        {title && (
+          <Typography variant="subtitle1" sx={{ color: PALETA.text, fontWeight: 700 }}>
+            {title}
+          </Typography>
+        )}
+        {subtitle && (
+          <Typography variant="caption" sx={{ color: PALETA.purple }}>
+            {subtitle}
+          </Typography>
+        )}
+      </Box>
+
+      <CardContent sx={{ pt: 1 }}>
+        {/* Ejemplo para @mui/x-charts (colores legibles en blanco) */}
+        {/*
+          <BarChart
+            series={series}
+            xAxis={xAxis}
+            colors={['#00C2FF','#0B8DB5','#6C4DE2']} // Azul Cielo, Cián, Violeta
+            slotProps={{ legend: { labelStyle: { fill: PALETA.text } } }}
+            sx={{
+              "--Charts-axisLineColor": PALETA.borderSoft,
+              "--Charts-tickColor": PALETA.borderSoft,
+              "--Charts-axisLabelColor": PALETA.text,
+              "--Charts-gridColor": "rgba(33,30,38,.10)",
+              background: "transparent",
+              borderRadius: 8,
+            }}
+          />
+        */}
+      </CardContent>
+    </Card>
   );
 };
 
