@@ -110,10 +110,11 @@ const LoginNavbar = ({
           {/* Nav simple para Login */}
           <Stack direction="row" spacing={1}>
             <NeonOutline onClick={(e) => setAnchor(e.currentTarget)} endIcon={<SupportAgentRoundedIcon />}>
-              Soporte
+              Servicio
             </NeonOutline>
-            <NeonOutline>Atención</NeonOutline>
-            <NeonOutline>Desarrolladores</NeonOutline>
+            <NeonOutline>Contactanos</NeonOutline>
+            <NeonOutline>Soporte</NeonOutline>
+            <NeonOutline>Nuestro Equipo</NeonOutline>
           </Stack>
 
           <Box sx={{ flexGrow: 1 }} />
@@ -149,11 +150,11 @@ const LoginNavbar = ({
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
       >
-        <MenuItem onClick={() => setAnchor(null)}>Dudas</MenuItem>
-        <MenuItem onClick={() => setAnchor(null)}>Comentarios & Sugerencias</MenuItem>
+        <MenuItem onClick={() => setAnchor(null)}>Nuestro Equipo</MenuItem>
+        <MenuItem onClick={() => setAnchor(null)}>FAQ / Preguntas Frecuentes</MenuItem>
         <MenuItem onClick={() => setAnchor(null)}>Ayuda</MenuItem>
         <Divider />
-        <MenuItem onClick={() => setAnchor(null)}>Soporte con Desarrolladores</MenuItem>
+        <MenuItem onClick={() => setAnchor(null)}>Soporte</MenuItem>
       </Menu>
     </>
   );

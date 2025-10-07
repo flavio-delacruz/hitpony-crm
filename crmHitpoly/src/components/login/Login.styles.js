@@ -14,7 +14,7 @@ export const Stage = styled(Box)({
   placeItems: "center",
   position: "relative",
   background: `
-    radial-gradient(ellipse at 80% 80%, #3B207F, transparent 55%),
+    radial-gradient(ellipse at 80% 80%, #00D1B8, transparent 55%),
     radial-gradient(ellipse at 0% 0%, rgba(0, 0, 0, 1), transparent 45%),
     rgba(0, 0, 0, 1)
   `,
@@ -133,14 +133,16 @@ export const NeonDot = styled("span", {
 
 // Estilos base para GlowTitle
 export const GlowTitle = styled(motion(Typography))({
-  fontWeight: 800,
-  letterSpacing: ".08em",
+
   textAlign: "center",
   textTransform: "uppercase",
-  color: "#ffffff",
+  color: "#00F0FF",
   position: "relative",
   overflow: "hidden",
   padding: "4px 8px",
+  letterSpacing: "1rem",
+  textShadow: "0 0 5px #00F0FF, 0 5px #00F0FF, 0 0 5px #00F0FF, 0 0 5px #00F0FF",
+  fontWeight: "bold",
 });
 
 export const fadeInUp = {

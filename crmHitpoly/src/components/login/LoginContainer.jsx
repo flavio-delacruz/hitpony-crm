@@ -21,7 +21,7 @@ export default function LoginContainer() {
     "Revolucionamos tu camino hacia el éxito",
     "Creamos un futuro de oportunidades",
   ];
-  const colors = ["#0B8DB5", "#F21C63", "#6C4DE2"];
+  const colors = ["#B0BEC5", "#B0BEC5", "#B0BEC5"];
   const wordIndex = useWordCycle(words);
 
   useEffect(() => {

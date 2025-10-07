@@ -4,8 +4,10 @@ import TapHint from "./TapHint";
 import NeonButton from "./NeonButton";
 import SplitText from "./SplitText";
 import { fadeInUp } from "./Login.styles"
+import 'animate.css';
 
-import { Box, Typography, TextField } from "@mui/material";
+
+import { Box, Typography, TextField, Grid } from "@mui/material";
 import { motion } from "framer-motion";
 
 export default function LoginView({
@@ -60,102 +62,195 @@ const metaBalls = [
         />
       ))}
 
-      <GlowTitle   
-        variants={ fadeInUp }
-        initial="hidden"
-        animate="visible"
-        variant="h2"
-        sx={{ fontFamily: "'Fredericka the Great', serif", letterSpacing: ".04em" }}
+      <Box 
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        gap={1.5}
+        sx={{ m: 0, p: 0, top: "10%", position: "absolute" }}
       >
-        Bienvenido a Formark CRM
-      </GlowTitle>
+        <GlowTitle
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+          variant="h2"
+          gutterBottom={false}
+          sx={{
+            fontFamily: "'Fredericka the Great', serif",
+            letterSpacing: ".04em",
+            m: 0,
+          }}
+        >
+          Bienvenido a Formark CRM
+        </GlowTitle>
 
-      <SplitText
+        <SplitText
           text={words[wordIndex]}
           color={colors[wordIndex]}
           fontFamily="'Berkshire Swash', cursive"
-      />
+        />
+      </Box>
 
 
-      <NeonWrap
-        className={expanded ? "expanded" : ""}
-        onMouseEnter={() => setExpanded(true)}
-        onMouseLeave={() => setExpanded(false)}
-        onClick={() => setExpanded((s) => !s)}
+
+      <Grid container sx={{ height: "100vh" }}>
+        {/* Columna derecha → Slogan */}
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            color: "#fff",
+            textAlign: "center",
+            px: 4,
+          }}
+        >
+    <Typography
+      variant="h3"
+      className="animate__animated animate__backInLeft"
+      sx={{
+        fontFamily: "'Asimovian', sans-serif",
+        fontWeight: 700,
+        mb: 2,
+        color: "#ffffffad",
+      }}
+    >
+      Impulsa tus{" "}
+      <span
+        className="animate__animated animate__rubberBand animate__delay-1s"
+        style={{
+          color: "#00D1B8",
+          fontFamily: "'Ultra', serif",
+          fontSize: "1.2em",
+          display: "inline-block",
+        }}
       >
-        <div className="compact">
-          <Pill
-            animate={{
-              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"], // se mueve de izq a der y vuelve
-            }}
-            transition={{
-              duration: 6, // tiempo en segundos
-              repeat: Infinity, // animación infinita
-              ease: "linear", // movimiento constante
-            }}
+        Ventas
+      </span>
+      , organiza tus{" "}
+      <span
+        className="animate__animated animate__rubberBand animate__delay-2s"
+        style={{
+          color: "#00D1B8",
+          fontFamily: "'Ultra', serif",
+          fontSize: "1.2em",
+          display: "inline-block",
+        }}
+      >
+        Contactos
+      </span>{" "}
+      y haz{" "}
+      <span
+        className="animate__animated animate__rubberBand animate__delay-3s"
+        style={{
+          color: "#00D1B8",
+          fontFamily: "'Ultra', serif",
+          fontSize: "1.2em",
+          display: "inline-block",
+        }}
+      >
+        crecer
+      </span>{" "}
+      tu negocio con nosotros.
+    </Typography>
+
+
+        </Grid>
+        {/* Columna izquierda → Login */}
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <NeonWrap
+            className={expanded ? "expanded" : ""}
+            onMouseEnter={() => setExpanded(true)}
+            onMouseLeave={() => setExpanded(false)}
+            onClick={() => setExpanded((s) => !s)}
           >
-          <NeonDot dotColor="#00ffff" dotSize={14} />
-          INICIAR SESIÓN
-          <NeonDot dotColor="#ff2d75" dotSize={14} />
-          </Pill>
-        </div>
+            <div className="compact">
+              <Pill
+                animate={{
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              >
+                <NeonDot dotColor="#00ffff" dotSize={14} />
+                INICIAR SESIÓN
+                <NeonDot dotColor="#ff2d75" dotSize={14} />
+              </Pill>
+            </div>
 
-        <div className="card">
-          
+            <div className="card">
+              <Box sx={{ display: "grid", gap: 3, mt: 2 }}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  type="email"
+                  label="Correo Electrónico"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  InputProps={{
+                    sx: { borderRadius: 3, bgcolor: "#121522", color: "#fff" },
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  type="password"
+                  label="Contraseña"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  InputProps={{
+                    sx: { borderRadius: 3, bgcolor: "#121522", color: "#fff" },
+                  }}
+                />
 
-            
-            <Typography
-            variant="body2"
-            sx={{
-                textAlign: "center",
-                fontFamily: "'Berkshire Swash', cursive",
-                fontWeight: 400,
-                letterSpacing: ".02em",
-            }}
-            >
-            
-            </Typography>
+                <NeonButton onClick={handleLogin}>Ingresar</NeonButton>
 
+                {error && (
+                  <Typography color="error" sx={{ mt: 1 }}>
+                    {error}
+                  </Typography>
+                )}
 
-          <DividerLine />
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mt: 1,
+                    fontSize: 14,
+                    color: "#aaa",
+                  }}
+                >
+                  <Typography sx={{ cursor: "pointer" }}>
+                    ¿Olvidaste tu contraseña?
+                  </Typography>
+                  <Typography sx={{ color: "#ff2d75", cursor: "pointer" }}>
+                    Crear cuenta
+                  </Typography>
+                </Box>
+              </Box>
+            </div>
+          </NeonWrap>
+        </Grid>
+      </Grid>
 
-          <Box sx={{ display: "grid", gap: 14, mt: 1 }}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              type="email"
-              label="Correo Electrónico"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={handleKeyDown}
-              InputProps={{ sx: { borderRadius: 3, bgcolor: "#121522", color: "#fff" } }}
-            />
-            <TextField
-              fullWidth
-              variant="outlined"
-              type="password"
-              label="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={handleKeyDown}
-              InputProps={{ sx: { borderRadius: 3, bgcolor: "#121522", color: "#fff" } }}
-            />
-
-            <NeonButton onClick={handleLogin}>Ingresar</NeonButton>
-
-            {error && (
-              <Typography color="error" sx={{ mt: 1 }}>
-                {error}
-              </Typography>
-            )}
-
-            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 0.5, fontSize: 14, color: "#aaa" }}>
-              <Typography sx={{ cursor: "pointer" }}>¿Olvidaste tu contraseña?</Typography>
-              <Typography sx={{ color: "#ff2d75", cursor: "pointer" }}>Crear cuenta</Typography>
-            </Box>
-          </Box>
-        </div>
-      </NeonWrap>
     </Stage>
   );
 }
