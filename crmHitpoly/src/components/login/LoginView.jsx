@@ -27,10 +27,10 @@ export default function LoginView({
 }) { // divide en palabras
 
 const metaBalls = [
-  { size: 250, color: "#6C4DE2" },
-  { size: 200, color: "rgba(108,77,226,.35)" },
-  { size: 180, color: "rgba(255,45,117,.28)" },
-  { size: 220, color: "rgba(0,255,255,.25)" },
+  { size: 250, color: "#520efdff" },
+  { size: 200, color: "#000000ff" },
+  { size: 180, color: "rgba(255, 45, 118, 1)" },
+  { size: 220, color: "rgba(0, 255, 255, 1)" },
 ];
 
 
@@ -46,7 +46,7 @@ const metaBalls = [
             borderRadius: "50%",
             background: ball.color,
             position: "absolute",
-            filter: "blur(25px)",
+            filter: "blur(10px)",
             mixBlendMode: "screen",
           }}
           animate={{
@@ -87,7 +87,7 @@ const metaBalls = [
         <SplitText
           text={words[wordIndex]}
           color={colors[wordIndex]}
-          fontFamily="'Berkshire Swash', cursive"
+          fontFamily="'Montserrat', cursive"
         />
       </Box>
 
@@ -104,7 +104,7 @@ const metaBalls = [
             alignItems: "center",
             justifyContent: "center",
             flexDirection: "column",
-            color: "#fff",
+            color: "#ECEAEF",
             textAlign: "center",
             px: 4,
           }}
@@ -116,14 +116,14 @@ const metaBalls = [
         fontFamily: "'Asimovian', sans-serif",
         fontWeight: 700,
         mb: 2,
-        color: "#ffffffad",
+        color: "#211E26",
       }}
     >
       Impulsa tus{" "}
       <span
         className="animate__animated animate__rubberBand animate__delay-1s"
         style={{
-          color: "#00D1B8",
+          color: "#0B8DB5",
           fontFamily: "'Ultra', serif",
           fontSize: "1.2em",
           display: "inline-block",
@@ -135,7 +135,7 @@ const metaBalls = [
       <span
         className="animate__animated animate__rubberBand animate__delay-2s"
         style={{
-          color: "#00D1B8",
+          color: "#0B8DB5",
           fontFamily: "'Ultra', serif",
           fontSize: "1.2em",
           display: "inline-block",
@@ -147,7 +147,7 @@ const metaBalls = [
       <span
         className="animate__animated animate__rubberBand animate__delay-3s"
         style={{
-          color: "#00D1B8",
+          color: "#0B8DB5",
           fontFamily: "'Ultra', serif",
           fontSize: "1.2em",
           display: "inline-block",

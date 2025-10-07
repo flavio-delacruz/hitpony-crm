@@ -14,9 +14,9 @@ export const Stage = styled(Box)({
   placeItems: "center",
   position: "relative",
   background: `
-    radial-gradient(ellipse at 80% 80%, #00D1B8, transparent 55%),
-    radial-gradient(ellipse at 0% 0%, rgba(0, 0, 0, 1), transparent 45%),
-    rgba(0, 0, 0, 1)
+    radial-gradient(ellipse at 80% 80%, #00C2FF, transparent 55%),
+    radial-gradient(ellipse at 0% 0%, rgba(180, 183, 184, 1), transparent 45%),
+    rgba(255, 255, 255, 1)
   `,
   overflow: "hidden",
 });
@@ -136,12 +136,12 @@ export const GlowTitle = styled(motion(Typography))({
 
   textAlign: "center",
   textTransform: "uppercase",
-  color: "#00F0FF",
+  color: "#00C2FF",
   position: "relative",
   overflow: "hidden",
   padding: "4px 8px",
   letterSpacing: "1rem",
-  textShadow: "0 0 5px #00F0FF, 0 5px #00F0FF, 0 0 5px #00F0FF, 0 0 5px #00F0FF",
+  textShadow: "0 0 15px #000000ff, 0 3px #2e3335ff, 0 0 15px #171818ff, 0 0 5px #000000ff",
   fontWeight: "bold",
 });
 

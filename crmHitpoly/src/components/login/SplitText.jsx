@@ -42,6 +42,7 @@ export default function SplitText({ text, color, fontFamily }) {
           style={{
             display: "inline-block",
             fontSize: "35px",
+            fontWeight: "bold",
             color,
             fontFamily,
           }}
