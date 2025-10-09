@@ -1,13 +1,14 @@
+
 // features/login/LoginView.jsx
-import { Stage, NeonWrap, Pill, NeonDot, GlowTitle, DividerLine } from "./Login.styles";
+import { Stage, NeonWrap, Pill, NeonDot, GlowTitle } from "./Login.styles";
 import TapHint from "./TapHint";
 import NeonButton from "./NeonButton";
 import SplitText from "./SplitText";
-import { fadeInUp } from "./Login.styles"
-import 'animate.css';
+import { fadeInUp } from "./Login.styles";
+import LoginForm from "./LoginForm";
+import "animate.css";
 
-
-import { Box, Typography, TextField, Grid } from "@mui/material";
+import { Box, Typography, TextField, Grid, Button  } from "@mui/material";
 import { motion } from "framer-motion";
 
 export default function LoginView({
@@ -19,20 +20,20 @@ export default function LoginView({
   handleKeyDown,
   expanded,
   setExpanded,
-  showHint, 
+  showHint,
   words,
   wordIndex,
   colors,
   error,
-}) { // divide en palabras
+}) {
 
-const metaBalls = [
-  { size: 250, color: "#520efdff" },
-  { size: 200, color: "#000000ff" },
-  { size: 180, color: "rgba(255, 45, 118, 1)" },
-  { size: 220, color: "rgba(0, 255, 255, 1)" },
-];
 
+  const metaBalls = [
+    { size: 250, color: "#520efdff" },
+    { size: 200, color: "#000000ff" },
+    { size: 180, color: "rgba(255, 45, 118, 1)" },
+    { size: 220, color: "rgba(0, 255, 255, 1)" },
+  ];
 
   return (
     <Stage>
@@ -62,12 +63,19 @@ const metaBalls = [
         />
       ))}
 
-      <Box 
+      <Box
         display="flex"
         flexDirection="column"
         alignItems="center"
         gap={1.5}
-        sx={{ m: 0, p: 0, top: "10%", position: "absolute" }}
+        sx={{
+          m: 0,
+          p: 0,
+          position: "relative",
+          textAlign: "center",
+          px: { xs: 2, sm: 3, md: 3 },
+          my: { xs: 0, sm: 0, md: 0 },
+        }}
       >
         <GlowTitle
           variants={fadeInUp}
@@ -76,9 +84,11 @@ const metaBalls = [
           variant="h2"
           gutterBottom={false}
           sx={{
+            mt: { xs: 4, sm: 3, md: 4 },
             fontFamily: "'Fredericka the Great', serif",
             letterSpacing: ".04em",
             m: 0,
+            fontSize: { xs: "1.8rem", sm: "2.3rem", md: "4.6rem" },
           }}
         >
           Bienvenido a Formark CRM
@@ -91,166 +101,106 @@ const metaBalls = [
         />
       </Box>
 
-
-
-      <Grid container sx={{ height: "100vh" }}>
+      <Grid
+        container
+        sx={{
+          px: { xs: 2, sm: 4, md: 4 },
+          py: { xs: 2, sm: 4, md: 0 },
+          mb: { xs: 8, sm: 8, md: 0 },
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         {/* Columna derecha → Slogan */}
         <Grid
           item
           xs={12}
           md={6}
           sx={{
+            m: 0,
+            p: 0,
+            order: { xs: 1, md: 1 },
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexDirection: "column",
             color: "#ECEAEF",
             textAlign: "center",
-            px: 4,
+            px: { xs: 1, sm: 2, md: 6 },
+            marginY: { xs: 2, sm: 0, md: 0 },
+
           }}
         >
-    <Typography
-      variant="h3"
-      className="animate__animated animate__backInLeft"
-      sx={{
-        fontFamily: "'Asimovian', sans-serif",
-        fontWeight: 700,
-        mb: 2,
-        color: "#211E26",
-      }}
-    >
-      Impulsa tus{" "}
-      <span
-        className="animate__animated animate__rubberBand animate__delay-1s"
-        style={{
-          color: "#0B8DB5",
-          fontFamily: "'Ultra', serif",
-          fontSize: "1.2em",
-          display: "inline-block",
-        }}
-      >
-        Ventas
-      </span>
-      , organiza tus{" "}
-      <span
-        className="animate__animated animate__rubberBand animate__delay-2s"
-        style={{
-          color: "#0B8DB5",
-          fontFamily: "'Ultra', serif",
-          fontSize: "1.2em",
-          display: "inline-block",
-        }}
-      >
-        Contactos
-      </span>{" "}
-      y haz{" "}
-      <span
-        className="animate__animated animate__rubberBand animate__delay-3s"
-        style={{
-          color: "#0B8DB5",
-          fontFamily: "'Ultra', serif",
-          fontSize: "1.2em",
-          display: "inline-block",
-        }}
-      >
-        crecer
-      </span>{" "}
-      tu negocio con nosotros.
-    </Typography>
-
-
+          <Typography
+            variant="h3"
+            className="animate__animated animate__backInLeft"
+            sx={{
+              fontFamily: "'Asimovian', sans-serif",
+              fontWeight: 700,
+              mb: 2,
+              color: "#211E26",
+              fontSize: { xs: "1.3rem", sm: "1.8rem", md: "2.5rem" },
+              lineHeight: 1.4,
+            }}
+          >
+            Impulsa tus{" "}
+            <span
+              className="animate__animated animate__rubberBand animate__delay-1s"
+              style={{
+                color: "#0B8DB5",
+                fontFamily: "'Ultra', serif",
+                fontSize: "1.5em",
+                display: "inline-block",
+              }}
+            >
+              Ventas
+            </span>
+            , organiza tus{" "}
+            <span
+              className="animate__animated animate__rubberBand animate__delay-2s"
+              style={{
+                color: "#0B8DB5",
+                fontFamily: "'Ultra', serif",
+                fontSize: "1.5em",
+                display: "inline-block",
+              }}
+            >
+              Contactos
+            </span>{" "}
+            y haz{" "}
+            <span
+              className="animate__animated animate__rubberBand animate__delay-3s"
+              style={{
+                color: "#0B8DB5",
+                fontFamily: "'Ultra', serif",
+                fontSize: "1.5em",
+                display: "inline-block",
+              }}
+            >
+              crecer
+            </span>{" "}
+            tu negocio con nosotros.
+          </Typography>
         </Grid>
+
         {/* Columna izquierda → Login */}
         <Grid
           item
           xs={12}
           md={6}
           sx={{
+            order: { xs: 2, md: 2 },
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            mt: { xs: 0, sm: 0, md: 0 },
           }}
         >
-          <NeonWrap
-            className={expanded ? "expanded" : ""}
-            onMouseEnter={() => setExpanded(true)}
-            onMouseLeave={() => setExpanded(false)}
-            onClick={() => setExpanded((s) => !s)}
-          >
-            <div className="compact">
-              <Pill
-                animate={{
-                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                }}
-                transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              >
-                <NeonDot dotColor="#00ffff" dotSize={14} />
-                INICIAR SESIÓN
-                <NeonDot dotColor="#ff2d75" dotSize={14} />
-              </Pill>
-            </div>
+          <LoginForm handleLogin={handleLogin}/>
 
-            <div className="card">
-              <Box sx={{ display: "grid", gap: 3, mt: 2 }}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  type="email"
-                  label="Correo Electrónico"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  InputProps={{
-                    sx: { borderRadius: 3, bgcolor: "#121522", color: "#fff" },
-                  }}
-                />
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  type="password"
-                  label="Contraseña"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  InputProps={{
-                    sx: { borderRadius: 3, bgcolor: "#121522", color: "#fff" },
-                  }}
-                />
-
-                <NeonButton onClick={handleLogin}>Ingresar</NeonButton>
-
-                {error && (
-                  <Typography color="error" sx={{ mt: 1 }}>
-                    {error}
-                  </Typography>
-                )}
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mt: 1,
-                    fontSize: 14,
-                    color: "#aaa",
-                  }}
-                >
-                  <Typography sx={{ cursor: "pointer" }}>
-                    ¿Olvidaste tu contraseña?
-                  </Typography>
-                  <Typography sx={{ color: "#ff2d75", cursor: "pointer" }}>
-                    Crear cuenta
-                  </Typography>
-                </Box>
-              </Box>
-            </div>
-          </NeonWrap>
         </Grid>
       </Grid>
-
     </Stage>
   );
 }

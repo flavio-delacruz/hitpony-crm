@@ -1,6 +1,6 @@
 // features/login/SplitText.jsx
 import { motion } from "framer-motion";
-
+import { useTheme, useMediaQuery } from "@mui/material";
 const container = {
   hidden: { opacity: 1 },
   visible: {
@@ -26,10 +26,20 @@ const letter = {
   },
 };
 
+
 export default function SplitText({ text, color, fontFamily }) {
+  const theme = useTheme();
+
+  // Detecta el tamaño de pantalla
+  const isXs = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMd = useMediaQuery(theme.breakpoints.between("sm", "md"));
+
+  // Ajusta tamaño dinámicamente
+  const fontSize = isXs ? "17px" : isMd ? "28px" : "40px";
+
   return (
     <motion.span
-      key={text} 
+      key={text}
       variants={container}
       initial="hidden"
       animate="visible"
@@ -41,13 +51,14 @@ export default function SplitText({ text, color, fontFamily }) {
           variants={letter}
           style={{
             display: "inline-block",
-            fontSize: "35px",
+            fontSize,
             fontWeight: "bold",
             color,
             fontFamily,
+            
           }}
         >
-          {char === " " ? "\u00A0" : char} {/* maneja espacios */}
+          {char === " " ? "\u00A0" : char}
         </motion.span>
       ))}
     </motion.span>
