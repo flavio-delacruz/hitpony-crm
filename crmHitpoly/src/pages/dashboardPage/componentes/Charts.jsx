@@ -1,134 +1,80 @@
+// src/pages/dashboardPage/componentes/Charts.jsx
 import { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import ChartCard from "../../../components/cards/chartCard/chartCard";
 import { useProspectos } from "../../../context/ProspectosContext";
 
-/* =========================
-   Paleta / helpers (modo claro)
-========================= */
 const getUI = () => ({
-  sky:    "#00C2FF",             // Azul Cielo
-  cyan:   "#0B8DB5",             // Cián Fugaz
-  purple: "#6C4DE2",             // Violeta
-  panel:  "#FFFFFF",             // BLANCO
-  text:   "#211E26",             // Negro Noche
+  sky:    "#00C2FF",
+  cyan:   "#0B8DB5",
+  purple: "#6C4DE2",
+  panel:  "#FFFFFF",
+  text:   "#211E26",
   border: "rgba(33,30,38,.15)",
-  glowCyan:  "rgba(11,141,181,.35)",
-  glowViolet:"rgba(108,77,226,.25)",
 });
 
-/* =========================
-   Panel con borde animado + shimmer (claro)
-========================= */
-const NeonPanel = ({ children, title, subtitle }) => {
+// cuánto mover los títulos a la derecha (px)
+const TITLE_SHIFT = 28;
+
+/* ========= PANEL OVALADO con desplazamiento opcional del TÍTULO ========= */
+const NeonPanel = ({ children, title, subtitle, titleOffsetX = 0 }) => {
   const ui = getUI();
   return (
     <Box
       component={motion.div}
       initial={{ y: 14, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      whileHover={{
-        rotateX: -2,
-        rotateY: 2,
-        transition: { type: "spring", stiffness: 120, damping: 16 },
-      }}
+      whileHover={{ rotateX: -2, rotateY: 2, transition: { type: "spring", stiffness: 120, damping: 16 } }}
       style={{ transformStyle: "preserve-3d" }}
       sx={{
         position: "relative",
-        borderRadius: 14,
-        overflow: "hidden",
+        borderRadius: 24,
         background: ui.panel,
         p: 2,
         border: `1px solid ${ui.border}`,
         boxShadow: "0 8px 30px rgba(33,30,38,.08)",
+        overflow: "visible",
       }}
     >
-      {/* Borde en gradiente animado (Azul Cielo → Cián → Violeta) */}
+      {/* Glow degradado detrás */}
       <Box
+        aria-hidden
         component={motion.div}
-        animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        animate={{ opacity: [0.45, 0.7, 0.45] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         sx={{
           position: "absolute",
-          inset: 0,
-          borderRadius: 14,
-          p: "1px",
+          inset: -2,
+          borderRadius: 24,
           background: `linear-gradient(120deg, ${ui.sky}, ${ui.cyan} 35%, ${ui.purple} 80%, ${ui.sky})`,
-          backgroundSize: "220% 220%",
-          opacity: 0.65,
-          WebkitMask:
-            "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-          WebkitMaskComposite: "xor",
-          maskComposite: "exclude",
+          filter: "blur(8px)",
+          opacity: 0.45,
           pointerEvents: "none",
+          zIndex: 0,
         }}
       />
 
-      {/* Título con glow sutil */}
-      {title && (
-        <Box sx={{ mb: 0.25 }}>
-          <Typography component="div" sx={{ fontWeight: 900, color: ui.text, lineHeight: 1.1 }}>
-            {title.split("").map((ch, i) => (
-              <motion.span
-                key={i}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.02 * i, type: "spring", stiffness: 240, damping: 18 }}
-                style={{
-                  textShadow:
-                    `0 1px 0 rgba(255,255,255,.6), 0 0 12px ${ui.glowCyan}, 0 0 8px ${ui.glowViolet}`,
-                  display: "inline-block",
-                  fontSize: 16,
-                }}
-              >
-                {ch}
-              </motion.span>
-            ))}
-          </Typography>
-          {subtitle && (
-            <Typography
-              variant="caption"
-              sx={{
-                color: ui.purple,
-                textShadow: "0 0 6px rgba(108,77,226,.2)",
-                display: "block",
-                mt: 0.25,
-              }}
-            >
-              {subtitle}
+      {/* Contenido */}
+      <Box sx={{ position: "relative", zIndex: 1 }}>
+        {title && (
+          <Box sx={{ mb: 0.25, transform: `translateX(${titleOffsetX}px)` }}>
+            <Typography component="div" sx={{ fontWeight: 900, color: ui.text, lineHeight: 1.1 }}>
+              {title}
             </Typography>
-          )}
-        </Box>
-      )}
-
-      {/* Shimmer suave */}
-      <Box sx={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-        <Box
-          component={motion.div}
-          initial={false}
-          whileHover={{ x: ["-120%", "120%"] }}
-          transition={{ duration: 0.9, ease: "easeInOut" }}
-          sx={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            width: "45%",
-            transform: "skewX(-20deg)",
-            background:
-              "linear-gradient(120deg, transparent 0, rgba(0,194,255,.14) 20%, transparent 40%)",
-          }}
-        />
+            {subtitle && (
+              <Typography variant="caption" sx={{ color: ui.purple, display: "block", mt: 0.25 }}>
+                {subtitle}
+              </Typography>
+            )}
+          </Box>
+        )}
+        {children}
       </Box>
-
-      {children}
     </Box>
   );
 };
 
-/* =========================
-   Charts
-========================= */
 const DashboardCharts = () => {
   const { prospectos } = useProspectos();
 
@@ -144,24 +90,39 @@ const DashboardCharts = () => {
     perdidos: "Cargando...",
   });
 
+  const buildMeses = () => {
+    const hoy = new Date();
+    const labels = [];
+    for (let i = 3; i >= 0; i--) {
+      const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const mes = fecha.toLocaleString("es-ES", { month: "short" });
+      labels.push(`${mes} ${fecha.getFullYear()}`);
+    }
+    return labels;
+  };
+
   useEffect(() => {
+    const mesesLabels = buildMeses();
+
     if (!prospectos || prospectos.length === 0) {
-      setProspectosPorMes({ meses: [], totalPorMes: [], ganadosPorMes: [], perdidosPorMes: [] });
-      setPorcentajes({ total: "No hay datos", ganados: "No hay datos", perdidos: "No hay datos" });
+      setProspectosPorMes({
+        meses: mesesLabels,
+        totalPorMes: [0, 0, 0, 0],
+        ganadosPorMes: [0, 0, 0, 0],
+        perdidosPorMes: [0, 0, 0, 0],
+      });
+      setPorcentajes({
+        total: "Sin variación (0)",
+        ganados: "Sin variación (0)",
+        perdidos: "Sin variación (0)",
+      });
       return;
     }
 
     const hoy = new Date();
-    const mesesLabels = [];
     const totalPorMes = Array(4).fill(0);
     const ganadosPorMes = Array(4).fill(0);
     const perdidosPorMes = Array(4).fill(0);
-
-    for (let i = 3; i >= 0; i--) {
-      const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
-      const mes = fecha.toLocaleString("es-ES", { month: "short" });
-      mesesLabels.push(`${mes} ${fecha.getFullYear()}`);
-    }
 
     prospectos.forEach((p) => {
       const fecha = new Date(p.created_at);
@@ -200,32 +161,37 @@ const DashboardCharts = () => {
         gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
         gap: 2,
         mb: 2,
+        background: "#FFFFFF",
+        borderRadius: 24,
       }}
     >
-      <NeonPanel title="Todos los prospectos" subtitle={porcentajes.total}>
+      {/* Todos los prospectos (ya estaba) */}
+      <NeonPanel title="Todos los prospectos" subtitle={porcentajes.total} titleOffsetX={TITLE_SHIFT}>
         <ChartCard
-          series={[{ data: totalPorMes }]}
-          xAxis={[{ data: meses, scaleType: "band" }]}
+          series={[{ data: totalPorMes || [0,0,0,0] }]}
+          xAxis={[{ data: meses || ["", "", "", ""] }]}
           titleChart=""
           title="Desde los últimos 4 meses"
           subtitle=""
         />
       </NeonPanel>
 
-      <NeonPanel title="Prospectos Ganados" subtitle={porcentajes.ganados}>
+      {/* Prospectos Ganados → desplazado también */}
+      <NeonPanel title="Prospectos Ganados" subtitle={porcentajes.ganados} titleOffsetX={TITLE_SHIFT}>
         <ChartCard
-          series={[{ data: ganadosPorMes }]}
-          xAxis={[{ data: meses, scaleType: "band" }]}
+          series={[{ data: ganadosPorMes || [0,0,0,0] }]}
+          xAxis={[{ data: meses || ["", "", "", ""] }]}
           titleChart=""
           title="Desde los últimos 4 meses"
           subtitle=""
         />
       </NeonPanel>
 
-      <NeonPanel title="Prospectos Perdidos" subtitle={porcentajes.perdidos}>
+      {/* Prospectos Perdidos → desplazado también */}
+      <NeonPanel title="Prospectos Perdidos" subtitle={porcentajes.perdidos} titleOffsetX={TITLE_SHIFT}>
         <ChartCard
-          series={[{ data: perdidosPorMes }]}
-          xAxis={[{ data: meses, scaleType: "band" }]}
+          series={[{ data: perdidosPorMes || [0,0,0,0] }]}
+          xAxis={[{ data: meses || ["", "", "", ""] }]}
           titleChart=""
           title="Desde los últimos 4 meses"
           subtitle=""

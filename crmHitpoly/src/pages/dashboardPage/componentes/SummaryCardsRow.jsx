@@ -11,8 +11,9 @@ const Item = ({ label, value }) => (
     transition={{ type: "spring", stiffness: 200, damping: 18 }}
     sx={{
       p: 2,
-      background: PALETA.white,                     // ← BLANCO
+      background: PALETA.white,
       border: `1px solid ${PALETA.border}`,
+      borderRadius: 24, // OVALADO
     }}
   >
     <Typography variant="body2" sx={{ color: PALETA.text, opacity: .9 }}>{label}</Typography>
@@ -20,8 +21,8 @@ const Item = ({ label, value }) => (
       variant="h4"
       sx={{
         mt: .5,
-        color: PALETA.sky,                           // número en Azul Cielo
-        textShadow: `0 0 12px ${PALETA.glowSky}`,    // brillo azul cielo
+        color: PALETA.sky,
+        textShadow: `0 0 12px ${PALETA.glowSky}`,
         fontWeight: 800,
       }}
     >

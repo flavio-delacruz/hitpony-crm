@@ -20,7 +20,8 @@ export const PALETA = {
   glowCyan:    "rgba(11,141,181,.30)",
   glowPurple:  "rgba(108,77,226,.28)",
 
-  // Gradientes (suaves para blanco)
+  // Gradientes
   gradEdge:    "linear-gradient(120deg,#00C2FF,#0B8DB5 40%,#6C4DE2 85%,#00C2FF)",
   gradEdgeSoft:"linear-gradient(120deg,rgba(0,194,255,.6),rgba(11,141,181,.6) 40%,rgba(108,77,226,.6) 85%,rgba(0,194,255,.6))",
 };
+

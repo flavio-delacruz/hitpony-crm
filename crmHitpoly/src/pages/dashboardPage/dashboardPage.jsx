@@ -10,18 +10,21 @@ import SummaryCardsRow from "./componentes/SummaryCardsRow";
 import DashboardCharts from "./componentes/Charts";
 import { useProspectos } from "../../context/ProspectosContext";
 
+// Fuente Montserrat 900 para el título
+import "@fontsource/montserrat/900.css";
+
 /* =========================
    Paleta / helpers (modo claro)
 ========================= */
 const getUI = () => ({
-  sky:   "#00C2FF",                // Azul Cielo
-  cyan:  "#0B8DB5",                // Cián Fugaz
-  violet:"#6C4DE2",                // Violeta
-  text:  "#211E26",                // Negro Noche (texto)
-  panel: "#FFFFFF",                // Fondo blanco
-  border:"rgba(33,30,38,.15)",
-  glowCyan:  "rgba(11,141,181,.35)",
-  glowViolet:"rgba(108,77,226,.25)",
+  sky: "#00C2FF", // Azul Cielo
+  cyan: "#0B8DB5", // Cián Fugaz
+  violet: "#6C4DE2", // Violeta
+  text: "#211E26", // Negro Noche (texto)
+  panel: "#FFFFFF", // Fondo blanco
+  border: "rgba(33,30,38,.15)",
+  glowCyan: "rgba(11,141,181,.35)",
+  glowViolet: "rgba(108,77,226,.25)",
 });
 
 /* =========================
@@ -61,7 +64,6 @@ const MetaballsBg = () => {
             top: ["10%", "60%", "30%", "70%", "20%", "50%"][i],
             left: ["5%", "70%", "40%", "15%", "80%", "55%"][i],
             borderRadius: "9999px",
-            // súper translúcido para no ensuciar el blanco
             background: `radial-gradient(circle at 30% 30%, ${ui.sky}22, ${ui.cyan}22 55%, transparent 70%),
                          radial-gradient(circle at 70% 70%, ${ui.violet}22, transparent 60%)`,
             opacity: 0.35,
@@ -89,7 +91,7 @@ const SectionCard = ({ children }) => {
         position: "relative",
         borderRadius: 14,
         overflow: "hidden",
-        background: ui.panel,                  // blanco
+        background: ui.panel, // blanco
         boxShadow: "0 8px 30px rgba(33,30,38,.08)",
         border: `1px solid ${ui.border}`,
       }}
@@ -186,17 +188,17 @@ const DashboardPage = () => {
       <Box sx={{ position: "relative", background: ui.panel }}>
         <MetaballsBg />
 
-        {/* Título con glow suave para blanco (Azul Cielo + Violeta) */}
+        {/* Título con Montserrat 900 + degradado azul→púrpura */}
         <Stack sx={{ mb: 2, position: "relative", zIndex: 1 }}>
           <Typography
             component="div"
             sx={{
-              fontFamily: "'Gravitas One', serif",
+              fontFamily:
+                "'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
               fontWeight: 900,
-              letterSpacing: ".04em",
-              color: ui.text,
-              fontSize: { xs: 36, sm: 44 },
+              letterSpacing: ".02em",
               lineHeight: 1.05,
+              fontSize: { xs: 40, sm: 56 },
             }}
           >
             {"Dashboard".split("").map((ch, i) => (
@@ -206,9 +208,12 @@ const DashboardPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.03, type: "spring", stiffness: 240, damping: 18 }}
                 style={{
-                  textShadow:
-                    `0 1px 0 rgba(255,255,255,.65), 0 0 12px ${ui.glowCyan}, 0 0 8px ${ui.glowViolet}`,
                   display: "inline-block",
+                  background: "linear-gradient(90deg,#00C2FF,#6C4DE2)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  textShadow:
+                    "0 0 10px rgba(108,77,226,.20), 0 0 12px rgba(11,141,181,.18)",
                 }}
               >
                 {ch}
