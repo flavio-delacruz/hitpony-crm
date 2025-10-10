@@ -9,7 +9,6 @@ export const EXPANDED_W = 460;
 export const EXPANDED_H = 620;
 
 export const Stage = styled(Box)({
-  minHeight: "100vh",
   display: "grid",
   placeItems: "center",
   position: "relative",
@@ -19,6 +18,7 @@ export const Stage = styled(Box)({
     rgba(255, 255, 255, 1)
   `,
   overflow: "hidden",
+  height: "100vh",
 });
 
 export const NeonWrap = styled(Box)({
@@ -99,7 +99,7 @@ export const Pill = styled(motion(Box))({
   padding: "16px 26px",
   borderRadius: 20,
   cursor: "pointer",
-  background: "linear-gradient(90deg, #00ffff, #ff2d75, #ff9900, #00ffff)", // 🔥 gradiente cíclico
+  background: "linear-gradient(90deg, #00C2FF, #0B8DB5, #00C2FF, #f6ffffff)", // 🔥 gradiente cíclico
   backgroundSize: "300% 100%", // más grande para dar efecto de movimiento
   backgroundClip: "text",
   WebkitBackgroundClip: "text",
@@ -128,7 +128,7 @@ export const NeonDot = styled("span", {
   background: dotColor,
   boxShadow: `0 0 10px ${dotColor}, 0 0 20px ${dotColor}`,
 }));
-
+  
 
 
 // Estilos base para GlowTitle

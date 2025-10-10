@@ -7,7 +7,7 @@ export const PALETA = {
 
   // Base modo claro
   white:  "#FFFFFF",
-  text:   "#211E26",  // Negro Noche (texto)
+  text:   "#fdfcffff",  // Negro Noche (texto)
 
   // Bordes / sombras
   border:      "rgba(11,141,181,.25)",     // borde en tono cián
