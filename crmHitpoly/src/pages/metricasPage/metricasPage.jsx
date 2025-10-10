@@ -31,6 +31,9 @@ import {
 // 🌀 Animaciones
 import { motion, AnimatePresence } from "framer-motion";
 
+// Título Montserrat como en Dashboard/CRM/Listas/Contactos
+import "@fontsource/montserrat/900.css";
+
 /* =========================
    Paleta + helpers
 ========================= */
@@ -86,7 +89,8 @@ const FancyTooltip = ({ active, payload, label }) => {
   const color = delta > 0 ? "#22C55E" : delta < 0 ? "#FF4D6D" : "#94A3B8";
 
   return (
-    <Box component={motion.div}
+    <Box
+      component={motion.div}
       initial={{ opacity: 0, y: 6, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 6, scale: 0.96 }}
@@ -98,7 +102,9 @@ const FancyTooltip = ({ active, payload, label }) => {
         position: "relative",
         color: theme.palette.mode === "dark" ? "#E8ECF1" : "#0F172A",
         bgcolor:
-          theme.palette.mode === "dark" ? "rgba(0,0,0,.72)" : "rgba(255,255,255,.98)",
+          theme.palette.mode === "dark"
+            ? "rgba(0,0,0,.72)"
+            : "rgba(255,255,255,.98)",
         border:
           theme.palette.mode === "dark"
             ? "1px solid rgba(255,255,255,.12)"
@@ -137,7 +143,7 @@ const FancyTooltip = ({ active, payload, label }) => {
 };
 
 /* =========================
-   Fondo: Metaballs suaves (sin libs externas)
+   Fondo: Metaballs suaves
 ========================= */
 const MetaballsBg = ({ ui }) => {
   return (
@@ -182,7 +188,7 @@ const MetaballsBg = ({ ui }) => {
 };
 
 /* =========================
-   Barra custom con Framer Motion (entrada + hover)
+   Barra custom con Framer Motion
 ========================= */
 const AnimatedBar = ({ x, y, width, height, fill, index, isActive }) => {
   return (
@@ -242,43 +248,51 @@ const MetricasPage = () => {
         {/* Fondo siempre activo */}
         <MetaballsBg ui={ui} />
 
-        {/* Header con animación de glow */}
-        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }} spacing={1} sx={{ mb: 1.5, position: "relative", zIndex: 1 }}>
-          <motion.div
-            initial={{ y: 12, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <motion.div
-              initial={{ textShadow: "0 0 0 rgba(0,0,0,0)" }}
-              animate={{
-                textShadow: [
-                  `0 1px 0 rgba(0,0,0,.25), 0 0 0 rgba(11,141,181,0)`,
-                  `0 1px 0 rgba(0,0,0,.25), 0 0 18px rgba(11,141,181,.45)`,
-                  `0 1px 0 rgba(0,0,0,.25), 0 0 10px rgba(255,45,117,.35)`,
-                ],
+        {/* ===== TÍTULO estilo Montserrat + degradado (como las otras pestañas) ===== */}
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          spacing={1}
+          sx={{ mb: 1.5, position: "relative", zIndex: 1 }}
+        >
+          <Box>
+            <Typography
+              component="div"
+              sx={{
+                fontFamily:
+                  "'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                fontWeight: 900,
+                letterSpacing: ".02em",
+                lineHeight: 1.05,
+                fontSize: { xs: 36, sm: 52 },
               }}
-              transition={{ repeat: Infinity, repeatType: "mirror", duration: 4 }}
             >
-              <Typography
-                variant="h4"
-                sx={{
-                  fontFamily: "'Gravitas One', serif",
-                  fontWeight: 900,
-                  fontSize: { xs: 28, sm: 34, md: 40 },
-                  letterSpacing: ".04em",
-                  lineHeight: 1.05,
-                  textAlign: "left",
-                }}
-              >
-                Métricas de Ventas
-              </Typography>
-            </motion.div>
-
-            <Typography variant="body2" sx={{ color: ui.sub, mt: 0.5 }}>
-              Le damos resultados tangibles a tu visión
+              {"Métricas".split("").map((ch, i) => (
+                <motion.span
+                  key={i}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03, type: "spring", stiffness: 240, damping: 18 }}
+                  style={{
+                    display: "inline-block",
+                    background: "linear-gradient(90deg,#00C2FF,#6C4DE2)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    textShadow:
+                      "0 0 10px rgba(108,77,226,.20), 0 0 12px rgba(11,141,181,.18)",
+                  }}
+                >
+                  {ch}
+                </motion.span>
+              ))}
             </Typography>
-          </motion.div>
+
+            {/* Subtítulo (puedes cambiar el texto si quieres) */}
+            <Typography variant="body2" sx={{ color: ui.sub, mt: 0.5 }}>
+              Métricas de ventas y progreso mensual
+            </Typography>
+          </Box>
 
           {/* Botonera derecha */}
           <Stack direction="row" spacing={1}>
@@ -294,7 +308,7 @@ const MetricasPage = () => {
           </Stack>
         </Stack>
 
-        {/* KPIs rápidos con fade in */}
+        {/* KPIs rápidos */}
         <Stack
           component={motion.div}
           initial="hidden"
@@ -378,16 +392,36 @@ const MetricasPage = () => {
 
                   <CartesianGrid stroke={ui.grid} strokeDasharray="4 4" />
                   <XAxis dataKey="name" tick={{ fill: ui.text }} />
-                  <YAxis domain={[0, 45]} ticks={[0, 5, 10, 15, 20, 25, 30, 35, 40, 45]} allowDecimals={false} tick={{ fill: ui.text }} />
+                  <YAxis
+                    domain={[0, 45]}
+                    ticks={[0, 5, 10, 15, 20, 25, 30, 35, 40, 45]}
+                    allowDecimals={false}
+                    tick={{ fill: ui.text }}
+                  />
                   <Tooltip content={<FancyTooltip />} />
 
                   {/* Línea de promedio */}
-                  <ReferenceLine y={avg} stroke={ui.blue} strokeDasharray="4 4" label={{ position: "right", value: `Promedio (${avg})`, fill: ui.text, fontWeight: 700 }} />
+                  <ReferenceLine
+                    y={avg}
+                    stroke={ui.blue}
+                    strokeDasharray="4 4"
+                    label={{ position: "right", value: `Promedio (${avg})`, fill: ui.text, fontWeight: 700 }}
+                  />
 
                   {/* Barras con shape custom animado */}
-                  <Bar dataKey="ventas" name="Métricas de Ventas" shape={(props) => (
-                    <AnimatedBar {...props} index={props.index} isActive={props.index === activeIdx} fill={props.index === activeIdx ? "url(#gradNeonActive)" : "url(#gradNeon)"} />
-                  )} isAnimationActive={false}>
+                  <Bar
+                    dataKey="ventas"
+                    name="Métricas de Ventas"
+                    shape={(props) => (
+                      <AnimatedBar
+                        {...props}
+                        index={props.index}
+                        isActive={props.index === activeIdx}
+                        fill={props.index === activeIdx ? "url(#gradNeonActive)" : "url(#gradNeon)"}
+                      />
+                    )}
+                    isAnimationActive={false}
+                  >
                     {data.map((_, i) => (
                       <Cell key={i} />
                     ))}
@@ -399,7 +433,12 @@ const MetricasPage = () => {
 
             {/* Textos inferiores */}
             <AnimatePresence>
-              <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+              >
                 <Typography
                   variant="subtitle1"
                   sx={{
@@ -440,4 +479,3 @@ const MetricasPage = () => {
 };
 
 export default MetricasPage;
-

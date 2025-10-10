@@ -1,19 +1,19 @@
 import React, { useState, useMemo } from "react";
 import Stack from "@mui/material/Stack";
 import {
-  Box, // Necesario para envolver el filtro y la barra de búsqueda si se usa
+  Box,
   Button,
   Typography,
   useMediaQuery,
   useTheme,
   Paper,
-  IconButton, // Necesario para el toggle de tema si se usa solo el ícono
+  IconButton,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles"; // Necesario para los gradientes y sombras
+import { alpha } from "@mui/material/styles";
 import { useAuth } from "../../../context/AuthContext";
 import { useProspectos } from "../../../context/ProspectosContext";
 import { useNavigate } from "react-router-dom";
-import { columns as defaultColumns } from "./components/columns"; 
+import { columns as defaultColumns } from "./components/columns";
 import CreateList from "./components/CreateList";
 import Swal from "sweetalert2";
 import ProspectFilter from "./components/Filter";
@@ -24,14 +24,15 @@ import ShareIcon from "@mui/icons-material/Share";
 import ShareLinkModal from "../../forms/clientesPotenciales/ShareLinkModal";
 import DownloadIcon from "@mui/icons-material/Download";
 import DownloadOptions from "./components/DownloadOptions";
-import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined"; // Se cambian los íconos por los Outline para coincidir con el diseño
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import { motion } from "framer-motion";
+import "@fontsource/montserrat/900.css";
 
 // ====================================================================
-// PALETAS DE COLORES Y ESTILOS DE GRADIENTE (Reimplementados)
+// PALETAS DE COLORES Y ESTILOS DE GRADIENTE
 // ====================================================================
 
-// Colores del gradiente global
 const CYAN = "#00EAF0";
 const BLUE = "#0B8DB5";
 const PURPLE = "#6C4DE2";
@@ -39,14 +40,12 @@ const PINK = "#FF2D75";
 
 const PALETTES = {
   dark: {
-    // Modo Oscuro: TODO NEGRO PURO
     shellBg: "#000000",
     panel: "#000000",
     tableBg: "#000000",
     text: "#E7E9EE",
     textMuted: "#AAB0C0",
-    textDark: "#0d1117", // Para texto oscuro sobre gradiente claro
-    // Gradiente de encabezado de tabla mejorado para negro
+    textDark: "#0d1117",
     headerGrad: `linear-gradient(90deg,
       rgba(0,234,240,.20) 0%,
       rgba(108,77,226,.20) 50%,
@@ -54,17 +53,16 @@ const PALETTES = {
     rowHover: "rgba(255,255,255,.05)",
     rowSelected: "rgba(108,77,226,.22)",
     rowSelectedHover: "rgba(108,77,226,.28)",
-    divider: "rgba(255,255,255,.08)", 
+    divider: "rgba(255,255,255,.08)",
     checkbox: "rgba(0,234,240,.9)",
   },
   light: {
-    // Modo Claro: TODO BLANCO PURO/GRIS CLARO
-    shellBg: "#f7f7f7", // Fondo principal gris claro (como en image_1734b0.png)
+    shellBg: "#f7f7f7",
     panel: "#FFFFFF",
     tableBg: "#FFFFFF",
     text: "#0d1117",
     textMuted: "#6b7280",
-    textDark: "#FFFFFF", // Para texto blanco sobre gradiente claro
+    textDark: "#FFFFFF",
     headerGrad: "linear-gradient(90deg,#EAF6FF,#F9E8F1)",
     rowHover: "rgba(0,0,0,.04)",
     rowSelected: "rgba(108,77,226,.16)",
@@ -74,34 +72,26 @@ const PALETTES = {
   },
 };
 
-// Estilo de botón/pastilla con gradiente de fondo (Añadir, Nombres Activo)
 const makeContainedGrad = (ui) => ({
   borderRadius: 999,
   px: 2.2,
   fontWeight: 700,
   letterSpacing: ".02em",
-  color: ui.textDark, // Blanco o negro, según el tema
-  boxShadow: `0 10px 24px ${alpha("#000", 0.25)}, 0 8px 24px ${alpha(
-    BLUE,
-    0.25
-  )}`,
+  color: ui.textDark,
+  boxShadow: `0 10px 24px ${alpha("#000", 0.25)}, 0 8px 24px ${alpha(BLUE, 0.25)}`,
   background: `linear-gradient(90deg, ${CYAN} 0%, ${BLUE} 45%, ${PINK} 100%)`,
   "&:hover": {
     filter: "brightness(1.05)",
-    boxShadow: `0 14px 34px ${alpha("#000", 0.35)}, 0 10px 34px ${alpha(
-      BLUE,
-      0.35
-    )}`,
+    boxShadow: `0 14px 34px ${alpha("#000", 0.35)}, 0 10px 34px ${alpha(BLUE, 0.35)}`,
   },
 });
 
-// Estilo de botón/pastilla con gradiente de borde (Descargar, Formularios, Filtros Inactivos)
 const makeOutlinedGrad = (ui) => ({
   borderRadius: 999,
   px: 2.2,
   fontWeight: 700,
   letterSpacing: ".02em",
-  color: ui.text, // Color de texto normal
+  color: ui.text,
   border: "1px solid transparent",
   background: `
     linear-gradient(${ui.panel}, ${ui.panel}) padding-box,
@@ -109,18 +99,14 @@ const makeOutlinedGrad = (ui) => ({
   "&:hover": {
     color: PINK,
     background: `
-      linear-gradient(${alpha(ui.panel, 0.85)}, ${alpha(
-      ui.panel,
-      0.85
-    )}) padding-box,
+      linear-gradient(${alpha(ui.panel, 0.85)}, ${alpha(ui.panel, 0.85)}) padding-box,
       linear-gradient(90deg, ${CYAN}, ${PURPLE} 60%, ${PINK}) border-box`,
     filter: "brightness(1.05)",
   },
 });
 
-// Estilo de pastilla de filtro activa
 const makeActiveFilterPill = (ui) => ({
-  ...makeContainedGrad(ui), // Reutilizamos el estilo de ContainedGrad
+  ...makeContainedGrad(ui),
   background: `linear-gradient(90deg, ${CYAN} 0%, ${PURPLE} 100%)`,
   boxShadow: `0 4px 10px ${alpha(PURPLE, 0.4)}`,
   "&:hover": {
@@ -143,7 +129,7 @@ function DataTable() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // === TEMA Y ESTILOS ===
-  const [darkMode, setDarkMode] = useState(true); 
+  const [darkMode, setDarkMode] = useState(false); // ← Modo CLARO por defecto (como el resto)
   const toggleTheme = () => setDarkMode((p) => !p);
 
   const mode = darkMode ? "dark" : "light";
@@ -152,7 +138,6 @@ function DataTable() {
   const outlinedGrad = makeOutlinedGrad(ui);
   const activeFilterPill = makeActiveFilterPill(ui);
 
-  // Estado para manejar la pastilla de filtro activa
   const [activeFilterPillId, setActiveFilterPillId] = useState("Nombres");
   const handlePillClick = (id) => setActiveFilterPillId(id);
 
@@ -173,7 +158,6 @@ function DataTable() {
   const [columnVisibilityModel] = useState({ estado_contacto: !isMobile });
   const [anchorEl, setAnchorEl] = useState(null);
 
-  // ... (mobileColumns y desktopColumns se mantienen iguales)
   const mobileColumns = [
     {
       field: "nombreCompleto",
@@ -184,6 +168,7 @@ function DataTable() {
     { field: "estado_contacto", headerName: "Estado", width: 150 },
     { field: "nombrePropietario", headerName: "Propietario", flex: 1 },
   ];
+
   const desktopColumns = useMemo(() => {
     const nombreCompletoColumn = {
       field: "nombreCompleto",
@@ -195,11 +180,11 @@ function DataTable() {
   }, []);
   const columnsToShow = isMobile ? mobileColumns : desktopColumns;
 
-  // ... (handleRowSelectionChange, handleSendMessage, etc. se mantienen iguales)
   const handleRowSelectionChange = (newSelectionModel) => {
     setRowSelectionModel(newSelectionModel);
     setSelectedRows(newSelectionModel);
   };
+
   const handleSendMessage = () => {
     if (selectedRows.length > 0) {
       navigate("/enviar-correo", {
@@ -241,9 +226,7 @@ function DataTable() {
     if (prospecto && prospecto.id && prospecto.nombre && prospecto.apellido) {
       const slug = `${prospecto.nombre
         .toLowerCase()
-        .replace(/\s+/g, "-")}-${prospecto.apellido
-        .toLowerCase()
-        .replace(/\s+/g, "-")}`;
+        .replace(/\s+/g, "-")}-${prospecto.apellido.toLowerCase().replace(/\s+/g, "-")}`;
       navigate(`/pagina-de-contacto/${slug}-${prospecto.id}`);
     }
   };
@@ -269,7 +252,6 @@ function DataTable() {
     <Stack
       spacing={2}
       sx={{
-        // Fondo de TODA la pestaña / página (Negro Puro o Gris Claro)
         bgcolor: ui.shellBg,
         color: ui.text,
         minHeight: "100vh",
@@ -277,33 +259,54 @@ function DataTable() {
         transition: "background-color .2s ease, color .2s ease",
       }}
     >
+      {/* ====== TÍTULO estilo Dashboard ====== */}
+      <Stack sx={{ mb: 1 }}>
+        <Typography
+          component="div"
+          sx={{
+            fontFamily:
+              "'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+            fontWeight: 900,
+            letterSpacing: ".02em",
+            lineHeight: 1.05,
+            fontSize: { xs: 36, sm: 52 },
+          }}
+        >
+          {"Contactos".split("").map((ch, i) => (
+            <motion.span
+              key={i}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.03, type: "spring", stiffness: 240, damping: 18 }}
+              style={{
+                display: "inline-block",
+                background: "linear-gradient(90deg,#00C2FF,#6C4DE2)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                textShadow: "0 0 10px rgba(108,77,226,.20), 0 0 12px rgba(11,141,181,.18)",
+              }}
+            >
+              {ch}
+            </motion.span>
+          ))}
+        </Typography>
+      </Stack>
+
       {/* 1. FILTROS Y BOTONES DE ACCIÓN (Superior) */}
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{ width: "100%" }}
-      >
-        {/* GRUPO DE FILTROS (Nombres, Propiet, Estados) */}
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ width: "100%" }}>
         <Stack direction="row" spacing={1}>
           {["Nombres", "Propiet", "Estados"].map((label) => (
             <Button
               key={label}
               variant="outlined"
               onClick={() => handlePillClick(label)}
-              // Aplica el gradiente completo si es activo, el outline si es inactivo
-              sx={
-                activeFilterPillId === label
-                  ? activeFilterPill
-                  : outlinedGrad
-              }
+              sx={activeFilterPillId === label ? activeFilterPill : outlinedGrad}
             >
               {label}
             </Button>
           ))}
         </Stack>
 
-        {/* GRUPO DE ACCIONES (Descargar, Formularios, Añadir, Tema) - SOLO ESCRITORIO */}
         {!isMobile && (
           <Stack direction="row" spacing={2} alignItems="center">
             <Button
@@ -330,7 +333,6 @@ function DataTable() {
             >
               Añadir
             </Button>
-            {/* Botón de cambiar tema */}
             <IconButton
               onClick={toggleTheme}
               sx={{
@@ -339,7 +341,6 @@ function DataTable() {
                 p: 1,
                 color: mode === "dark" ? CYAN : PINK,
                 border: `1px solid ${ui.divider}`,
-                // Usa el fondo del panel (Negro o Blanco) con el borde de gradiente
                 background: `
                     linear-gradient(${ui.panel}, ${ui.panel}) padding-box,
                     linear-gradient(90deg, ${CYAN}, ${PURPLE} 60%, ${PINK}) border-box`,
@@ -351,7 +352,7 @@ function DataTable() {
         )}
       </Stack>
 
-      {/* 2. BARRA DE BÚSQUEDA (FilterBar) */}
+      {/* 2. BARRA DE BÚSQUEDA */}
       <Box className="filterBar" sx={{ width: "100%", mt: 1 }}>
         <ProspectFilter
           columns={columnsToShow}
@@ -361,21 +362,13 @@ function DataTable() {
         />
       </Box>
 
-      {/* 3. Mobile quick actions (debajo del filtro en móvil) */}
+      {/* 3. Acciones rápidas en móvil */}
       {isMobile && (
         <Stack direction="row" spacing={2} sx={{ mb: 1, width: "100%" }}>
-          <Button
-            startIcon={<ShareIcon />}
-            onClick={handleShareForm}
-            sx={{ flex: 1, ...outlinedGrad }}
-          >
+          <Button startIcon={<ShareIcon />} onClick={handleShareForm} sx={{ flex: 1, ...outlinedGrad }}>
             Formularios
           </Button>
-          <Button
-            startIcon={<PersonAddIcon />}
-            onClick={handleAddNew}
-            sx={{ flex: 1, ...containedGrad }}
-          >
+          <Button startIcon={<PersonAddIcon />} onClick={handleAddNew} sx={{ flex: 1, ...containedGrad }}>
             Añadir
           </Button>
         </Stack>
@@ -384,12 +377,7 @@ function DataTable() {
       {/* 4. Selection actions */}
       {selectedRows.length > 0 && (
         <Stack direction="row" spacing={1} justifyContent="flex-end">
-          {/* Botones de acción planos, se pueden mantener o cambiar a gradiente si es necesario */}
-          <Button
-            variant="contained"
-            onClick={handleOpenCreateList}
-            sx={{ width: "fit-content", mt: 1, ...containedGrad }} // Usando gradiente
-          >
+          <Button variant="contained" onClick={handleOpenCreateList} sx={{ width: "fit-content", mt: 1, ...containedGrad }}>
             Enviar a lista
           </Button>
           <Button
@@ -423,7 +411,7 @@ function DataTable() {
         </Stack>
       )}
 
-      {/* 5. Tabla de datos (DataGrid) */}
+      {/* 5. Tabla */}
       <Paper
         sx={{
           height: "80vh",
@@ -431,8 +419,7 @@ function DataTable() {
           borderRadius: 3,
           overflow: "hidden",
           border: `1px solid ${ui.divider}`,
-          // Fondo de la tabla: Negro Puro o Blanco Puro
-          background: ui.tableBg, 
+          background: ui.tableBg,
           boxShadow: "0 12px 30px rgba(0,0,0,.35)",
         }}
       >
@@ -454,7 +441,6 @@ function DataTable() {
             border: "none",
             color: ui.text,
             fontFamily: `'Poppins', system-ui, Segoe UI, Roboto, Arial`,
-            // Encabezados con gradiente
             "& .MuiDataGrid-columnHeaders": {
               background: ui.headerGrad,
               borderBottom: `1px solid ${ui.divider}`,
@@ -466,7 +452,6 @@ function DataTable() {
               textTransform: "uppercase",
               fontSize: 12,
             },
-            // Fondo del cuerpo de la tabla (Negro Puro o Blanco Puro)
             "& .MuiDataGrid-virtualScroller": {
               background: ui.tableBg,
             },
@@ -495,7 +480,6 @@ function DataTable() {
             "& .MuiTablePagination-root, & .MuiDataGrid-selectedRowCount": {
               color: ui.text,
             },
-            // Fondo del pie de página de paginación
             "& .MuiTablePagination-toolbar": {
               backgroundColor:
                 mode === "dark" ? "rgba(255,255,255,.03)" : "rgba(0,0,0,.03)",
@@ -517,21 +501,10 @@ function DataTable() {
           onListCreated={handleListCreated}
         />
       )}
-      <AddModal
-        open={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSave={() => setIsAddModalOpen(false)}
-      />
-      <ShareLinkModal
-        open={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-      />
-      <DownloadOptions
-        anchorEl={anchorEl}
-        handleClose={handleCloseDownloadMenu}
-        prospectsToDownload={prospectsToDownload}
-      />
-      
+      <AddModal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onSave={() => setIsAddModalOpen(false)} />
+      <ShareLinkModal open={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} />
+      <DownloadOptions anchorEl={anchorEl} handleClose={handleCloseDownloadMenu} prospectsToDownload={prospectsToDownload} />
+
       {/* Toggle visible en móvil (abajo) */}
       {isMobile && (
         <IconButton
@@ -551,7 +524,7 @@ function DataTable() {
         </IconButton>
       )}
 
-      {/* Estilos CSS para la barra de búsqueda (ajustada para el tema) */}
+      {/* Estilos para la barra de búsqueda */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
         .filterBar .MuiFormControl-root { width: 100%; }
@@ -559,7 +532,6 @@ function DataTable() {
           color: ${ui.text};
           border-radius: 999px !important;
           padding-left: 10px;
-          // Fondo del input: Negro Puro o Blanco Puro, con borde de gradiente
           background:
             linear-gradient(${ui.panel}, ${ui.panel}) padding-box,
             linear-gradient(90deg, ${CYAN}, ${PURPLE} 60%, ${PINK}) border-box;
@@ -568,13 +540,8 @@ function DataTable() {
         }
         .filterBar .MuiOutlinedInput-notchedOutline { border-color: transparent !important; }
         .filterBar .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline { border-color: transparent; }
-        .filterBar .MuiInputLabel-root {
-          color: ${ui.textMuted};
-          font-weight: 600;
-        }
-        .filterBar .Mui-focused .MuiOutlinedInput-notchedOutline {
-          box-shadow: 0 0 0 3px ${alpha(BLUE, 0.25)};
-        }
+        .filterBar .MuiInputLabel-root { color: ${ui.textMuted}; font-weight: 600; }
+        .filterBar .Mui-focused .MuiOutlinedInput-notchedOutline { box-shadow: 0 0 0 3px ${alpha(BLUE, 0.25)}; }
         .filterBar .MuiSvgIcon-root { color: ${ui.text}; }
       `}</style>
     </Stack>

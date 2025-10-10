@@ -17,48 +17,112 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../../../context/AuthContext";
 import ProfileImageCard from "./ProfileImageCard";
+import { PALETA } from "../../../theme/paleta";
+
+// Tipografía Montserrat (como en Dashboard/CRM/Listas/Contactos/Métricas)
+import "@fontsource/montserrat/700.css";
+import "@fontsource/montserrat/900.css";
 
 /* =========================
-   Paleta / helpers
+   Helpers (modo claro)
 ========================= */
-const ui = {
-  cyan: "#00EAF0",
-  blue: "#0B8DB5",
-  pink: "#FF2D75",
-  purple: "#6C4DE2",
-  text: "#E8ECF1",
-  sub: "#A7B1C1",
-  panel: "#0b0f14",
+const UI = {
+  sky: PALETA.sky,         // #00C2FF
+  cyan: PALETA.cyan,       // #0B8DB5
+  purple: PALETA.purple,   // #6C4DE2
+  text: PALETA.text,       // #211E26
+  panel: PALETA.white,     // #FFFFFF
+  border: PALETA.border,   // rgba(11,141,181,.25)
+  borderSoft: PALETA.borderSoft || "rgba(11,141,181,.18)",
+  shadow: PALETA.shadow,   // "0 8px 30px rgba(33,30,38,.08)"
 };
 
+/* =========================
+   Fondo con Metaballs sutiles (modo claro)
+========================= */
+const MetaballsBg = () => {
+  return (
+    <Box
+      component={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      aria-hidden
+      sx={{
+        position: "absolute",
+        inset: 0,
+        zIndex: 0,
+        overflow: "hidden",
+        pointerEvents: "none",
+        filter: "blur(22px) saturate(110%)",
+      }}
+    >
+      {[...Array(6)].map((_, i) => (
+        <Box
+          key={i}
+          component={motion.div}
+          animate={{
+            x: [20 * i, -40 * (i + 1), 30 * (i + 1), 0],
+            y: [-10 * i, 30 * (i + 1), -25 * (i + 1), 0],
+          }}
+          transition={{ repeat: Infinity, duration: 12 + i * 2, ease: "easeInOut" }}
+          sx={{
+            position: "absolute",
+            width: 220 + i * 40,
+            height: 220 + i * 40,
+            top: ["10%", "60%", "30%", "70%", "20%", "50%"][i],
+            left: ["5%", "70%", "40%", "15%", "80%", "55%"][i],
+            borderRadius: "9999px",
+            background: `radial-gradient(circle at 30% 30%, ${UI.sky}22, ${UI.cyan}22 55%, transparent 70%),
+                         radial-gradient(circle at 70% 70%, ${UI.purple}22, transparent 60%)`,
+            opacity: 0.35,
+            mixBlendMode: "multiply",
+          }}
+        />
+      ))}
+    </Box>
+  );
+};
+
+/* =========================
+   Botón gradiente (acción principal)
+========================= */
 const NeonButton = (props) => (
   <Button
     {...props}
     sx={{
-      borderRadius: 999,
+      borderRadius: 12,
       px: 2.4,
-      py: 1,
+      py: 1.1,
       fontWeight: 900,
       letterSpacing: ".02em",
-      color: "#0b0f14",
+      color: "#FFFFFF",
       textTransform: "none",
-      background: `linear-gradient(90deg, ${ui.cyan} 0%, ${ui.blue} 45%, ${ui.pink} 100%)`,
-      boxShadow: "0 10px 24px rgba(0,0,0,.35)",
-      "&:hover": { filter: "brightness(1.06)" },
+      background: `linear-gradient(90deg, ${UI.sky} 0%, ${UI.cyan} 45%, ${UI.purple} 100%)`,
+      boxShadow: "0 10px 24px rgba(0,0,0,.18)",
+      "&:hover": { filter: "brightness(1.06)", boxShadow: "0 14px 34px rgba(0,0,0,.24)" },
       ...props.sx,
     }}
   />
 );
 
-/* Card con borde degradado animado + shimmer */
+/* =========================
+   Card con borde degradado animado + shimmer + hover 3D
+========================= */
 const NeonCard = ({ children, sx }) => (
   <Box
     component={motion.div}
-    initial={{ y: 12, opacity: 0 }}
+    initial={{ y: 16, opacity: 0, rotateX: 0, rotateY: 0 }}
     animate={{ y: 0, opacity: 1 }}
-    transition={{ type: "spring", stiffness: 220, damping: 24 }}
-    sx={{ position: "relative", borderRadius: 16, overflow: "hidden", ...sx }}
+    whileHover={{
+      rotateX: -2,
+      rotateY: 2,
+      transition: { type: "spring", stiffness: 120, damping: 16 },
+    }}
+    style={{ transformStyle: "preserve-3d" }}
+    sx={{ position: "relative", borderRadius: 18, overflow: "hidden", ...sx }}
   >
+    {/* Borde animado */}
     <Box
       component={motion.div}
       animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
@@ -67,21 +131,21 @@ const NeonCard = ({ children, sx }) => (
         position: "absolute",
         inset: 0,
         p: "1px",
-        borderRadius: 16,
-        background:
-          "linear-gradient(120deg,#00EAF0,#0B8DB5 40%,#FF2D75 85%,#00EAF0)",
-        backgroundSize: "200% 200%",
-        WebkitMask:
-          "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+        borderRadius: 18,
+        background: `linear-gradient(120deg, ${UI.sky}, ${UI.cyan} 35%, ${UI.purple} 80%, ${UI.sky})`,
+        backgroundSize: "220% 220%",
+        opacity: 0.85,
+        WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
         WebkitMaskComposite: "xor",
         maskComposite: "exclude",
         pointerEvents: "none",
       }}
     />
-    {/* shimmer suave en hover */}
+    {/* shimmer sutil */}
     <Box sx={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
       <Box
         component={motion.div}
+        initial={false}
         whileHover={{ x: ["-120%", "120%"] }}
         transition={{ duration: 0.9, ease: "easeInOut" }}
         sx={{
@@ -91,7 +155,7 @@ const NeonCard = ({ children, sx }) => (
           width: "45%",
           transform: "skewX(-20deg)",
           background:
-            "linear-gradient(120deg, transparent 0, rgba(255,255,255,.08) 20%, transparent 40%)",
+            "linear-gradient(120deg, transparent 0, rgba(0,194,255,.12) 20%, transparent 40%)",
         }}
       />
     </Box>
@@ -99,18 +163,19 @@ const NeonCard = ({ children, sx }) => (
   </Box>
 );
 
-/* Título con glow y letras en stagger */
+/* =========================
+   Título Montserrat 900 con degradado + animación por letra
+========================= */
 const NeonTitle = ({ text }) => (
   <Typography
     component="div"
     sx={{
-      fontFamily: "'Gravitas One', serif",
+      fontFamily:
+        "'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
       fontWeight: 900,
-      color: ui.text,
-      letterSpacing: ".04em",
-      wordSpacing: ".25em",
-      fontSize: { xs: 26, sm: 30 },
+      letterSpacing: ".02em",
       lineHeight: 1.05,
+      fontSize: { xs: 28, sm: 34 },
     }}
   >
     {text.split("").map((ch, i) =>
@@ -126,10 +191,12 @@ const NeonTitle = ({ text }) => (
           transition={{ delay: i * 0.02, type: "spring", stiffness: 260, damping: 18 }}
           style={{
             display: "inline-block",
-            textShadow:
-              "0 1px 0 rgba(0,0,0,.25), 0 0 18px rgba(11,141,181,.45), 0 0 12px rgba(255,45,117,.35)",
+            background: "linear-gradient(90deg,#00C2FF,#6C4DE2)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            textShadow: "0 0 10px rgba(108,77,226,.20), 0 0 12px rgba(11,141,181,.18)",
           }}
-    >
+        >
           {ch}
         </motion.span>
       )
@@ -137,7 +204,9 @@ const NeonTitle = ({ text }) => (
   </Typography>
 );
 
-/* TextField estilizado neon */
+/* =========================
+   TextField estilizado (modo claro)
+========================= */
 const NeonTextField = ({ editable, ...props }) => (
   <TextField
     {...props}
@@ -145,38 +214,45 @@ const NeonTextField = ({ editable, ...props }) => (
     disabled={!editable}
     sx={{
       "& .MuiInputLabel-root": {
-        color: "rgba(232,236,241,.8)",
+        color: "rgba(33,30,38,.7)",
         fontWeight: 700,
         letterSpacing: ".02em",
       },
       "& label.Mui-focused": {
-        color: ui.cyan,
-        textShadow: "0 0 10px rgba(0,234,240,.45)",
+        color: UI.cyan,
+        textShadow: "0 0 8px rgba(11,141,181,.25)",
       },
       "& .MuiOutlinedInput-root": {
-        borderRadius: 2,
-        background: "rgba(255,255,255,.03)",
-        color: ui.text,
+        borderRadius: 14,
+        background: "#FFFFFF",
+        color: UI.text,
+        transition: "transform .12s ease",
         "& fieldset": {
-          borderColor: "rgba(255,255,255,.12)",
+          borderColor: UI.border,
         },
         "&:hover fieldset": {
-          borderColor: ui.blue,
+          borderColor: UI.cyan,
+        },
+        "&.Mui-focused": {
+          transform: "translateY(-1px)",
         },
         "&.Mui-focused fieldset": {
-          borderColor: ui.cyan,
+          borderColor: UI.sky,
           boxShadow:
-            "0 0 0 2px rgba(0,234,240,.35), 0 0 20px rgba(255,45,117,.2)",
+            "0 0 0 2px rgba(0,194,255,.25), 0 0 14px rgba(11,141,181,.18)",
         },
       },
       "& .MuiInputBase-input": {
         fontWeight: 600,
-        letterSpacing: ".02em",
+        letterSpacing: ".01em",
       },
     }}
   />
 );
 
+/* =========================
+   Componente principal
+========================= */
 const ProfileCard = () => {
   const { user, login } = useAuth();
   const [formData, setFormData] = useState(user);
@@ -270,8 +346,11 @@ const ProfileCard = () => {
     localChanges && JSON.stringify(localChanges) !== JSON.stringify(user);
 
   return (
-    <Box>
-      {/* Alert neon centrado */}
+    <Box sx={{ position: "relative", background: UI.panel }}>
+      {/* Fondo metaballs */}
+      <MetaballsBg />
+
+      {/* Alert claro centrado */}
       <Box sx={{ position: "relative" }}>
         <Collapse in={alert.show} sx={{ position: "absolute", inset: 0, zIndex: 10 }}>
           {alert.show && (
@@ -286,13 +365,12 @@ const ProfileCard = () => {
                 px: 3,
                 py: 1,
                 borderRadius: 2,
-                background: ui.panel,
-                color: alert.type === "success" ? ui.cyan : ui.pink,
+                background: "#FFFFFF",
+                color: alert.type === "success" ? UI.cyan : "#D92D20",
                 border: `1px solid ${
-                  alert.type === "success" ? "rgba(0,234,240,.45)" : "rgba(255,45,117,.45)"
+                  alert.type === "success" ? "rgba(11,141,181,.35)" : "rgba(217,45,32,.35)"
                 }`,
-                boxShadow:
-                  "0 20px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06)",
+                boxShadow: "0 18px 40px rgba(0,0,0,.18)",
               }}
             >
               {alert.message}
@@ -301,27 +379,33 @@ const ProfileCard = () => {
         </Collapse>
       </Box>
 
+      {/* Card de avatar/perfil (si quieres, también puedes envolverla en NeonCard desde dentro de ProfileImageCard) */}
       <ProfileImageCard />
 
-      <NeonCard sx={{ mt: 2, background: ui.panel, boxShadow: "0 18px 50px rgba(0,0,0,.55)" }}>
+      {/* Card del formulario */}
+      <NeonCard
+        sx={{
+          mt: 2,
+          background: UI.panel,
+          boxShadow: UI.shadow,
+          border: `1px solid ${UI.border}`,
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
         <Card
           elevation={0}
           sx={{
-            borderRadius: 3,
+            borderRadius: 18,
             p: { xs: 2, sm: 3 },
-            background:
-              "radial-gradient(1200px 450px at -10% -20%, rgba(11,141,181,.16), transparent 60%), radial-gradient(1100px 420px at 120% 120%, rgba(255,45,117,.12), transparent 60%), #0b0f14",
-            color: ui.text,
+            background: "#FFFFFF",
+            color: UI.text,
           }}
         >
           <CardHeader
-            sx={{ pb: 0, borderBottom: "1px solid rgba(255,255,255,.08)" }}
+            sx={{ pb: 0.5, borderBottom: `1px solid ${UI.border}` }}
             title={<NeonTitle text="Editar perfil" />}
-            action={
-              hasChanges ? (
-                <NeonButton onClick={handleUpdate}>Actualizar</NeonButton>
-              ) : null
-            }
+            action={hasChanges ? <NeonButton onClick={handleUpdate}>Actualizar</NeonButton> : null}
           />
 
           <CardContent>
@@ -329,9 +413,10 @@ const ProfileCard = () => {
               variant="subtitle2"
               sx={{
                 textTransform: "uppercase",
-                color: ui.sub,
+                color: "rgba(33,30,38,.6)",
                 letterSpacing: ".12em",
                 mb: 2,
+                fontWeight: 800,
               }}
             >
               Información del usuario
@@ -358,11 +443,7 @@ const ProfileCard = () => {
                       editable={!!editableFields[field.name]}
                     />
                     <Tooltip
-                      title={
-                        editableFields[field.name]
-                          ? "Bloquear campo"
-                          : "Editar campo"
-                      }
+                      title={editableFields[field.name] ? "Bloquear campo" : "Editar campo"}
                     >
                       <IconButton
                         onClick={() => toggleFieldEdit(field.name)}
@@ -371,12 +452,14 @@ const ProfileCard = () => {
                           position: "absolute",
                           top: 8,
                           right: 8,
-                          color: editableFields[field.name] ? ui.cyan : ui.sub,
+                          color: editableFields[field.name] ? UI.cyan : "rgba(33,30,38,.5)",
                           "&:hover": {
-                            color: ui.pink,
-                            textShadow: "0 0 10px rgba(255,45,117,.45)",
+                            color: UI.purple,
+                            textShadow: "0 0 10px rgba(108,77,226,.25)",
                           },
                           transition: "color .2s ease",
+                          background: "#FFFFFF",
+                          borderRadius: 10,
                         }}
                       >
                         <EditIcon fontSize="small" />
