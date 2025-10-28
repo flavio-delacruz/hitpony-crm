@@ -10,25 +10,25 @@ import SummaryCardsRow from "./componentes/SummaryCardsRow";
 import DashboardCharts from "./componentes/Charts";
 import { useProspectos } from "../../context/ProspectosContext";
 
-// Fuente Montserrat 900 para el título
+// Fuente Montserrat 900 para títulos
 import "@fontsource/montserrat/900.css";
 
 /* =========================
    Paleta / helpers (modo claro)
 ========================= */
 const getUI = () => ({
-  sky: "#00C2FF", // Azul Cielo
-  cyan: "#0B8DB5", // Cián Fugaz
-  violet: "#6C4DE2", // Violeta
-  text: "#211E26", // Negro Noche (texto)
-  panel: "#FFFFFF", // Fondo blanco
+  sky: "#00C2FF",
+  cyan: "#0B8DB5",
+  violet: "#6C4DE2",
+  text: "#211E26",
+  panel: "#FFFFFF",
   border: "rgba(33,30,38,.15)",
   glowCyan: "rgba(11,141,181,.35)",
   glowViolet: "rgba(108,77,226,.25)",
 });
 
 /* =========================
-   Fondo metaballs suave (muy tenue para blanco)
+   Fondo metaballs suave
 ========================= */
 const MetaballsBg = () => {
   const ui = getUI();
@@ -76,10 +76,13 @@ const MetaballsBg = () => {
 };
 
 /* =========================
-   Card con borde animado (modo claro)
+   Card con fondo degradado y halo animado
 ========================= */
 const SectionCard = ({ children }) => {
   const ui = getUI();
+  const GRADIENT_BG =
+    "linear-gradient(145deg, rgba(125,211,252,0.92) 0%, rgba(167,139,250,0.92) 100%)";
+
   return (
     <Box
       component={motion.div}
@@ -89,14 +92,18 @@ const SectionCard = ({ children }) => {
       transition={{ type: "spring", stiffness: 200, damping: 22 }}
       sx={{
         position: "relative",
-        borderRadius: 14,
+        borderRadius: 18,
         overflow: "hidden",
-        background: ui.panel, // blanco
-        boxShadow: "0 8px 30px rgba(33,30,38,.08)",
-        border: `1px solid ${ui.border}`,
+        backgroundImage: GRADIENT_BG,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundColor: "transparent !important",
+        border: "1px solid rgba(255,255,255,0.35)",
+        boxShadow:
+          "0 14px 36px rgba(96,165,250,0.26), 0 4px 10px rgba(167,139,250,0.18)",
+        color: "#fff",
       }}
     >
-      {/* borde neón animado (suave para blanco) */}
       <Box
         component={motion.div}
         animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
@@ -104,43 +111,35 @@ const SectionCard = ({ children }) => {
         sx={{
           position: "absolute",
           inset: 0,
-          borderRadius: 14,
+          borderRadius: 18,
           p: "1px",
           background: `linear-gradient(120deg, ${ui.sky}, ${ui.cyan} 35%, ${ui.violet} 80%, ${ui.sky})`,
           backgroundSize: "220% 220%",
-          opacity: 0.65,
+          opacity: 0.4,
           WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
           WebkitMaskComposite: "xor",
           maskComposite: "exclude",
           pointerEvents: "none",
         }}
       />
-      {/* shimmer */}
-      <Box sx={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-        <Box
-          component={motion.div}
-          initial={false}
-          whileHover={{ x: ["-120%", "120%"] }}
-          transition={{ duration: 0.9, ease: "easeInOut" }}
-          sx={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            width: "45%",
-            transform: "skewX(-20deg)",
-            background:
-              "linear-gradient(120deg, transparent 0, rgba(0,194,255,.14) 20%, transparent 40%)",
-          }}
-        />
-      </Box>
 
-      {children}
+      {/* Contenido */}
+      <Box
+        sx={{
+          p: { xs: 2, sm: 2.5 },
+          position: "relative",
+          zIndex: 1,
+          fontFamily: "Montserrat, sans-serif",
+        }}
+      >
+        {children}
+      </Box>
     </Box>
   );
 };
 
 /* =========================
-   Página
+   Página principal
 ========================= */
 const DashboardPage = () => {
   const { prospectos, loadingProspectos, errorProspectos } = useProspectos();
@@ -166,80 +165,61 @@ const DashboardPage = () => {
     }
   }, [prospectos]);
 
-  if (loadingProspectos) {
+  if (loadingProspectos)
     return (
       <Layout title="Inicio">
         <p>Cargando prospectos...</p>
       </Layout>
     );
-  }
 
-  if (errorProspectos) {
+  if (errorProspectos)
     return (
       <Layout title="Inicio">
         <p>Error: {errorProspectos}</p>
       </Layout>
     );
-  }
 
   return (
     <Layout title="Inicio">
-      {/* fondo BLANCO */}
       <Box sx={{ position: "relative", background: ui.panel }}>
         <MetaballsBg />
 
-        {/* Título con Montserrat 900 + degradado azul→púrpura */}
-        <Stack sx={{ mb: 2, position: "relative", zIndex: 1 }}>
+        {/* Título principal */}
+        <Stack sx={{ mb: 2, position: "relative", zIndex: 1, alignItems: "center" }}>
           <Typography
             component="div"
             sx={{
-              fontFamily:
-                "'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+              fontFamily: "Montserrat, sans-serif",
               fontWeight: 900,
               letterSpacing: ".02em",
               lineHeight: 1.05,
               fontSize: { xs: 40, sm: 56 },
+              textAlign: "center",
+              background: "linear-gradient(90deg,#00C2FF,#6C4DE2)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textShadow:
+                "0 0 10px rgba(108,77,226,.20), 0 0 12px rgba(11,141,181,.18)",
             }}
           >
-            {"Dashboard".split("").map((ch, i) => (
-              <motion.span
-                key={i}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03, type: "spring", stiffness: 240, damping: 18 }}
-                style={{
-                  display: "inline-block",
-                  background: "linear-gradient(90deg,#00C2FF,#6C4DE2)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  textShadow:
-                    "0 0 10px rgba(108,77,226,.20), 0 0 12px rgba(11,141,181,.18)",
-                }}
-              >
-                {ch}
-              </motion.span>
-            ))}
+            Dashboard
           </Typography>
         </Stack>
 
         {/* KPIs */}
         <SectionCard>
-          <Box sx={{ p: { xs: 1, sm: 1.5 }, position: "relative", zIndex: 1 }}>
-            <SummaryCardsRow
-              totalProspectos={totalProspectos}
-              totalInteresados={totalInteresados}
-              totalAgendados={totalAgendados}
-              totalGanados={totalGanados}
-            />
-          </Box>
+          <SummaryCardsRow
+            totalProspectos={totalProspectos}
+            totalInteresados={totalInteresados}
+            totalAgendados={totalAgendados}
+            totalGanados={totalGanados}
+          />
         </SectionCard>
 
         {/* Gráficas */}
         <Box sx={{ mt: 2 }}>
           <SectionCard>
-            <Box sx={{ p: { xs: 1, sm: 1.5 } }}>
-              <DashboardCharts />
-            </Box>
+            <DashboardCharts />
           </SectionCard>
         </Box>
 
@@ -250,7 +230,6 @@ const DashboardPage = () => {
             display: "grid",
             gridTemplateColumns: { xs: "repeat(1, 1fr)", sm: "2fr 1fr" },
             gap: 2,
-            flexWrap: "wrap",
             mb: 2,
             mt: 2,
             position: "relative",
@@ -258,21 +237,57 @@ const DashboardPage = () => {
           }}
         >
           <SectionCard>
-            <ContentCard
-              title="Lista de Usuarios Interesados"
-              subtitle="Usuarios que se interesaron recientemente"
-              gridSize={8}
+            <Typography
+              variant="h6"
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 800,
+                mb: 1,
+                textAlign: "center",
+              }}
             >
+              Lista de Usuarios Interesados
+            </Typography>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textAlign: "center",
+                mb: 2,
+              }}
+            >
+              Usuarios que se interesaron recientemente
+            </Typography>
+            <ContentCard>
               <UserTable users={prospectos} />
             </ContentCard>
           </SectionCard>
 
           <SectionCard>
-            <ContentCard
-              title="Resumen de Leads"
-              subtitle="Todos los movimientos del Lead"
-              gridSize={4}
+            <Typography
+              variant="h6"
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 800,
+                mb: 1,
+                textAlign: "center",
+              }}
             >
+              Resumen de Leads
+            </Typography>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textAlign: "center",
+                mb: 2,
+              }}
+            >
+              Todos los movimientos del Lead
+            </Typography>
+            <ContentCard>
               <OrdersList />
             </ContentCard>
           </SectionCard>

@@ -27,6 +27,9 @@ const UI = {
   shadow: PALETA.shadow || "0 8px 30px rgba(33,30,38,.08)",
 };
 
+const GRADIENT_BG =
+  "linear-gradient(145deg, rgba(125,211,252,0.95) 0%, rgba(167,139,250,0.95) 100%)";
+
 /* =========================
    Fondo con Metaballs sutiles
 ========================= */
@@ -73,7 +76,7 @@ const MetaballsBg = () => (
 );
 
 /* =========================
-   Título Montserrat 900 con degradado + animación por letra
+   Título Montserrat 900 con degradado + animación por letra (centrado)
 ========================= */
 const NeonTitle = ({ text }) => (
   <Typography
@@ -87,6 +90,7 @@ const NeonTitle = ({ text }) => (
       fontSize: { xs: 32, sm: 40 },
       position: "relative",
       zIndex: 1,
+      textAlign: "center", // ← centrado
     }}
   >
     {text.split("").map((ch, i) =>
@@ -114,7 +118,7 @@ const NeonTitle = ({ text }) => (
 );
 
 /* =========================
-   Contenedor con borde degradado animado + shimmer
+   Contenedor con fondo degradado + borde degradado animado + shimmer
 ========================= */
 const NeonCard = ({ children, sx }) => (
   <Box
@@ -123,7 +127,18 @@ const NeonCard = ({ children, sx }) => (
     animate={{ y: 0, opacity: 1 }}
     whileHover={{ scale: 1.01 }}
     transition={{ type: "spring", stiffness: 200, damping: 22 }}
-    sx={{ position: "relative", borderRadius: 18, overflow: "hidden", ...sx }}
+    sx={{
+      position: "relative",
+      borderRadius: 18,
+      overflow: "hidden",
+      // FONDO DEGRADADO (como pediste)
+      backgroundImage: GRADIENT_BG,
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
+      backgroundColor: "transparent !important",
+      color: "#fff",
+      ...sx,
+    }}
   >
     {/* Borde gradiente animado */}
     <Box
@@ -137,9 +152,8 @@ const NeonCard = ({ children, sx }) => (
         borderRadius: 18,
         background: `linear-gradient(120deg, ${UI.sky}, ${UI.cyan} 35%, ${UI.purple} 80%, ${UI.sky})`,
         backgroundSize: "220% 220%",
-        opacity: 0.9,
-        WebkitMask:
-          "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+        opacity: 0.5,
+        WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
         WebkitMaskComposite: "xor",
         maskComposite: "exclude",
         pointerEvents: "none",
@@ -159,7 +173,7 @@ const NeonCard = ({ children, sx }) => (
           width: "45%",
           transform: "skewX(-20deg)",
           background:
-            "linear-gradient(120deg, transparent 0, rgba(0,194,255,.12) 20%, transparent 40%)",
+            "linear-gradient(120deg, transparent 0, rgba(255,255,255,.16) 20%, transparent 40%)",
         }}
       />
     </Box>
@@ -204,7 +218,11 @@ const SearchBar = ({ value, onChange }) => (
             borderRadius: 999,
             background: UI.white,
             px: 1.5,
-            "& input::placeholder": { fontWeight: 600, color: "rgba(33,30,38,.55)" },
+            "& input::placeholder": {
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              color: "rgba(33,30,38,.55)",
+            },
             "& .MuiOutlinedInput-notchedOutline": { borderColor: "transparent" },
             "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: UI.borderSoft },
             "&.Mui-focused": {
@@ -226,20 +244,28 @@ const SearchBar = ({ value, onChange }) => (
 );
 
 /* =========================
-   Sección con etiqueta/chip
+   Sección con etiqueta/chip (Montserrat + negrita + centrado)
 ========================= */
 const SectionHeader = ({ label }) => (
-  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", mb: 1 }}>
     <Chip
-      label={label}
+      label={
+        <Typography
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            fontWeight: 800, // NEGRITA
+            letterSpacing: ".02em",
+          }}
+        >
+          {label}
+        </Typography>
+      }
       sx={{
-        fontWeight: 800,
-        letterSpacing: ".02em",
-        color: UI.text,
         background:
           "linear-gradient(90deg, rgba(0,194,255,.15), rgba(108,77,226,.15))",
         border: `1px solid ${UI.borderSoft}`,
         borderRadius: 2,
+        px: 1,
       }}
     />
   </Box>
@@ -333,14 +359,8 @@ const MisAsignacionesSetter = ({
       <Grid container spacing={2} sx={{ mb: 2, position: "relative", zIndex: 1 }}>
         {clienteFiltrado.length > 0 ? (
           <Grid item xs={12} sm={6} md={4}>
-            <NeonCard
-              sx={{
-                background: UI.white,
-                border: `1px solid ${UI.border}`,
-                boxShadow: UI.shadow,
-              }}
-            >
-              {/* Contenido: envolvemos tu ContactoCard dentro */}
+            <NeonCard>
+              {/* Contenido */}
               <Box sx={{ borderRadius: 18, overflow: "hidden" }}>
                 <ContactoCard
                   contacto={clienteFiltrado[0]}
@@ -352,7 +372,14 @@ const MisAsignacionesSetter = ({
           </Grid>
         ) : (
           <Grid item xs={12}>
-            <Typography sx={{ color: "rgba(33,30,38,.7)", fontWeight: 700 }}>
+            <Typography
+              sx={{
+                color: "rgba(33,30,38,.85)",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 700, // NEGRITA
+                textAlign: "center",
+              }}
+            >
               No tienes un cliente asignado.
             </Typography>
           </Grid>
@@ -364,13 +391,7 @@ const MisAsignacionesSetter = ({
       <Grid container spacing={2} sx={{ position: "relative", zIndex: 1 }}>
         {closersFiltrados.length > 0 ? (
           <Grid item xs={12} sm={6} md={4}>
-            <NeonCard
-              sx={{
-                background: UI.white,
-                border: `1px solid ${UI.border}`,
-                boxShadow: UI.shadow,
-              }}
-            >
+            <NeonCard>
               <Box sx={{ borderRadius: 18, overflow: "hidden" }}>
                 <ContactoCard
                   contacto={closersFiltrados[0]}
@@ -382,7 +403,14 @@ const MisAsignacionesSetter = ({
           </Grid>
         ) : (
           <Grid item xs={12}>
-            <Typography sx={{ color: "rgba(33,30,38,.7)", fontWeight: 700 }}>
+            <Typography
+              sx={{
+                color: "rgba(33,30,38,.85)",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 700, // NEGRITA
+                textAlign: "center",
+              }}
+            >
               No tienes un closer asignado.
             </Typography>
           </Grid>
@@ -393,3 +421,4 @@ const MisAsignacionesSetter = ({
 };
 
 export default MisAsignacionesSetter;
+

@@ -28,10 +28,10 @@ import {
   LabelList,
 } from "recharts";
 
-// 🌀 Animaciones
 import { motion, AnimatePresence } from "framer-motion";
 
-// Título Montserrat como en Dashboard/CRM/Listas/Contactos
+// Montserrat
+import "@fontsource/montserrat/700.css";
 import "@fontsource/montserrat/900.css";
 
 /* =========================
@@ -55,6 +55,7 @@ const getUI = (mode) => ({
 const containedGrad = (ui) => ({
   borderRadius: 999,
   px: 2.2,
+  fontFamily: "Montserrat, sans-serif",
   fontWeight: 800,
   letterSpacing: ".02em",
   color: "#0b0f14",
@@ -65,6 +66,7 @@ const containedGrad = (ui) => ({
 const outlinedGrad = (ui) => ({
   borderRadius: 999,
   px: 2.2,
+  fontFamily: "Montserrat, sans-serif",
   fontWeight: 800,
   letterSpacing: ".02em",
   color: ui.text,
@@ -87,6 +89,9 @@ const FancyTooltip = ({ active, payload, label }) => {
   const delta = p?.delta ?? 0;
   const arrow = delta > 0 ? "↑" : delta < 0 ? "↓" : "•";
   const color = delta > 0 ? "#22C55E" : delta < 0 ? "#FF4D6D" : "#94A3B8";
+  const textColor = theme.palette.mode === "dark" ? "#E8ECF1" : "#0F172A";
+  const bg = theme.palette.mode === "dark" ? "rgba(0,0,0,.72)" : "rgba(255,255,255,.98)";
+  const bd = theme.palette.mode === "dark" ? "1px solid rgba(255,255,255,.12)" : "1px solid rgba(0,0,0,.08)";
 
   return (
     <Box
@@ -96,31 +101,16 @@ const FancyTooltip = ({ active, payload, label }) => {
       exit={{ opacity: 0, y: 6, scale: 0.96 }}
       transition={{ type: "spring", stiffness: 380, damping: 28 }}
       sx={{
-        px: 1.6,
-        py: 1.1,
-        borderRadius: 2,
-        position: "relative",
-        color: theme.palette.mode === "dark" ? "#E8ECF1" : "#0F172A",
-        bgcolor:
-          theme.palette.mode === "dark"
-            ? "rgba(0,0,0,.72)"
-            : "rgba(255,255,255,.98)",
-        border:
-          theme.palette.mode === "dark"
-            ? "1px solid rgba(255,255,255,.12)"
-            : "1px solid rgba(0,0,0,.08)",
+        px: 1.6, py: 1.1, borderRadius: 2, position: "relative",
+        color: textColor, bgcolor: bg, border: bd,
         boxShadow:
           theme.palette.mode === "dark"
             ? "0 10px 30px rgba(0,0,0,.55), 0 0 0 1px rgba(0,234,240,.15)"
             : "0 10px 24px rgba(0,0,0,.18)",
         backdropFilter: "blur(6px)",
         "&::after": {
-          content: '""',
-          position: "absolute",
-          bottom: -6,
-          left: 24,
-          borderWidth: 6,
-          borderStyle: "solid",
+          content: '""', position: "absolute", bottom: -6, left: 24,
+          borderWidth: 6, borderStyle: "solid",
           borderColor:
             theme.palette.mode === "dark"
               ? "rgba(0,0,0,.72) transparent transparent transparent"
@@ -128,15 +118,14 @@ const FancyTooltip = ({ active, payload, label }) => {
         },
       }}
     >
-      <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 0.25 }}>
+      <Typography variant="subtitle2" sx={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, mb: 0.25 }}>
         {label}
       </Typography>
-      <Typography variant="body2" sx={{ fontWeight: 700 }}>
+      <Typography variant="body2" sx={{ fontFamily: "Montserrat, sans-serif", fontWeight: 700 }}>
         Ventas: <b>{payload[0].value}</b>
       </Typography>
-      <Typography variant="body2" sx={{ color, fontWeight: 700 }}>
-        {arrow} Δ vs mes anterior: {delta > 0 ? "+" : ""}
-        {delta}
+      <Typography variant="body2" sx={{ fontFamily: "Montserrat, sans-serif", color, fontWeight: 700 }}>
+        {arrow} Δ vs mes anterior: {delta > 0 ? "+" : ""}{delta}
       </Typography>
     </Box>
   );
@@ -245,23 +234,22 @@ const MetricasPage = () => {
   return (
     <Layout title={"Metricas"}>
       <Box sx={{ position: "relative" }}>
-        {/* Fondo siempre activo */}
+        {/* Fondo */}
         <MetaballsBg ui={ui} />
 
-        {/* ===== TÍTULO estilo Montserrat + degradado (como las otras pestañas) ===== */}
+        {/* ===== TÍTULO Montserrat + degradado ===== */}
         <Stack
           direction={{ xs: "column", sm: "row" }}
           justifyContent="space-between"
-          alignItems={{ xs: "flex-start", sm: "center" }}
+          alignItems={{ xs: "center", sm: "center" }}
           spacing={1}
           sx={{ mb: 1.5, position: "relative", zIndex: 1 }}
         >
-          <Box>
+          <Box sx={{ textAlign: { xs: "center", sm: "left" } }}>
             <Typography
               component="div"
               sx={{
-                fontFamily:
-                  "'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                fontFamily: "Montserrat, sans-serif",
                 fontWeight: 900,
                 letterSpacing: ".02em",
                 lineHeight: 1.05,
@@ -279,8 +267,7 @@ const MetricasPage = () => {
                     background: "linear-gradient(90deg,#00C2FF,#6C4DE2)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
-                    textShadow:
-                      "0 0 10px rgba(108,77,226,.20), 0 0 12px rgba(11,141,181,.18)",
+                    textShadow: "0 0 10px rgba(108,77,226,.20), 0 0 12px rgba(11,141,181,.18)",
                   }}
                 >
                   {ch}
@@ -288,13 +275,15 @@ const MetricasPage = () => {
               ))}
             </Typography>
 
-            {/* Subtítulo (puedes cambiar el texto si quieres) */}
-            <Typography variant="body2" sx={{ color: ui.sub, mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              sx={{ color: ui.sub, mt: 0.5, fontFamily: "Montserrat, sans-serif", fontWeight: 700 }}
+            >
               Métricas de ventas y progreso mensual
             </Typography>
           </Box>
 
-          {/* Botonera derecha */}
+          {/* Botonera */}
           <Stack direction="row" spacing={1}>
             <Button variant="outlined" startIcon={<ShareIcon />} sx={outlinedGrad(ui)}>
               Compartir
@@ -320,7 +309,10 @@ const MetricasPage = () => {
         >
           {[`Total: ${total}`, `Promedio: ${avg}`, `Máximo: ${max}`].map((label, i) => (
             <motion.div key={i} variants={{ hidden: { y: 6, opacity: 0 }, show: { y: 0, opacity: 1 } }}>
-              <Chip label={label} sx={{ ...outlinedGrad(ui), borderRadius: 2, py: 0.5, fontWeight: 800 }} />
+              <Chip
+                label={label}
+                sx={{ ...outlinedGrad(ui), borderRadius: 2, py: 0.5, fontWeight: 800, fontFamily: "Montserrat, sans-serif" }}
+              />
             </motion.div>
           ))}
         </Stack>
@@ -388,15 +380,19 @@ const MetricasPage = () => {
                     </filter>
                   </defs>
 
-                  <Legend verticalAlign="top" align="center" wrapperStyle={{ marginBottom: 8, fontWeight: 700 }} />
+                  <Legend
+                    verticalAlign="top"
+                    align="center"
+                    wrapperStyle={{ marginBottom: 8, fontWeight: 700, fontFamily: "Montserrat, sans-serif" }}
+                  />
 
                   <CartesianGrid stroke={ui.grid} strokeDasharray="4 4" />
-                  <XAxis dataKey="name" tick={{ fill: ui.text }} />
+                  <XAxis dataKey="name" tick={{ fill: ui.text, fontFamily: "Montserrat, sans-serif", fontWeight: 700 }} />
                   <YAxis
                     domain={[0, 45]}
                     ticks={[0, 5, 10, 15, 20, 25, 30, 35, 40, 45]}
                     allowDecimals={false}
-                    tick={{ fill: ui.text }}
+                    tick={{ fill: ui.text, fontFamily: "Montserrat, sans-serif", fontWeight: 700 }}
                   />
                   <Tooltip content={<FancyTooltip />} />
 
@@ -405,7 +401,13 @@ const MetricasPage = () => {
                     y={avg}
                     stroke={ui.blue}
                     strokeDasharray="4 4"
-                    label={{ position: "right", value: `Promedio (${avg})`, fill: ui.text, fontWeight: 700 }}
+                    label={{
+                      position: "right",
+                      value: `Promedio (${avg})`,
+                      fill: ui.text,
+                      fontWeight: 700,
+                      fontFamily: "Montserrat, sans-serif",
+                    }}
                   />
 
                   {/* Barras con shape custom animado */}
@@ -425,13 +427,17 @@ const MetricasPage = () => {
                     {data.map((_, i) => (
                       <Cell key={i} />
                     ))}
-                    <LabelList dataKey="ventas" position="top" style={{ fill: ui.text, fontWeight: 900 }} />
+                    <LabelList
+                      dataKey="ventas"
+                      position="top"
+                      style={{ fill: ui.text, fontWeight: 900, fontFamily: "Montserrat, sans-serif" }}
+                    />
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </Box>
 
-            {/* Textos inferiores */}
+            {/* Textos inferiores (Montserrat) */}
             <AnimatePresence>
               <motion.div
                 initial={{ opacity: 0, y: 6 }}
@@ -442,7 +448,7 @@ const MetricasPage = () => {
                 <Typography
                   variant="subtitle1"
                   sx={{
-                    fontFamily: "'Gravitas One', serif",
+                    fontFamily: "Montserrat, sans-serif",
                     fontWeight: 900,
                     fontSize: { xs: 18, sm: 20, md: 22 },
                     letterSpacing: ".02em",
@@ -455,14 +461,15 @@ const MetricasPage = () => {
                 <Typography
                   variant="caption"
                   sx={{
-                    fontFamily: "'Berkshire Swash', cursive",
-                    fontSize: { xs: 16, sm: 17 },
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 700,
+                    fontSize: { xs: 14, sm: 15 },
                     lineHeight: 1.25,
                     color: ui.purple,
                     textShadow:
                       theme.palette.mode === "dark"
-                        ? "0 0 10px rgba(108,77,226,.45)"
-                        : "0 0 6px rgba(108,77,226,.25)",
+                        ? "0 0 10px rgba(108,77,226,.35)"
+                        : "0 0 6px rgba(108,77,226,.22)",
                     display: "inline-block",
                     mt: 0.5,
                   }}
@@ -479,3 +486,4 @@ const MetricasPage = () => {
 };
 
 export default MetricasPage;
+
